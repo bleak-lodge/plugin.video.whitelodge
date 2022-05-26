@@ -2,7 +2,7 @@
 
 This add-on lists movies and TV-shows from various services (separated or mixed), available in the user's selected country.
 
-It fetches the selected item's official stream, and sends it for playback to the corresponding add-on,
+It fetches the selected item's official stream id, and sends it for playback to the corresponding add-on,
 which must be installed and configured (with linked active accounts where required) beforehand on user's system.
 
 Supported services and their equivalent add-ons for playback are as follows:
