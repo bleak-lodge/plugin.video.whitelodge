@@ -5,28 +5,28 @@ import simplejson as json
 from six import ensure_str, ensure_text
 
 from six.moves.urllib_parse import urlparse, urlencode, parse_qs
-from resources.lib.modules import cleantitle, control#, log_utils
+from resources.lib.modules import cleantitle, control, log_utils
 
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'el']
-        self.domains = []
-        self.base_link = ''
+        self.aliases = []
 
     def movie(self, imdb, tmdb, title, localtitle, aliases, year):
         try:
+            self.aliases.extend(aliases)
             return urlencode({'imdb': imdb, 'title': title, 'localtitle': localtitle,'year': year})
         except:
             return
 
-    def tvshow(self, imdb, tvdb, tvshowtitle, localtvshowtitle, aliases, year):
+    def tvshow(self, imdb, tmdb, tvshowtitle, localtvshowtitle, aliases, year):
         try:
-            return urlencode({'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'year': year})
+            self.aliases.extend(aliases)
+            return urlencode({'imdb': imdb, 'tmdb': tmdb, 'tvshowtitle': tvshowtitle, 'localtvshowtitle': localtvshowtitle, 'year': year})
         except:
             return
 
-    def episode(self, url, imdb, tvdb, title, premiered, season, episode):
+    def episode(self, url, imdb, tmdb, title, premiered, season, episode):
         try:
             if url is None:
                 return
@@ -53,15 +53,16 @@ class source:
             years = (data['year'], str(int(data['year'])+1), str(int(data['year'])-1))
 
             if content_type == 'movie':
-                title = cleantitle.get(data['title'])
-                localtitle = cleantitle.get(data['localtitle'])
+                titles = [cleantitle.get(data['title']), cleantitle.get(data['localtitle'])]
+                if self.aliases:
+                    titles.extend([cleantitle.get(i['title']) for i in self.aliases])
                 ids = [data['imdb']]
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle", "file"]}, "id": 1}' % years)
                 r = ensure_text(r, 'utf-8', errors='ignore')
                 r = json.loads(r)['result']['movies']
 
-                r = [i for i in r if str(i['imdbnumber']) in ids or any(x in [cleantitle.get(i['title']), cleantitle.get(i['originaltitle'])] for x in [title, localtitle])]
+                r = [i for i in r if str(i['imdbnumber']) in ids or (cleantitle.get(i['title']) in titles or cleantitle.get(i['originaltitle']) in titles)]
                 r = [i for i in r if not ensure_str(i['file']).endswith('.strm')][0]
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"properties": ["streamdetails", "file"], "movieid": %s }, "id": 1}' % str(r['movieid']))
@@ -69,15 +70,16 @@ class source:
                 r = json.loads(r)['result']['moviedetails']
 
             elif content_type == 'episode':
-                title = cleantitle.get(data['tvshowtitle'])
-                localtitle = cleantitle.get(data['localtvshowtitle'])
+                titles = [cleantitle.get(data['tvshowtitle']), cleantitle.get(data['localtvshowtitle'])]
+                if self.aliases:
+                    titles.extend([cleantitle.get(i['title']) for i in self.aliases])
                 season, episode = data['season'], data['episode']
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle"]}, "id": 1}' % years)
                 r = ensure_text(r, 'utf-8', errors='ignore')
                 r = json.loads(r)['result']['tvshows']
 
-                r = [i for i in r if any(x in [cleantitle.get(i['title']), cleantitle.get(i['originaltitle'])] for x in [title, localtitle])][0]
+                r = [i for i in r if (cleantitle.get(i['title']) in titles or cleantitle.get(i['originaltitle']) in titles)][0]
 
                 r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (str(season), str(episode), str(r['tvshowid'])))
                 r = ensure_text(r, 'utf-8', errors='ignore')
@@ -94,10 +96,10 @@ class source:
             try: qual = int(r['streamdetails']['video'][0]['width'])
             except: qual = -1
 
-            if qual >= 2160: quality = '4k'
-            elif 1920 <= qual < 2000: quality = '1080p'
-            elif 1280 <= qual < 1900: quality = '720p'
-            elif qual < 1280: quality = 'sd'
+            if qual >= 2100: quality = '4k'
+            elif 1900 <= qual < 2100: quality = '1080p'
+            elif 1200 <= qual < 1900: quality = '720p'
+            elif qual < 1200: quality = 'sd'
 
             info = []
 
@@ -131,7 +133,7 @@ class source:
 
             info = ' | '.join(info)
 
-            sources.append({'source': '', 'quality': quality, 'language': 'en', 'url': url, 'info': info, 'local': True, 'direct': True, 'debridonly': False})
+            sources.append({'source': '', 'quality': quality, 'url': url, 'info': info, 'local': True})
 
             return sources
         except:

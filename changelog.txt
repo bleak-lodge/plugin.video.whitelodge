@@ -1,3 +1,7 @@
+[B][COLOR gold]v1.01.03[/COLOR][/B]
+- Library and Official scrapers fixes/tweaks
+- Code cleanup
+
 [B][COLOR gold]v1.01.02[/COLOR][/B]
 - Added some more official services:
     Pluto TV - played through plugin.video.plutotv from official Kodi repository

@@ -283,7 +283,7 @@ class navigator:
             ('Crackle', '12', providers.CRACKLE_ENABLED),
             ('Curiosity Stream', '190', providers.CURSTREAM_ENABLED),
             ('Disney+', '337', providers.DISNEY_ENABLED),
-            ('HBO Max', '616|384|27', providers.HBO_ENABLED),
+            ('HBO Max', '616|384|27|425', providers.HBO_ENABLED),
             ('Hulu', '15', providers.HULU_ENABLED),
             ('Netflix', '8|175', providers.NETFLIX_ENABLED),
             ('Paramount+', '531', providers.PARAMOUNT_ENABLED),

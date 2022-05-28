@@ -137,15 +137,9 @@ class sources:
 
         syshandle = int(sys.argv[1])
 
+        systitle = urllib_parse.quote_plus(title)
+
         listMeta = control.setting('source.list.meta')
-
-        systitle = sysname = urllib_parse.quote_plus(title)
-
-        if 'tvshowtitle' in meta and 'season' in meta and 'episode' in meta:
-            sysname += urllib_parse.quote_plus(' S%02dE%02d' % (int(meta['season']), int(meta['episode'])))
-        elif 'year' in meta:
-            sysname += urllib_parse.quote_plus(' (%s)' % meta['year'])
-
 
         poster = meta.get('poster') or control.addonPoster()
         if control.setting('fanart') == 'true':
@@ -161,10 +155,6 @@ class sources:
         #if banner == '0': banner = poster
         #if banner == '0': banner = control.addonBanner()
 
-        sysimage = urllib_parse.quote_plus(six.ensure_str(poster))
-
-        downloadMenu = control.lang(32403)
-
 
         for i in range(len(items)):
             try:
@@ -174,18 +164,14 @@ class sources:
 
                 sysurl = '%s?action=playItem&title=%s&source=%s' % (sysaddon, systitle, syssource)
 
-                cm = []
-
                 try: item = control.item(label=label, offscreen=True)
                 except: item = control.item(label=label)
-                item.addContextMenuItems(cm)
 
                 if listMeta == 'true':
                     item.setArt({'thumb': thumb, 'icon': thumb, 'poster': poster, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart, 'discart': discart})
                     video_streaminfo = {'codec': 'h264'}
                     item.addStreamInfo('video', video_streaminfo)
                     item.setInfo(type='video', infoLabels=control.metadataClean(meta))
-
                 else:
                     item.setArt({'thumb': thumb})
                     item.setInfo(type='video', infoLabels={})
@@ -333,17 +319,8 @@ class sources:
 
         if self.content == 'movie':
             sourceDict = [(i[0], i[1], getattr(i[1], 'movie', None)) for i in sourceDict]
-            #genres = trakt.getGenre('movie', 'imdb', imdb)
         else:
             sourceDict = [(i[0], i[1], getattr(i[1], 'tvshow', None)) for i in sourceDict]
-            #genres = trakt.getGenre('show', 'tmdb', tmdb)
-
-        sourceDict = [(i[0], i[1], i[2]) for i in sourceDict if not hasattr(i[1], 'genre_filter') or not i[1].genre_filter]# or any(x in i[1].genre_filter for x in genres)]
-        sourceDict = [(i[0], i[1]) for i in sourceDict if not i[2] == None]
-
-        language = ['en']
-        sourceDict = [(i[0], i[1], i[1].language) for i in sourceDict]
-        sourceDict = [(i[0], i[1]) for i in sourceDict if any(x in i[2] for x in language)]
 
         try: sourceDict = [(i[0], i[1], control.setting('provider.' + i[0])) for i in sourceDict]
         except: sourceDict = [(i[0], i[1], 'true') for i in sourceDict]
@@ -386,13 +363,7 @@ class sources:
         start_time = time.time()
         end_time = start_time + timeout
 
-        string1 = control.lang(32404)
-        string2 = control.lang(32405)
         string3 = control.lang(32406)
-        string4 = control.lang(32601)
-        string5 = control.lang(32602)
-        string6 = control.lang(32606)
-        string7 = control.lang(32607)
 
         lib_source = service_source = 0
 
@@ -648,13 +619,6 @@ class sources:
         filter += [i for i in self.sources if i['quality'] in ['SCR', 'CAM']]
         self.sources = filter
 
-        # local = [i for i in self.sources if i.get('local')]
-        # for i in local: i.update({'language': self._getPrimaryLang() or 'en'})
-        # #self.sources = [i for i in self.sources if not i in local]
-
-        # official = [i for i in self.sources if i.get('official')]
-        # for i in official: i.update({'language': self._getPrimaryLang() or 'en'})
-
         self.sources = [i for i in self.sources if i.get('local')] + [i for i in self.sources if i.get('official')]
 
 
@@ -676,8 +640,6 @@ class sources:
             p = self.sources[i]['provider'].upper()
 
             q = self.sources[i]['quality']
-
-            l = self.sources[i]['language'].upper()
 
             n = self.sources[i].get('name', '') or ''
 
@@ -733,11 +695,9 @@ class sources:
     def sourcesResolve(self, item, info=False):
         try:
             self.url = None
-            name = ''
 
             u = url = item['url']
 
-            direct = item['direct']
             local = item.get('local', False)
             provider = item['provider']
             call = [i[1] for i in self.sourceDict if i[0] == provider][0]

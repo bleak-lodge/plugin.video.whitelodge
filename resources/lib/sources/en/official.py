@@ -14,9 +14,6 @@ from resources.lib.modules.justwatch import JustWatch, providers
 class source:
     def __init__(self):
         self.priority = 1
-        self.language = ['en', 'el']
-        self.domains = []
-        self.base_link = ''
         self.country = control.setting('official.country') or 'US'
         self.tm_user = control.setting('tm.user') or api_keys.tmdb_key
         self.tmdb_by_imdb = 'https://api.themoviedb.org/3/find/%s?api_key=%s&external_source=imdb_id' % ('%s', self.tm_user)
@@ -63,7 +60,7 @@ class source:
 
     def sources(self, url):
         sources = []
-        # sources.append({'source': 'test', 'quality': '1080p', 'language': 'en', 'url': 'plugin://addon_id', 'direct': True, 'debridonly': False, 'official': True})
+        # sources.append({'source': 'test_addon', 'quality': '1080p', 'url': 'plugin://addon_id', 'official': True})
         try:
             if url is None: return sources
 
@@ -126,7 +123,7 @@ class source:
             streams = []
 
             if providers.NETFLIX_ENABLED:
-                nfx = [o for o in offers if o['package_short_name'] in ['nfx', 'nfk']]
+                nfx = [o for o in offers if o['provider_id'] in [8, 175]]
                 if nfx:
                     nfx_id = nfx[0]['urls']['standard_web']
                     nfx_id = nfx_id.rstrip('/').split('/')[-1]
@@ -138,28 +135,28 @@ class source:
                         streams.append(('netflix', 'plugin://plugin.video.netflix/play_strm/%s/' % netflix_id))
 
             if providers.PRIME_ENABLED:
-                prv = [o for o in offers if o['package_short_name'] in ['amp', 'prv', 'aim', 'app']]
+                prv = [o for o in offers if o['provider_id'] in [9, 119, 613, 582] and o['monetization_type'] == 'flatrate']
                 if prv:
                     prime_id = prv[0]['urls']['standard_web']
                     prime_id = prime_id.rstrip('/').split('gti=')[1]
                     streams.append(('amazon prime', 'plugin://plugin.video.amazon-test/?asin=%s&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0' % prime_id))
 
             if providers.HBO_ENABLED:
-                hbm = [o for o in offers if o['package_short_name'] in ['hmf', 'hbm', 'hbo', 'hbn']]
+                hbm = [o for o in offers if o['provider_id'] in [616, 384, 27, 425] and o['monetization_type'] == 'flatrate']
                 if hbm:
                     hbo_id = hbm[0]['urls']['standard_web']
                     hbo_id = hbo_id.rstrip('/').split('/')[-1]
                     streams.append(('hbo max', 'plugin://slyguy.hbo.max/?_=play&slug=' + hbo_id))
 
             if providers.DISNEY_ENABLED:
-                dnp = [o for o in offers if o['package_short_name'] == 'dnp']
+                dnp = [o for o in offers if o['provider_id'] == 337 and o['monetization_type'] == 'flatrate']
                 if dnp:
                     disney_id = dnp[0]['urls']['deeplink_web']
                     disney_id = disney_id.rstrip('/').split('/')[-1]
                     streams.append(('disney+', 'plugin://slyguy.disney.plus/?_=play&_play=1&content_id=' + disney_id))
 
             if providers.IPLAYER_ENABLED:
-                bbc = [o for o in offers if o['package_short_name'] == 'bbc']
+                bbc = [o for o in offers if o['provider_id'] == 38]
                 if bbc:
                     iplayer_url = bbc[0]['urls']['standard_web']
                     if content == 'tvshows' and '/episodes/' in iplayer_url: # justwatch sometimes returns season url for bbciplayer - get episode url from bbc
@@ -170,7 +167,7 @@ class source:
                         streams.append(('bbc iplayer', 'plugin://plugin.video.iplayerwww/?mode=202&name=null&url=%s&iconimage=null&description=null' % quote_plus(iplayer_id)))
 
             if providers.CURSTREAM_ENABLED:
-                cts = [o for o in offers if o['package_short_name'] == 'cts']
+                cts = [o for o in offers if o['provider_id'] == 190]
                 if cts:
                     cts_id = cts[0]['urls']['standard_web']
                     cts_id = cts_id.rstrip('/').split('/')[-1]
@@ -181,21 +178,21 @@ class source:
                     streams.append(('curiosity stream', uri))
 
             if providers.HULU_ENABLED:
-                hlu = [o for o in offers if o['package_short_name'] == 'hlu']
+                hlu = [o for o in offers if o['provider_id'] == 15]
                 if hlu:
                     hulu_id = hlu[0]['urls']['standard_web']
                     hulu_id = hulu_id.rstrip('/').split('/')[-1]
                     streams.append(('hulu', 'plugin://slyguy.hulu/?_=play&id=' + hulu_id))
 
             if providers.PARAMOUNT_ENABLED:
-                pmp = [o for o in offers if o['package_short_name'] == 'pmp']
+                pmp = [o for o in offers if o['provider_id'] == 531]
                 if pmp:
                     pmp_url = pmp[0]['urls']['standard_web']
                     pmp_id = pmp_url.split('?')[0].split('/')[-1] if content == 'movies' else re.findall('/video/(.+?)/', pmp_url)[0]
                     streams.append(('paramount+', 'plugin://slyguy.paramount.plus/?_=play&id=' + pmp_id))
 
             if providers.CRACKLE_ENABLED:
-                crk = [o for o in offers if o['package_short_name'] == 'crk']
+                crk = [o for o in offers if o['provider_id'] == 12]
                 if crk:
                     if content == 'movies':
                         crk_id = crk[0]['urls']['standard_web']
@@ -210,21 +207,21 @@ class source:
                         streams.append(('crackle', 'plugin://plugin.video.crackle/?id=%s&mode=103&type=%s' % (crk_id, content)))
 
             if providers.TUBI_ENABLED:
-                tbv = [o for o in offers if o['package_short_name'] == 'tbv']
+                tbv = [o for o in offers if o['provider_id'] == 73]
                 if tbv:
                     tbv_url = tbv[0]['urls']['standard_web']
                     tbv_id = tbv_url.split('?')[0].strip('/').split('/')[-1]
                     streams.append(('tubi tv', 'plugin://plugin.video.tubi.m7/?mode=%splay-tubitv' % tbv_id))
 
             if providers.UKTVPLAY_ENABLED:
-                ukt = [o for o in offers if o['package_short_name'] == 'ukt']
+                ukt = [o for o in offers if o['provider_id'] == 137]
                 if ukt:
                     ukt_url = ukt[0]['urls']['standard_web']
                     ukt_id = ukt_url.split('?')[0].strip('/').split('/')[-1]
                     streams.append(('uktv play', 'plugin://plugin.video.catchuptvandmore/resources/lib/channels/uk/uktvplay/get_video_url/?item_id=uktvplay&data_video_id=' + ukt_id))
 
             if providers.PLUTO_ENABLED:
-                ptv = [o for o in offers if o['package_short_name'] == 'ptv']
+                ptv = [o for o in offers if o['provider_id'] == 300]
                 if ptv:
                     ptv_url = ptv[0]['urls']['deeplink_rokuos']
                     ptv_id = re.findall('contentID=(.+?)&', ptv_url)[0]
@@ -232,7 +229,7 @@ class source:
 
             if streams:
                 for s in streams:
-                    sources.append({'source': s[0], 'quality': '1080p', 'language': 'en', 'url': s[1], 'direct': True, 'debridonly': False, 'official': True})
+                    sources.append({'source': s[0], 'quality': '1080p', 'url': s[1], 'official': True})
 
             return sources
         except:
