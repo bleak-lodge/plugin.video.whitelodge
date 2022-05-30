@@ -135,21 +135,21 @@ class source:
                         streams.append(('netflix', 'plugin://plugin.video.netflix/play_strm/%s/' % netflix_id))
 
             if providers.PRIME_ENABLED:
-                prv = [o for o in offers if o['provider_id'] in [9, 119, 613, 582] and o['monetization_type'] == 'flatrate']
+                prv = [o for o in offers if o['provider_id'] in [9, 119, 613, 582] and o['monetization_type'] in ['free', 'ads', 'flatrate']]
                 if prv:
                     prime_id = prv[0]['urls']['standard_web']
                     prime_id = prime_id.rstrip('/').split('gti=')[1]
                     streams.append(('amazon prime', 'plugin://plugin.video.amazon-test/?asin=%s&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0' % prime_id))
 
             if providers.HBO_ENABLED:
-                hbm = [o for o in offers if o['provider_id'] in [616, 384, 27, 425] and o['monetization_type'] == 'flatrate']
+                hbm = [o for o in offers if o['provider_id'] in [616, 384, 27, 425] and o['monetization_type'] in ['free', 'ads', 'flatrate']]
                 if hbm:
                     hbo_id = hbm[0]['urls']['standard_web']
                     hbo_id = hbo_id.rstrip('/').split('/')[-1]
                     streams.append(('hbo max', 'plugin://slyguy.hbo.max/?_=play&slug=' + hbo_id))
 
             if providers.DISNEY_ENABLED:
-                dnp = [o for o in offers if o['provider_id'] == 337 and o['monetization_type'] == 'flatrate']
+                dnp = [o for o in offers if o['provider_id'] == 337 and o['monetization_type'] in ['free', 'ads', 'flatrate']]
                 if dnp:
                     disney_id = dnp[0]['urls']['deeplink_web']
                     disney_id = disney_id.rstrip('/').split('/')[-1]

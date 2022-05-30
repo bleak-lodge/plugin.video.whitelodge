@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.01.04[/COLOR][/B]
+- Fixed support of free streams on some services
+
 [B][COLOR gold]v1.01.03[/COLOR][/B]
 - Library and Official scrapers fixes/tweaks
 - Code cleanup
