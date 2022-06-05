@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import os,sys
+import os, sys
 
-import six
 from six.moves.urllib_parse import quote
 
 from resources.lib.modules import control
 from resources.lib.modules import trakt
-from resources.lib.modules import cache
 from resources.lib.modules.justwatch import providers
 
 
@@ -217,9 +215,9 @@ class navigator:
         if enabledServices:
             if len(enabledServices) > 1:
                 codes = '|'.join([i[1] for i in enabledServices])
-                self.addDirectoryItem('Mixed', 'movieServices&code=%s' % quote(codes), 'mymovies.png', 'DefaultMovies.png')
+                self.addDirectoryItem('Mixed', 'movieServices&code=%s' % quote(codes), 'mymovies.png', 'DefaultMovies.png', plot='[I]Provided by JustWatch[/I]')
             for i in enabledServices:
-                self.addDirectoryItem(i[0], 'movieServices&code=%s' % quote(i[1]), 'services/' + i[0].lower() + '.png', 'DefaultMovies.png')
+                self.addDirectoryItem(i[0], 'movieServices&code=%s' % quote(i[1]), 'services/' + i[0].lower() + '.png', 'DefaultMovies.png', plot='[I]Provided by JustWatch[/I]')
 
             self.endDirectory()
 
@@ -229,9 +227,9 @@ class navigator:
         if enabledServices:
             if len(enabledServices) > 1:
                 codes = '|'.join([i[1] for i in enabledServices])
-                self.addDirectoryItem('Mixed', 'tvServices&code=%s' % quote(codes), 'mytvshows.png', 'DefaultTVShows.png')
+                self.addDirectoryItem('Mixed', 'tvServices&code=%s' % quote(codes), 'mytvshows.png', 'DefaultTVShows.png', plot='[I]Provided by JustWatch[/I]')
             for i in enabledServices:
-                self.addDirectoryItem(i[0], 'tvServices&code=%s' % quote(i[1]), 'services/' + i[0].lower() + '.png', 'DefaultTVShows.png')
+                self.addDirectoryItem(i[0], 'tvServices&code=%s' % quote(i[1]), 'services/' + i[0].lower() + '.png', 'DefaultTVShows.png', plot='[I]Provided by JustWatch[/I]')
 
             self.endDirectory()
 
@@ -354,7 +352,7 @@ class navigator:
         from resources.lib.modules import log_utils
         log_utils.empty_log()
 
-    def addDirectoryItem(self, name, query, thumb, icon, context=None, queue=False, isAction=True, isFolder=True):
+    def addDirectoryItem(self, name, query, thumb, icon, plot='[CR]', context=None, queue=False, isAction=True, isFolder=True):
         sysaddon = sys.argv[0]
         syshandle = int(sys.argv[1])
         try: name = control.lang(name)
@@ -369,7 +367,7 @@ class navigator:
         except: item = control.item(label=name)
         item.addContextMenuItems(cm)
         item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': addonFanart})
-        item.setInfo(type='video', infoLabels={'plot': '[CR]'})
+        item.setInfo(type='video', infoLabels={'plot': plot})
         control.addItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
 
     def endDirectory(self, cache=True):

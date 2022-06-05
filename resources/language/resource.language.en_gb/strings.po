@@ -1148,5 +1148,5 @@ msgid "Country code"
 msgstr ""
 
 msgctxt "#32639"
-msgid "INFO - press here"
+msgid "[I]INFO - press here[/I]"
 msgstr ""

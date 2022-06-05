@@ -57,12 +57,12 @@ def get(media_type, imdb, season, episode, local=False):
             dbcur.execute("CREATE TABLE IF NOT EXISTS bookmarks (""timeInSeconds TEXT, ""type TEXT, ""imdb TEXT, ""season TEXT, ""episode TEXT, ""playcount INTEGER, ""overlay INTEGER, ""UNIQUE(imdb, season, episode)"");")
             dbcur.execute(sql_select)
             match = dbcur.fetchone()
+            dbcon.commit()
             if match:
                 offset = match[0]
                 return float(offset)
             else:
                 return 0
-            dbcon.commit()
         except:
             log_utils.log('bookmarks_get', 1)
             return 0
@@ -152,9 +152,9 @@ def _indicators():
     dbcur = dbcon.cursor()
     dbcur.execute("SELECT * FROM bookmarks WHERE overlay = 7")
     match = dbcur.fetchall()
+    dbcon.commit()
     if match:
         return [i[2] for i in match]
-    dbcon.commit()
 
 
 def _get_watched(media_type, imdb, season, episode):
@@ -166,11 +166,11 @@ def _get_watched(media_type, imdb, season, episode):
     dbcur = dbcon.cursor()
     dbcur.execute(sql_select)
     match = dbcur.fetchone()
+    dbcon.commit()
     if match:
         return 7
     else:
         return 6
-    dbcon.commit()
 
 
 def _update_watched(media_type, new_value, imdb, season, episode):

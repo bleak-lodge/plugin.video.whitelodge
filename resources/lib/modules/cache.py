@@ -216,16 +216,6 @@ def _get_connection_providers():
     conn.row_factory = _dict_factory
     return conn
 
-def _get_connection_cursor_debrid():
-    conn = _get_connection_debrid()
-    return conn.cursor()
-
-def _get_connection_debrid():
-    control.makeFile(control.dataPath)
-    conn = db.connect(control.dbFile)
-    conn.row_factory = _dict_factory
-    return conn
-
 def _get_connection_cursor_search():
     conn = _get_connection_search()
     return conn.cursor()

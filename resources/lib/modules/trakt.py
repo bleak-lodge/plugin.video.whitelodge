@@ -117,9 +117,11 @@ def authTrakt():
         if getTraktCredentialsInfo() == True:
             if control.yesnoDialog(control.lang(32511) + '[CR]' + control.lang(32512), heading='Trakt'):
                 control.setSetting(id='trakt.user', value='')
-                control.setSetting(id='trakt.authed', value='')
                 control.setSetting(id='trakt.token', value='')
                 control.setSetting(id='trakt.refresh', value='')
+                control.setSetting(id='trakt.authed', value='')
+                control.setSetting(id='trakt.authed2', value='')
+                control.setSetting(id='trakt.authed3', value='')
             raise Exception()
 
         result = getTraktAsJson('/oauth/device/code', {'client_id': V2_API_KEY})

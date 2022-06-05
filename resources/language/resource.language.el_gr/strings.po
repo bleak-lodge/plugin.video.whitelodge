@@ -1101,5 +1101,5 @@ msgid "Country code"
 msgstr "Κωδικός χώρας"
 
 msgctxt "#32639"
-msgid "INFO - press here"
-msgstr "Πληροφορίες - επιλέξτε εδώ"
+msgid "[I]INFO - press here[/I]"
+msgstr "[I]Πληροφορίες - επιλέξτε εδώ[/I]"

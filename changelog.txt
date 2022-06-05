@@ -1,3 +1,7 @@
+[B][COLOR gold]v1.01.05[/COLOR][/B]
+- Fixed resuming from local resume points
+- Fixed Trakt authorisation reset
+
 [B][COLOR gold]v1.01.04[/COLOR][/B]
 - Fixed support of free streams on some services
 
