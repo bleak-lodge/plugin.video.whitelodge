@@ -26,3 +26,12 @@ Playback of local library files is also supported.
 It also supports Trakt and IMDb watchlists and personal user lists, as well as library integration.
 
 ***This project uses the TMDb and JustWatch services.***
+
+
+## Screenshots:
+
+![Settings](/resources/images/screenshot-01.png)
+
+![Menu](/resources/images/screenshot-02.png)
+
+![Sources results](/resources/images/screenshot-03.png)
