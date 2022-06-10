@@ -173,9 +173,9 @@ class movies:
             elif u in self.tmdb_link:
                 self.list = cache.get(self.tmdb_list, 24, url)
                 if code:
-                    self.list = [i for i in self.list if self.providers_availability(i['tmdb'], code)]
+                    self.list = [i for i in self.list if self.services_availability(i['tmdb'], code)]
                     if not self.list:
-                        control.infoDialog('Nothing found on your servises')
+                        control.infoDialog('Nothing found on your services')
                         raise Exception()
                 if idx == True: self.worker()
 
@@ -248,6 +248,11 @@ class movies:
 
         if not q: return
         q = q.lower()
+
+        try:
+            dbcur.executescript("CREATE TABLE IF NOT EXISTS movies (ID Integer PRIMARY KEY AUTOINCREMENT, term);")
+        except:
+            pass
 
         dbcon = database.connect(control.searchFile)
         dbcur = dbcon.cursor()
@@ -664,6 +669,24 @@ class movies:
 
         self.addDirectory(self.list)
         return self.list
+
+
+    def services_availability(self, tmdb, code):
+        url = self.tmdb_providers_avail_link % tmdb
+        r = self.session.get(url, timeout=10).json()
+        r = r['results'].get(self.country)
+        if r:
+            offers = []
+            offers.extend((r.get('free', {}), r.get('ads', {}), r.get('flatrate', {})))
+            offers = [o for o in offers if o]
+            if offers:
+                providers = []
+                for o in offers[0]:
+                    providers.append(str(o['provider_id']))
+                if providers:
+                    if any(p in code.split('|') for p in providers):
+                        return True
+        return False
 
 
     def userlists(self):
@@ -1103,24 +1126,6 @@ class movies:
                 pass
 
         return self.list
-
-
-    def providers_availability(self, tmdb, code):
-        url = self.tmdb_providers_avail_link % tmdb
-        r = self.session.get(url, timeout=10).json()
-        r = r['results'].get(self.country) if str(r['id']) == tmdb else None
-        if r:
-            offers = []
-            offers.extend((r.get('free', {}), r.get('ads', {}), r.get('flatrate', {})))
-            offers = [o for o in offers if o]
-            if offers:
-                providers = []
-                for o in offers[0]:
-                    providers.append(str(o['provider_id']))
-                if providers:
-                    if any(p in code.split('|') for p in providers):
-                        return True
-        return False
 
 
     def worker(self):
