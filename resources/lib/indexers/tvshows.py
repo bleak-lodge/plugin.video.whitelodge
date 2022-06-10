@@ -64,7 +64,7 @@ class tvshows:
         self.tmdb_by_imdb = 'https://api.themoviedb.org/3/find/%s?api_key=%s&external_source=imdb_id' % ('%s', self.tm_user)
         self.tmdb_networks_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&sort_by=popularity.desc&with_networks=%s&page=1' % (self.tm_user, '%s')
         self.tm_img_link = 'https://image.tmdb.org/t/p/w%s%s'
-        self.search_link = 'https://api.themoviedb.org/3/search/tv?api_key=%s&language=en-US&query=%s&page=1' % (self.tm_user, '%s')
+        self.tm_search_link = 'https://api.themoviedb.org/3/search/tv?api_key=%s&language=en-US&query=%s&page=1' % (self.tm_user, '%s')
         self.related_link = 'https://api.themoviedb.org/3/tv/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
         self.tmdb_providers_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&sort_by=popularity.desc&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, '%s', self.country)
 
@@ -73,6 +73,7 @@ class tvshows:
         self.tmdb_providers_rated_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&sort_by=vote_average.desc&vote_count.gte=500&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, '%s', self.country)
         self.tmdb_language_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&with_original_language=%s&language=en-US&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, '%s', '%s', self.country)
         self.tmdb_genre_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&with_genres=%s&language=en-US&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, '%s', '%s', self.country)
+        self.tmdb_providers_avail_link = 'https://api.themoviedb.org/3/tv/%s/watch/providers?api_key=%s' % ('%s', self.tm_user)
 
         self.tvmaze_info_link = 'https://api.tvmaze.com/shows/%s'
         self.fanart_tv_art_link = 'http://webservice.fanart.tv/v3/tv/%s'
@@ -112,7 +113,7 @@ class tvshows:
         self.session.close()
 
 
-    def get(self, url, idx=True, create_directory=True):
+    def get(self, url, idx=True, create_directory=True, code=None):
         try:
             try: url = getattr(self, url + '_link')
             except: pass
@@ -152,6 +153,11 @@ class tvshows:
 
             elif u in self.tmdb_link:
                 self.list = cache.get(self.tmdb_list, 24, url)
+                if code:
+                    self.list = [i for i in self.list if self.providers_availability(i['tmdb'], code)]
+                    if not self.list:
+                        control.infoDialog('Nothing found on your servises')
+                        raise Exception()
                 if idx == True: self.worker()
 
             if idx == True and create_directory == True: self.tvshowDirectory(self.list)
@@ -208,8 +214,29 @@ class tvshows:
         dbcur.execute("INSERT INTO tvshow VALUES (?,?)", (None,q))
         dbcon.commit()
         dbcur.close()
-        url = self.search_link % urllib_parse.quote(q)
+        url = self.tm_search_link % urllib_parse.quote(q)
         self.get(url)
+
+
+    def search_services_new(self, code):
+        control.idle()
+
+        t = control.lang(32010)
+        k = control.keyboard('', t)
+        k.doModal()
+        q = k.getText() if k.isConfirmed() else None
+
+        if not q: return
+        q = q.lower()
+
+        dbcon = database.connect(control.searchFile)
+        dbcur = dbcon.cursor()
+        dbcur.execute("DELETE FROM tvshow WHERE term = ?", (q,))
+        dbcur.execute("INSERT INTO tvshow VALUES (?,?)", (None,q))
+        dbcon.commit()
+        dbcur.close()
+        url = self.tm_search_link % urllib_parse.quote(q)
+        self.get(url, code=code)
 
 
     def search_term(self, q):
@@ -222,7 +249,7 @@ class tvshows:
         dbcur.execute("INSERT INTO tvshow VALUES (?,?)", (None, q))
         dbcon.commit()
         dbcur.close()
-        url = self.search_link % urllib_parse.quote(q)
+        url = self.tm_search_link % urllib_parse.quote(q)
         self.get(url)
 
 
@@ -1137,6 +1164,24 @@ class tvshows:
         return self.list
 
 
+    def providers_availability(self, tmdb, code):
+        url = self.tmdb_providers_avail_link % tmdb
+        r = self.session.get(url, timeout=10).json()
+        r = r['results'].get(self.country)
+        if r:
+            offers = []
+            offers.extend((r.get('free', {}), r.get('ads', {}), r.get('flatrate', {})))
+            offers = [o for o in offers if o]
+            if offers:
+                providers = []
+                for o in offers[0]:
+                    providers.append(str(o['provider_id']))
+                if providers:
+                    if any(p in code.split('|') for p in providers):
+                        return True
+        return False
+
+
     def worker(self):
         self.meta = []
         total = len(self.list)
@@ -1179,7 +1224,7 @@ class tvshows:
 
             if tmdb == '0':
                 try:
-                    url = self.search_link % (urllib_parse.quote(list_title)) + '&first_air_date_year=' + self.list[i]['year']
+                    url = self.tm_search_link % (urllib_parse.quote(list_title)) + '&first_air_date_year=' + self.list[i]['year']
                     result = self.session.get(url, timeout=10).json()
                     results = result['results']
                     show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(list_title)][0]# and re.findall('(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]

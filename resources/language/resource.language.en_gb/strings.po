@@ -1150,3 +1150,19 @@ msgstr ""
 msgctxt "#32639"
 msgid "[I]INFO - press here[/I]"
 msgstr ""
+
+msgctxt "#32640"
+msgid "Movies on My Services"
+msgstr ""
+
+msgctxt "#32641"
+msgid "TV Shows on My Services"
+msgstr ""
+
+msgctxt "#32642"
+msgid "Search Movies on My Services"
+msgstr ""
+
+msgctxt "#32643"
+msgid "Search TV Shows on My Services"
+msgstr ""

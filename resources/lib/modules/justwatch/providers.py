@@ -16,3 +16,21 @@ UKTVPLAY_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.catchup
 PLUTO_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.plutotv)') and control.setting('plutotv') == 'true')
 
 SCRAPER_INIT = any(e for e in [NETFLIX_ENABLED, PRIME_ENABLED, HBO_ENABLED, DISNEY_ENABLED, IPLAYER_ENABLED, CURSTREAM_ENABLED, HULU_ENABLED, PARAMOUNT_ENABLED, CRACKLE_ENABLED, TUBI_ENABLED, UKTVPLAY_ENABLED, PLUTO_ENABLED])
+
+
+def enabled_services():
+    services = [
+        ('Amazon Prime', '9|119|613|582', PRIME_ENABLED),
+        ('BBC Iplayer', '38', IPLAYER_ENABLED),
+        ('Crackle', '12', CRACKLE_ENABLED),
+        ('Curiosity Stream', '190', CURSTREAM_ENABLED),
+        ('Disney+', '337', DISNEY_ENABLED),
+        ('HBO Max', '616|384|27|425', HBO_ENABLED),
+        ('Hulu', '15', HULU_ENABLED),
+        ('Netflix', '8|175', NETFLIX_ENABLED),
+        ('Paramount+', '531', PARAMOUNT_ENABLED),
+        ('Pluto TV', '300', PLUTO_ENABLED),
+        ('Tubi TV', '73', TUBI_ENABLED),
+        ('UKTV Play', '137', UKTVPLAY_ENABLED)
+    ]
+    return [s for s in services if s[2]]

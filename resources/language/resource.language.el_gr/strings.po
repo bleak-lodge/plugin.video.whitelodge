@@ -1103,3 +1103,19 @@ msgstr "Κωδικός χώρας"
 msgctxt "#32639"
 msgid "[I]INFO - press here[/I]"
 msgstr "[I]Πληροφορίες - επιλέξτε εδώ[/I]"
+
+msgctxt "#32640"
+msgid "Movies on My Services"
+msgstr "Ταινίες στις Υπηρεσίες μου"
+
+msgctxt "#32641"
+msgid "TV Shows on My Services"
+msgstr "Σειρές στις Υπηρεσίες μου"
+
+msgctxt "#32642"
+msgid "Search Movies on My Services"
+msgstr "Αναζήτηση Ταινιών στις Υπηρεσίες μου"
+
+msgctxt "#32643"
+msgid "Search TV Shows on My Services"
+msgstr "Αναζήτηση Σειρών στις Υπηρεσίες μου"

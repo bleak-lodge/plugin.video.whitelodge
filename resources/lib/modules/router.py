@@ -147,6 +147,10 @@ def routing(_argv):
         from resources.lib.indexers import movies
         movies.movies().search_term(name)
 
+    elif action == 'movieSearchServices':
+        from resources.lib.indexers import movies
+        movies.movies().search_services_new(code)
+
     elif action == 'movieServicesMenu':
         from resources.lib.indexers import navigator
         navigator.navigator().movie_services_menu()
@@ -222,6 +226,10 @@ def routing(_argv):
     elif action == 'tvSearchterm':
         from resources.lib.indexers import tvshows
         tvshows.tvshows().search_term(name)
+
+    elif action == 'tvSearchServices':
+        from resources.lib.indexers import tvshows
+        tvshows.tvshows().search_services_new(code)
 
     elif action == 'tvMosts':
         from resources.lib.indexers import tvshows

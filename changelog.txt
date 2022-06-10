@@ -1,3 +1,7 @@
+[B][COLOR gold]v1.01.06[/COLOR][/B]
+- Added new Search My Services menu items under My Services and Search menus.
+    Searching through those paths will filter results based on user's enabled services
+
 [B][COLOR gold]v1.01.05[/COLOR][/B]
 - Fixed resuming from local resume points
 - Fixed Trakt authorisation reset

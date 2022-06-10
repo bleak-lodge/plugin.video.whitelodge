@@ -14,6 +14,7 @@ imdbCredentials = False if control.setting('imdb.user') == '' else True
 traktCredentials = trakt.getTraktCredentialsInfo()
 traktIndicators = trakt.getTraktIndicatorsInfo()
 queueMenu = control.lang(32065)
+enabledServices = providers.enabled_services()
 
 
 class navigator:
@@ -211,30 +212,34 @@ class navigator:
 
 
     def movie_services_menu(self):
-        enabledServices = self.enabledServices()
         if enabledServices:
+            codes = '|'.join([i[1] for i in enabledServices])
             if len(enabledServices) > 1:
-                codes = '|'.join([i[1] for i in enabledServices])
                 self.addDirectoryItem('Mixed', 'movieServices&code=%s' % quote(codes), 'mymovies.png', 'DefaultMovies.png', plot='[I]Provided by JustWatch[/I]')
             for i in enabledServices:
                 self.addDirectoryItem(i[0], 'movieServices&code=%s' % quote(i[1]), 'services/' + i[0].lower() + '.png', 'DefaultMovies.png', plot='[I]Provided by JustWatch[/I]')
+            self.addDirectoryItem(32642, 'movieSearchServices&code=%s' % quote(codes), 'search.png', 'DefaultAddonsSearch.png')
 
             self.endDirectory()
 
 
     def tv_services_menu(self):
-        enabledServices = self.enabledServices()
         if enabledServices:
+            codes = '|'.join([i[1] for i in enabledServices])
             if len(enabledServices) > 1:
-                codes = '|'.join([i[1] for i in enabledServices])
                 self.addDirectoryItem('Mixed', 'tvServices&code=%s' % quote(codes), 'mytvshows.png', 'DefaultTVShows.png', plot='[I]Provided by JustWatch[/I]')
             for i in enabledServices:
                 self.addDirectoryItem(i[0], 'tvServices&code=%s' % quote(i[1]), 'services/' + i[0].lower() + '.png', 'DefaultTVShows.png', plot='[I]Provided by JustWatch[/I]')
+            self.addDirectoryItem(32643, 'tvSearchServices&code=%s' % quote(codes), 'search.png', 'DefaultAddonsSearch.png')
 
             self.endDirectory()
 
 
     def search(self):
+        if enabledServices:
+            codes = '|'.join([i[1] for i in enabledServices])
+            self.addDirectoryItem(32640, 'movieSearchServices&code=%s' % quote(codes), 'search.png', 'DefaultAddonsSearch.png')
+            self.addDirectoryItem(32641, 'tvSearchServices&code=%s' % quote(codes), 'search.png', 'DefaultAddonsSearch.png')
         self.addDirectoryItem(32001, 'movieSearch', 'search.png', 'DefaultAddonsSearch.png')
         self.addDirectoryItem(32002, 'tvSearch', 'search.png', 'DefaultAddonsSearch.png')
         self.addDirectoryItem(32013, 'peopleSearch', 'people-search.png', 'DefaultAddonsSearch.png')
@@ -274,26 +279,7 @@ class navigator:
             return
 
 
-    def enabledServices(self):
-        services = [
-            ('Amazon Prime', '9|119|613|582', providers.PRIME_ENABLED),
-            ('BBC Iplayer', '38', providers.IPLAYER_ENABLED),
-            ('Crackle', '12', providers.CRACKLE_ENABLED),
-            ('Curiosity Stream', '190', providers.CURSTREAM_ENABLED),
-            ('Disney+', '337', providers.DISNEY_ENABLED),
-            ('HBO Max', '616|384|27|425', providers.HBO_ENABLED),
-            ('Hulu', '15', providers.HULU_ENABLED),
-            ('Netflix', '8|175', providers.NETFLIX_ENABLED),
-            ('Paramount+', '531', providers.PARAMOUNT_ENABLED),
-            ('Pluto TV', '300', providers.PLUTO_ENABLED),
-            ('Tubi TV', '73', providers.TUBI_ENABLED),
-            ('UKTV Play', '137', providers.UKTVPLAY_ENABLED)
-        ]
-        return [s for s in services if s[2]]
-
-
     def servicesCheck(self):
-        enabledServices = self.enabledServices()
         if len(enabledServices) < 1:
             control.dialog.ok(control.addonInfo('name'), "You don't seem to have any supported services' add-ons installed, thus this add-on will not be of any use for you.[CR]Please see Tools/Settings/Providers for supported services.")
 
