@@ -129,27 +129,23 @@ def routing(_argv):
 
     elif action == 'movies':
         from resources.lib.indexers import movies
-        movies.movies().get(url)
+        movies.movies().get(url, code=code)
 
     elif action == 'moviePage':
         from resources.lib.indexers import movies
-        movies.movies().get(url)
+        movies.movies().get(url, code=code)
 
     elif action == 'movieSearch':
         from resources.lib.indexers import movies
-        movies.movies().search()
+        movies.movies().search(code)
 
     elif action == 'movieSearchnew':
         from resources.lib.indexers import movies
-        movies.movies().search_new()
+        movies.movies().search_new(code)
 
     elif action == 'movieSearchterm':
         from resources.lib.indexers import movies
-        movies.movies().search_term(name)
-
-    elif action == 'movieSearchServices':
-        from resources.lib.indexers import movies
-        movies.movies().search_services_new(code)
+        movies.movies().search_term(name, code)
 
     elif action == 'movieServicesMenu':
         from resources.lib.indexers import navigator
@@ -209,27 +205,23 @@ def routing(_argv):
 
     elif action == 'tvshows':
         from resources.lib.indexers import tvshows
-        tvshows.tvshows().get(url)
+        tvshows.tvshows().get(url, code=code)
 
     elif action == 'tvshowPage':
         from resources.lib.indexers import tvshows
-        tvshows.tvshows().get(url)
+        tvshows.tvshows().get(url, code=code)
 
     elif action == 'tvSearch':
         from resources.lib.indexers import tvshows
-        tvshows.tvshows().search()
+        tvshows.tvshows().search(code)
 
     elif action == 'tvSearchnew':
         from resources.lib.indexers import tvshows
-        tvshows.tvshows().search_new()
+        tvshows.tvshows().search_new(code)
 
     elif action == 'tvSearchterm':
         from resources.lib.indexers import tvshows
-        tvshows.tvshows().search_term(name)
-
-    elif action == 'tvSearchServices':
-        from resources.lib.indexers import tvshows
-        tvshows.tvshows().search_services_new(code)
+        tvshows.tvshows().search_term(name, code)
 
     elif action == 'tvMosts':
         from resources.lib.indexers import tvshows
