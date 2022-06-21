@@ -174,6 +174,8 @@ class movies:
 
             elif u in self.tmdb_link:
                 self.list = cache.get(self.tmdb_list, 24, url, self.code)
+                if self.code and not self.list:
+                    return control.infoDialog('Nothing found on your services')
                 if idx == True: self.worker()
 
 
@@ -648,8 +650,7 @@ class movies:
         r = self.session.get(url, timeout=10).json()
         r = r['results'].get(self.country)
         if r:
-            offers = []
-            offers.extend((r.get('free'), r.get('ads'), r.get('flatrate')))
+            offers = [r.get('free'), r.get('ads'), r.get('flatrate')]
             offers = [o for o in offers if o]
             if offers:
                 providers = []
