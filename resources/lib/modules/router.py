@@ -392,29 +392,30 @@ def routing(_argv):
         sources.sources().clearSources()
 
     elif action == 'random':
-        from sys import argv
-        if rtype == 'movie':
-            from resources.lib.indexers import movies
-            rlist = movies.movies().get(url, create_directory=False)
-            r = argv[0]+'?action=play'
-        elif rtype == 'episode':
-            from resources.lib.indexers import episodes
-            rlist = episodes.episodes().get(tvshowtitle, year, imdb, tmdb, meta, season, create_directory=False)
-            r = argv[0]+'?action=play'
-        elif rtype == 'season':
-            from resources.lib.indexers import episodes
-            rlist = episodes.seasons().get(tvshowtitle, year, imdb, tmdb, None, create_directory=False)
-            r = argv[0]+'?action=random&rtype=episode'
-        elif rtype == 'show':
-            from resources.lib.indexers import tvshows
-            rlist = tvshows.tvshows().get(url, create_directory=False)
-            r = argv[0]+'?action=random&rtype=season'
-        from random import randint
-        import simplejson as json
         try:
+            from sys import argv
+            from random import randint
+            import simplejson as json
             from resources.lib.modules import control
+            if rtype == 'movie':
+                from resources.lib.indexers import movies
+                rlist = movies.movies().get(url, create_directory=False)
+                r = argv[0]+'?action=play'
+            elif rtype == 'episode':
+                from resources.lib.indexers import episodes
+                rlist = episodes.episodes().get(tvshowtitle, year, imdb, tmdb, meta, season, create_directory=False)
+                r = argv[0]+'?action=play'
+            elif rtype == 'season':
+                from resources.lib.indexers import episodes
+                rlist = episodes.seasons().get(tvshowtitle, year, imdb, tmdb, meta, create_directory=False)
+                r = argv[0]+'?action=random&rtype=episode'
+            elif rtype == 'show':
+                from resources.lib.indexers import tvshows
+                rlist = tvshows.tvshows().get(url, create_directory=False)
+                r = argv[0]+'?action=random&rtype=season'
+            rlist = [r for r in rlist if not r.get('unaired')]
             rand = randint(1,len(rlist))-1
-            for p in ['title','year','imdb','tmdb','season','episode','tvshowtitle','premiered','select']:
+            for p in ['title','year','imdb','tmdb','season','episode','tvshowtitle','premiered']:
                 if rtype == 'show' and p == 'tvshowtitle':
                     try: r += '&'+p+'='+quote_plus(rlist[rand]['title'])
                     except: pass
@@ -428,15 +429,16 @@ def routing(_argv):
             try: r += '&meta='+quote_plus(json.dumps(rlist[rand]))
             except: r += '&meta={}'
             if rtype == 'movie':
-                try: control.infoDialog('%s (%s)' % (rlist[rand]['title'], rlist[rand]['year']), control.lang(32536), time=20000)
+                try: control.infoDialog('%s (%s)' % (rlist[rand]['title'], rlist[rand]['year']), control.lang(32536), time=10000)
                 except: pass
             elif rtype == 'episode':
-                try: control.infoDialog('%s - %01dx%02d . %s' % (unquote_plus(rlist[rand]['tvshowtitle']), int(rlist[rand]['season']), int(rlist[rand]['episode']), rlist[rand]['title']), control.lang(32536), time=20000)
+                try: control.infoDialog('%s - %01dx%02d . %s' % (unquote_plus(rlist[rand]['tvshowtitle']), int(rlist[rand]['season']), int(rlist[rand]['episode']), rlist[rand]['title']), control.lang(32536), time=10000)
                 except: pass
             control.execute('RunPlugin(%s)' % r)
         except:
-            from resources.lib.modules import control
+            from resources.lib.modules import control, log_utils
             control.infoDialog(control.lang(32537), time=8000)
+            log_utils.log('play random fail', 1)
 
     elif action == 'movieToLibrary':
         from resources.lib.modules import libtools

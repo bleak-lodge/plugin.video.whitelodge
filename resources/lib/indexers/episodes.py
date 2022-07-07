@@ -707,8 +707,8 @@ class episodes:
                     pass
 
                 itemlist.append({'title': title, 'season': season, 'episode': episode, 'tvshowtitle': tvshowtitle, 'year': year, 'premiered': premiered, 'status': 'Continuing',
-                                 'studio': studio, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': mpaa, 'plot': plot, 'imdb': imdb, 'tvdb': tvdb, 'tmdb': tmdb,
-                                 'poster': '0', 'thumb': '0', 'paused_at': paused_at, 'watched_at': watched_at})
+                                 'studio': studio, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': mpaa, 'plot': plot, 'imdb': imdb, 'imdbnumber': imdb,
+                                 'tvdb': tvdb, 'tmdb': tmdb, 'poster': '0', 'thumb': '0', 'paused_at': paused_at, 'watched_at': watched_at, 'mediatype': 'episode'})
             except:
                 log_utils.log('trakt_list1', 1)
                 pass
@@ -778,8 +778,8 @@ class episodes:
 
                 last_watched = item['last_watched_at']
                 if last_watched == None or last_watched == '': last_watched = '0'
-                items.append({'imdb': imdb, 'tvdb': tvdb, 'tmdb': tmdb, 'tvshowtitle': tvshowtitle, 'year': year, 'studio': studio, 'duration': duration, 'mpaa': mpaa, 'status': status,
-                              'genre': genre, 'snum': season, 'enum': episode, '_last_watched': last_watched})
+                items.append({'imdb': imdb, 'tvdb': tvdb, 'tmdb': tmdb, 'tvshowtitle': tvshowtitle, 'year': year, 'studio': studio, 'duration': duration,
+                              'mpaa': mpaa, 'status': status, 'genre': genre, 'snum': season, 'enum': episode, '_last_watched': last_watched})
             except:
                 pass
 
@@ -900,7 +900,7 @@ class episodes:
                                   'genre': i['genre'], 'status': i['status'], 'duration': i['duration'], 'rating': rating, 'votes': votes, 'mpaa': i['mpaa'], 'director': director, 'writer': writer,
                                   'castwiththumb': castwiththumb, 'plot': plot, 'poster': poster, 'banner': banner, 'fanart': fanart, 'thumb': thumb, 'clearlogo': clearlogo, 'clearart': clearart,
                                   'landscape': landscape, 'snum': i['snum'], 'enum': i['enum'], 'action': 'episodes', 'unaired': unaired, '_last_watched': i['_last_watched'],
-                                  'imdb': imdb, 'tvdb': tvdb, 'tmdb': tmdb, '_sort_key': max(i['_last_watched'], premiered)})
+                                  'imdb': imdb, 'imdbnumber': imdb, 'tvdb': tvdb, 'tmdb': tmdb, '_sort_key': max(i['_last_watched'], premiered), 'mediatype': 'episode'})
             except:
                 log_utils.log('TProgress', 1)
                 pass
@@ -1013,8 +1013,8 @@ class episodes:
 
                 self.list.append({'title': title, 'season': season, 'episode': episode, 'tvshowtitle': tvshowtitle, 'year': year, 'premiered': premiered, 'status': status, 'studio': studio, 'genre': genre,
                                   'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': mpaa, 'director': director, 'writer': writer, 'castwiththumb': castwiththumb, 'plot': plot,
-                                  'imdb': imdb, 'tvdb': tvdb, 'tmdb': tmdb, 'poster': poster, 'banner': banner, 'fanart': fanart, 'thumb': thumb, 'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape,
-                                  'paused_at': paused_at, 'watched_at': watched_at})
+                                  'imdb': imdb, 'imdbnumber': imdb, 'tvdb': tvdb, 'tmdb': tmdb, 'poster': poster, 'banner': banner, 'fanart': fanart, 'thumb': thumb, 'clearlogo': clearlogo,
+                                  'clearart': clearart, 'landscape': landscape, 'paused_at': paused_at, 'watched_at': watched_at, 'mediatype': 'episode'})
             except:
                 log_utils.log('trakt_episodes_list', 1)
                 pass
@@ -1154,8 +1154,8 @@ class episodes:
                 thumb = thumb1 or poster
 
                 itemlist.append({'title': title, 'season': season, 'episode': episode, 'tvshowtitle': tvshowtitle, 'year': year, 'premiered': premiered, 'status': 'Continuing',
-                                 'studio': studio, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'plot': plot, 'imdb': imdb, 'tvdb': tvdb, 'tmdb': '0',
-                                 'thumb': thumb, 'poster': poster, 'banner': banner, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape})
+                                 'studio': studio, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'plot': plot, 'imdb': imdb, 'imdbnumber': imdb, 'tvdb': tvdb, 'tmdb': '0',
+                                 'thumb': thumb, 'poster': poster, 'banner': banner, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'mediatype': 'episode'})
             except:
                 log_utils.log('tvmaze_list1', 1)
                 pass
@@ -1365,8 +1365,8 @@ class episodes:
 
                     self.list.append({'title': title, 'label': label, 'season': season, 'episode': episode, 'tvshowtitle': tvshowtitle, 'year': year, 'premiered': premiered,
                                       'rating': rating, 'votes': votes, 'director': director, 'writer': writer, 'castwiththumb': castwiththumb, 'duration': duration,
-                                      'status': status, 'plot': episodeplot, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': '0', 'unaired': unaired, 'thumb': thumb, 'poster': poster,
-                                      'fanart': fanart, 'banner': banner,'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape})
+                                      'status': status, 'plot': episodeplot, 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': tmdb, 'tvdb': '0', 'unaired': unaired, 'thumb': thumb,
+                                      'poster': poster, 'fanart': fanart, 'banner': banner,'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'mediatype': 'episode'})
                 except:
                     log_utils.log('tmdb_list2 Exception', 1)
                     pass
@@ -1466,9 +1466,9 @@ class episodes:
 
                 meta = dict((k,v) for k, v in six.iteritems(i) if not v == '0')
                 if i.get('season') == '0': meta.update({'season': '0'})
-                meta.update({'mediatype': 'episode'})
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s&season=%s&episode=%s' % (sysaddon, trailerAction, systvshowtitle, tmdb, imdb, season, episode)})
+                if not 'mediatype' in meta: meta.update({'mediatype': 'episode'})
                 if not 'duration' in meta: meta.update({'duration': '45'})
                 elif meta['duration'] == '0': meta.update({'duration': '45'})
                 try: meta.update({'duration': str(int(meta['duration']) * 60)})

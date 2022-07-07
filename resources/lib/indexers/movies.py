@@ -798,7 +798,8 @@ class movies:
                 paused_at = re.sub('[^0-9]+', '', paused_at)
 
                 self.list.append({'title': title, 'originaltitle': title, 'year': year, 'premiered': premiered, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes,
-                                  'mpaa': mpaa, 'plot': plot, 'tagline': tagline, 'imdb': imdb, 'tmdb': tmdb, 'country': country, 'tvdb': '0', 'poster': '0', 'next': next, 'paused_at': paused_at})
+                                  'mpaa': mpaa, 'plot': plot, 'tagline': tagline, 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': tmdb, 'country': country, 'tvdb': '0', 'poster': '0',
+                                  'paused_at': paused_at, 'mediatype': 'movie', 'next': next})
             except:
                 log_utils.log('movies_trakt_list1', 1)
                 pass
@@ -996,7 +997,8 @@ class movies:
                     plot = six.ensure_str(plot, errors='ignore')
 
                 self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': mpaa,
-                                  'director': director, 'plot': plot, 'tagline': '0', 'imdb': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': cast, 'next': next})
+                                  'director': director, 'plot': plot, 'tagline': '0', 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': cast,
+                                  'mediatype': 'movie', 'next': next})
             except:
                 log_utils.log('imdb_list fail', 1)
                 pass
@@ -1098,7 +1100,8 @@ class movies:
                 if poster_path: poster = self.tm_img_link % ('500', poster_path)
                 else: poster = '0'
 
-                self.list.append({'title': title, 'originaltitle': originaltitle, 'premiered': premiered, 'year': year, 'rating': rating, 'votes': votes, 'plot': plot, 'imdb': '0', 'tmdb': tmdb, 'tvdb': '0', 'poster': poster, 'next': next})
+                self.list.append({'title': title, 'originaltitle': originaltitle, 'premiered': premiered, 'year': year, 'rating': rating, 'votes': votes, 'plot': plot, 'imdb': '0',
+                                  'tmdb': tmdb, 'tvdb': '0', 'poster': poster, 'mediatype': 'movie', 'next': next})
             except:
                 log_utils.log('tmdb_list1', 1)
                 pass
@@ -1447,10 +1450,10 @@ class movies:
 
                 meta = dict((k,v) for k, v in six.iteritems(i) if not v == '0')
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
-                meta.update({'mediatype': 'movie'})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb)})
-                if not 'duration' in i: meta.update({'duration': '120'})
-                elif i['duration'] == '0': meta.update({'duration': '120'})
+                if not 'mediatype' in meta: meta.update({'mediatype': 'movie'})
+                if not 'duration' in meta: meta.update({'duration': '120'})
+                elif meta['duration'] == '0': meta.update({'duration': '120'})
                 try: meta.update({'duration': str(int(meta['duration']) * 60)})
                 except: pass
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})

@@ -77,7 +77,7 @@
         <setting type="lsep" label="32627" />
         <setting id="imdb.user" type="text" label="32303" default="" />
         <setting type="lsep" label="32315" />
-        <setting id="trakt.user" type="action" label="32306" option="close" action="RunPlugin(plugin://plugin.video.blacklodge/?action=authTrakt)" />
+        <setting id="trakt.user" type="action" label="32306" option="close" action="RunPlugin(plugin://plugin.video.whitelodge/?action=authTrakt)" />
         <setting id="trakt.token" type="text" visible="false" label="" default="" />
         <setting id="trakt.refresh" type="text" visible="false" label="" default="" />
         <setting type="lsep" label="32075" />
