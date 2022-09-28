@@ -265,9 +265,14 @@ class navigator:
             poster, banner, fanart = control.addonPoster(), control.addonBanner(), control.addonFanart()
 
             item = control.item(label=title)
-            item.setInfo(type='Video', infoLabels = {'title': title})
-            item.setArt({'icon': poster, 'thumb': poster, 'poster': poster, 'banner': banner})
-            item.setProperty('Fanart_Image', fanart)
+            item.setArt({'icon': poster, 'thumb': poster, 'poster': poster, 'fanart': fanart, 'banner': banner})
+
+            if control.getKodiVersion() < 20:
+                item.setInfo(type='video', infoLabels={'title': title})
+            else:
+                vtag = item.getVideoInfoTag()
+                vtag.setMediaType('video')
+                vtag.setTitle(title)
 
             control.addItem(handle=int(sys.argv[1]), url=url, listitem=item, isFolder=False)
             control.content(int(sys.argv[1]), content)
@@ -353,7 +358,12 @@ class navigator:
         except: item = control.item(label=name)
         item.addContextMenuItems(cm)
         item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': addonFanart})
-        item.setInfo(type='video', infoLabels={'plot': plot})
+        if control.getKodiVersion() < 20:
+            item.setInfo(type='video', infoLabels={'plot': plot})
+        else:
+            vtag = item.getVideoInfoTag()
+            vtag.setMediaType('video')
+            vtag.setPlot(plot)
         control.addItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
 
     def endDirectory(self, cache=True):

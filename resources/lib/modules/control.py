@@ -100,6 +100,8 @@ listDir = xbmcvfs.listdir
 
 transPath = xbmc.translatePath if getKodiVersion() < 19 else xbmcvfs.translatePath
 
+actor = xbmc.Actor if getKodiVersion() >= 20 else None
+
 skinPath = transPath('special://skin/')
 
 addonPath = transPath(addonInfo('path'))
@@ -381,7 +383,7 @@ def queueItem():
 
 
 def metadataClean(metadata): # Filter out non-existing/custom keys. Otherise there are tons of errors in Kodi 18 log.
-    if metadata == None: return metadata
+    if not metadata: return metadata
     allowed = ['genre', 'country', 'year', 'episode', 'season', 'sortepisode', 'sortseason', 'episodeguide', 'showlink', 'top250', 'setid', 'tracknumber', 'rating', 'userrating', 'watched', 'playcount', 'overlay',
                'cast', 'castandrole', 'director', 'mpaa', 'plot', 'plotoutline', 'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle', 'premiered', 'status', 'set', 'setoverview',
                'tag', 'imdbnumber', 'code', 'aired', 'credits', 'lastplayed', 'album', 'artist', 'votes', 'path', 'trailer', 'dateadded', 'mediatype', 'dbid', 'totalteasons', 'totalepisodes']

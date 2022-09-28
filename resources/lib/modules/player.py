@@ -49,7 +49,31 @@ class player(xbmc.Player):
                 item.setArt({'icon': thumb, 'thumb': thumb, 'poster': poster, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart, 'discart': discart})
             else:
                 item.setArt({'icon': thumb, 'thumb': thumb, 'tvshow.poster': poster, 'season.poster': poster, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart})
-            item.setInfo(type='video', infoLabels = control.metadataClean(meta))
+
+            if control.getKodiVersion() < 20:
+                item.setInfo(type='video', infoLabels=control.metadataClean(meta))
+            else:
+                vtag = item.getVideoInfoTag()
+                vtag.setMediaType(meta.get('mediatype', 'video'))
+                vtag.setTitle(meta.get('title'))
+                vtag.setOriginalTitle(meta.get('originaltitle'))
+                vtag.setPlot(meta.get('plot'))
+                vtag.setPlotOutline(meta.get('plot'))
+                vtag.setYear(int(meta.get('year', '0')))
+                vtag.setRating(float(meta.get('rating', '0')), int(meta.get('votes', '0').replace(',', '')))
+                vtag.setMpaa(meta.get('mpaa'))
+                vtag.setDuration(int(meta['duration']))
+                vtag.setGenres(meta.get('genre', '').split(' / '))
+                vtag.setTagLine(meta.get('tagline'))
+                vtag.setStudios([meta.get('studio')])
+                vtag.setDirectors(meta.get('director', '').split(', '))
+                vtag.setPremiered(meta.get('premiered'))
+                vtag.setIMDBNumber(meta['imdb'])
+                vtag.setUniqueIDs({'imdb': meta['imdb'], 'tmdb': meta.get('tmdb', '0')})
+                if 'tvshowtitle' in meta:
+                    vtag.setTvShowTitle(meta.get('tvshowtitle'))
+                    vtag.setSeason(int(meta['season']))
+                    vtag.setEpisode(int(meta['episode']))
 
             if 'plugin' in control.infoLabel('Container.PluginName'):
                 control.player.play(url, item)
@@ -68,6 +92,12 @@ class player(xbmc.Player):
 
     def getMeta(self, meta):
 
+        def playerMeta(metadata):
+            if not metadata: return metadata
+            allowed = ['title', 'tvshowtitle', 'originaltitle', 'label', 'year', 'season', 'episode', 'imdbnumber', 'imdb', 'tmdb', 'premiered',
+                       'genre', 'mpaa', 'rating', 'votes', 'plot', 'tagline', 'duration', 'studio', 'director', 'mediatype']
+            return {k: v for k, v in six.iteritems(metadata) if k in allowed}
+
         try:
             poster = meta['poster']
             thumb = meta.get('thumb') or poster
@@ -76,7 +106,7 @@ class player(xbmc.Player):
             clearart = meta.get('clearart', '')
             discart = meta.get('discart', '')
 
-            return poster, thumb, fanart, clearlogo, clearart, discart, meta
+            return poster, thumb, fanart, clearlogo, clearart, discart, playerMeta(meta)
         except:
             pass
 

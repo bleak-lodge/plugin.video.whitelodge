@@ -214,6 +214,8 @@ class People:
 
         nextMenu = control.lang(32053)
 
+        kodiVersion = control.getKodiVersion()
+
         for i in items:
             try:
                 name = i['name']
@@ -223,12 +225,6 @@ class People:
                 if i['image'].startswith('http'): thumb = i['image']
                 elif not artPath == None: thumb = os.path.join(artPath, i['image'])
                 else: thumb = addonThumb
-
-                try: item = control.item(label=name, offscreen=True)
-                except: item = control.item(label=name)
-
-                item.setArt({'icon': thumb, 'thumb': thumb, 'poster': thumb, 'fanart': addonFanart})
-                item.setInfo(type='video', infoLabels={'plot': plot})
 
                 cm = []
 
@@ -243,8 +239,20 @@ class People:
                 else:
                     url = '%s?action=personsSelect&name=%s&url=%s' % (sysaddon, urllib_parse.quote_plus(name), urllib_parse.quote_plus(i['id']))
 
+                try: item = control.item(label=name, offscreen=True)
+                except: item = control.item(label=name)
+
+                item.setArt({'icon': thumb, 'thumb': thumb, 'poster': thumb, 'fanart': addonFanart})
+
                 if cm:
                     item.addContextMenuItems(cm)
+
+                if kodiVersion < 20:
+                    item.setInfo(type='video', infoLabels={'plot': plot})
+                else:
+                    vtag = item.getVideoInfoTag()
+                    vtag.setMediaType('video')
+                    vtag.setPlot(plot)
 
                 control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
             except:

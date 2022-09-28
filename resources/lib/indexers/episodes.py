@@ -248,9 +248,7 @@ class seasons:
 
         syshandle = int(sys.argv[1])
 
-        addonPoster, addonBanner = control.addonPoster(), control.addonBanner()
-
-        addonFanart, settingFanart = control.addonFanart(), control.setting('fanart')
+        addonPoster, addonFanart, addonBanner = control.addonPoster(), control.addonFanart(), control.addonBanner()
 
         traktCredentials = trakt.getTraktCredentialsInfo()
 
@@ -310,7 +308,7 @@ class seasons:
 
                 meta = dict((k,v) for k, v in six.iteritems(i) if not v == '0')
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
-                meta.update({'mediatype': 'tvshow'})
+                meta.update({'mediatype': 'season'})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s&season=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb, season)})
                 if not 'duration' in meta: meta.update({'duration': '45'})
                 elif meta['duration'] == '0': meta.update({'duration': '45'})
@@ -318,15 +316,21 @@ class seasons:
                 except: pass
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})
                 except: pass
-                try: meta.update({'year': re.findall('(\d{4})', i['premiered'])[0]})
-                except: pass
+                try:
+                    season_year = re.findall('(\d{4})', i['premiered'])[0]
+                    meta.update({'year': season_year})
+                except:
+                    season_year = year
+                meta.update({'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape})
 
                 try:
                     overlay = int(playcount.getSeasonOverlay(indicators, imdb, season))
                     if overlay == 7: meta.update({'playcount': 1, 'overlay': 7})
                     else: meta.update({'playcount': 0, 'overlay': 6})
                 except:
-                    pass
+                    overlay = 6
+
+                url = '%s?action=episodes&tvshowtitle=%s&year=%s&imdb=%s&tmdb=%s&meta=%s&season=%s' % (sysaddon, systitle, year, imdb, tmdb, sysmeta, season)
 
                 cm = []
 
@@ -346,18 +350,7 @@ class seasons:
 
                 cm.append((addToLibrary, 'RunPlugin(%s?action=tvshowToLibrary&tvshowtitle=%s&year=%s&imdb=%s&tmdb=%s)' % (sysaddon, systitle, year, imdb, tmdb)))
 
-                try: item = control.item(label=label, offscreen=True)
-                except: item = control.item(label=label)
-
-
-                art = {}
-
-                art.update({'icon': poster, 'thumb': poster, 'poster': poster, 'banner': banner, 'landscape': landscape})
-
-                if settingFanart == 'true':
-                    art.update({'fanart': fanart})
-                elif not addonFanart == None:
-                    art.update({'fanart': addonFanart})
+                art = {'icon': poster, 'thumb': poster, 'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape}
 
                 if 'clearlogo' in i and not i['clearlogo'] == '0':
                     art.update({'clearlogo': i['clearlogo']})
@@ -365,22 +358,56 @@ class seasons:
                 if 'clearart' in i and not i['clearart'] == '0':
                     art.update({'clearart': i['clearart']})
 
-                castwiththumb = i.get('castwiththumb')
-                if castwiththumb and not castwiththumb == '0':
-                    if kodiVersion >= 18:
-                        item.setCast(castwiththumb)
-                    else:
-                        cast = [(p['name'], p['role']) for p in castwiththumb]
-                        meta.update({'cast': cast})
+                try: item = control.item(label=label, offscreen=True)
+                except: item = control.item(label=label)
 
                 item.setArt(art)
                 item.addContextMenuItems(cm)
-                item.setInfo(type='Video', infoLabels = control.metadataClean(meta))
 
-                video_streaminfo = {'codec': 'h264'}
-                item.addStreamInfo('video', video_streaminfo)
+                if kodiVersion < 20:
+                    castwiththumb = i.get('castwiththumb')
+                    if castwiththumb and not castwiththumb == '0':
+                        if kodiVersion >= 18:
+                            item.setCast(castwiththumb)
+                        else:
+                            cast = [(p['name'], p['role']) for p in castwiththumb]
+                            meta.update({'cast': cast})
 
-                url = '%s?action=episodes&tvshowtitle=%s&year=%s&imdb=%s&tmdb=%s&meta=%s&season=%s' % (sysaddon, systitle, year, imdb, tmdb, sysmeta, season)
+                    item.setInfo(type='video', infoLabels=control.metadataClean(meta))
+
+                    video_streaminfo = {'codec': 'h264'}
+                    item.addStreamInfo('video', video_streaminfo)
+
+                else:
+                    vtag = item.getVideoInfoTag()
+                    vtag.setMediaType('season')
+                    vtag.setTvShowTitle(i['tvshowtitle'])
+                    vtag.setSeason(int(season))
+                    vtag.setPlot(meta.get('plot'))
+                    vtag.setPlotOutline(meta.get('plot'))
+                    vtag.setYear(int(season_year))
+                    #vtag.setRating(float(i['rating']), int(i['votes'].replace(',', '')))
+                    vtag.setMpaa(meta.get('mpaa'))
+                    vtag.setDuration(int(meta['duration']))
+                    vtag.setGenres(meta.get('genre', '').split(' / '))
+                    vtag.setTrailer(meta['trailer'])
+                    vtag.setStudios([meta.get('studio')])
+                    vtag.setPremiered(meta.get('premiered'))
+                    vtag.setTvShowStatus(meta.get('status'))
+                    vtag.setIMDBNumber(imdb)
+                    vtag.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
+
+                    if overlay > 6:
+                        vtag.setPlaycount(1)
+
+                    cast = []
+                    if 'castwiththumb' in i and not i['castwiththumb'] == '0':
+                        for p in i['castwiththumb']:
+                            cast.append(control.actor(p['name'], p['role'], 0, p['thumbnail']))
+                    elif 'cast' in i and not i['cast'] == '0':
+                        for p in i['cast']:
+                            cast.append(control.actor(p, '', 0, ''))
+                    vtag.setCast(cast)
 
                 control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
             except:
@@ -1384,9 +1411,7 @@ class episodes:
 
         syshandle = int(sys.argv[1])
 
-        addonPoster, addonBanner = control.addonPoster(), control.addonBanner()
-
-        addonFanart, settingFanart = control.addonFanart(), control.setting('fanart')
+        addonPoster, addonFanart, addonBanner = control.addonPoster(), control.addonFanart(), control.addonBanner()
 
         traktCredentials = trakt.getTraktCredentialsInfo()
 
@@ -1452,10 +1477,7 @@ class episodes:
                 fanart = i['fanart'] if 'fanart' in i and not i['fanart'] == '0' else addonFanart
                 banner1 = i.get('banner', '')
                 banner = banner1 or fanart or addonBanner
-                if 'landscape' in i and not i['landscape'] == '0':
-                    landscape = i['landscape']
-                else:
-                    landscape = fanart
+                landscape = i['landscape'] if 'landscape' in i and not i['landscape'] == '0' else fanart
 
                 seasons_meta = {'poster': poster, 'fanart': fanart, 'banner': banner, 'clearlogo': i.get('clearlogo', '0'), 'clearart': i.get('clearart', '0'), 'landscape': landscape, 'duration': i.get('duration', '0'), 'status': i.get('status', '0')}
                 seas_meta = urllib_parse.quote_plus(json.dumps(seasons_meta))
@@ -1475,15 +1497,17 @@ class episodes:
                 except: pass
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})
                 except: pass
-                try: meta.update({'year': re.findall('(\d{4})', i['premiered'])[0]})
-                except: pass
+                try:
+                    episode_year = re.findall('(\d{4})', i['premiered'])[0]
+                    meta.update({'year': episode_year})
+                except:
+                    episode_year = year
                 try: meta.update({'title': i['label']})
                 except: pass
+                meta.update({'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape})
 
                 # try: meta.update({'tvshowyear': i['year']}) # Kodi uses the year (the year the show started) as the year for the episode. Change it from the premiered date.
                 # except: pass
-
-                meta.update({'poster': poster, 'fanart': fanart, 'banner': banner})
 
                 sysmeta = urllib_parse.quote_plus(json.dumps(meta))
 
@@ -1528,50 +1552,77 @@ class episodes:
                 if isFolder == False:
                     cm.append((clearProviders, 'RunPlugin(%s?action=clearCacheProviders)' % sysaddon))
 
-                try: item = control.item(label=label, offscreen=True)
-                except: item = control.item(label=label)
-
-                art = {}
-
                 thumb = meta.get('thumb', '') or fanart
                 clearlogo = meta.get('clearlogo', '')
                 clearart = meta.get('clearart', '')
 
-                art.update({'icon': thumb, 'thumb': thumb, 'banner': banner, 'poster': thumb, 'tvshow.poster': poster, 'season.poster': poster, 'landscape': landscape, 'clearlogo': clearlogo, 'clearart': clearart})
+                art = {'icon': thumb, 'thumb': thumb, 'fanart': fanart, 'banner': banner, 'poster': thumb, 'tvshow.poster': poster, 'season.poster': poster, 'landscape': landscape, 'clearlogo': clearlogo, 'clearart': clearart}
 
-                if settingFanart == 'true':
-                    art.update({'fanart': fanart})
-                elif not addonFanart == None:
-                    art.update({'fanart': addonFanart})
-
-                castwiththumb = i.get('castwiththumb')
-                if castwiththumb and not castwiththumb == '0':
-                    if kodiVersion >= 18:
-                        item.setCast(castwiththumb)
-                    else:
-                        cast = [(p['name'], p['role']) for p in castwiththumb]
-                        meta.update({'cast': cast})
+                try: item = control.item(label=label, offscreen=True)
+                except: item = control.item(label=label)
 
                 item.setArt(art)
                 item.addContextMenuItems(cm)
                 if isPlayable:
                     item.setProperty('IsPlayable', 'true')
 
-                offset = bookmarks.get('episode', imdb, season, episode, True)
-                if float(offset) > 120:
-                    percentPlayed = int(float(offset) / float(meta['duration']) * 100)
-                    item.setProperty('resumetime', str(offset))
-                    item.setProperty('percentplayed', str(percentPlayed))
+                if kodiVersion < 20:
+                    castwiththumb = i.get('castwiththumb')
+                    if castwiththumb and not castwiththumb == '0':
+                        if kodiVersion >= 18:
+                            item.setCast(castwiththumb)
+                        else:
+                            cast = [(p['name'], p['role']) for p in castwiththumb]
+                            meta.update({'cast': cast})
 
-                item.setProperty('imdb_id', imdb)
-                item.setProperty('tmdb_id', tmdb)
-                try: item.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
-                except: pass
+                    offset = bookmarks.get('episode', imdb, season, episode, True)
+                    if float(offset) > 120:
+                        percentPlayed = int(float(offset) / float(meta['duration']) * 100)
+                        item.setProperty('resumetime', str(offset))
+                        item.setProperty('percentplayed', str(percentPlayed))
 
-                item.setInfo(type='Video', infoLabels = control.metadataClean(meta))
+                    item.setProperty('imdb_id', imdb)
+                    item.setProperty('tmdb_id', tmdb)
+                    try: item.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
+                    except: pass
 
-                video_streaminfo = {'codec': 'h264'}
-                item.addStreamInfo('video', video_streaminfo)
+                    item.setInfo(type='video', infoLabels=control.metadataClean(meta))
+
+                    video_streaminfo = {'codec': 'h264'}
+                    item.addStreamInfo('video', video_streaminfo)
+
+                else:
+                    vtag = item.getVideoInfoTag()
+                    vtag.setMediaType('episode')
+                    vtag.setTvShowTitle(i['tvshowtitle'])
+                    vtag.setTitle(meta['label'])
+                    vtag.setSeason(int(season))
+                    vtag.setEpisode(int(episode))
+                    vtag.setPlot(meta.get('plot'))
+                    vtag.setPlotOutline(meta.get('plot'))
+                    vtag.setYear(int(episode_year))
+                    vtag.setRating(float(i['rating']), int(i['votes'].replace(',', '')))
+                    vtag.setMpaa(meta.get('mpaa'))
+                    vtag.setDuration(int(meta['duration']))
+                    vtag.setGenres(meta.get('genre', '').split(' / '))
+                    vtag.setTrailer(meta['trailer'])
+                    vtag.setStudios([meta.get('studio')])
+                    vtag.setPremiered(meta.get('premiered'))
+                    vtag.setTvShowStatus(meta.get('status'))
+                    vtag.setIMDBNumber(imdb)
+                    vtag.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
+
+                    if overlay > 6:
+                        vtag.setPlaycount(1)
+
+                    cast = []
+                    if 'castwiththumb' in i and not i['castwiththumb'] == '0':
+                        for p in i['castwiththumb']:
+                            cast.append(control.actor(p['name'], p['role'], 0, p['thumbnail']))
+                    elif 'cast' in i and not i['cast'] == '0':
+                        for p in i['cast']:
+                            cast.append(control.actor(p, '', 0, ''))
+                    vtag.setCast(cast)
 
                 control.addItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
             except:

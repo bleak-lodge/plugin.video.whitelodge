@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.02.00[/COLOR][/B]
+- Compatibility adjustments for Kodi 20's new (faster) list building methods
+
 [B][COLOR gold]v1.01.10[/COLOR][/B]
 - Fixed some issues with Play Random function
 - Fixed Trakt authorisation from settings

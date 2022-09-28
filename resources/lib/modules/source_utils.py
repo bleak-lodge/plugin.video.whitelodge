@@ -20,7 +20,7 @@ RES_1080 = ['1080', '1o8o', '.fullhd.', '.full.hd.', '.fhd.']
 RES_720 = ['.720.', '.720p.', '.720i.', '.hd720.', '.720hd.', '.72o.', '.72op.']
 RES_SD = ['576', '480', '.360.', '.360p.', '.360i.', '.sd360.', '.360sd.', '.240.', '.240p.', '.240i.', '.sd240.', '.240sd.']
 SCR = ['.scr.', '.screener.', '.dvdscr.', '.dvd.scr.', '.r5.', '.r6.']
-CAM = ['.camrip.', '.tsrip.', '.hdcam.', '.hd.cam.', '.cam.rip.', '.hdts.', '.dvdcam.', '.dvdts.', '.cam.', '.telesync.', '.ts.']
+CAM = ['.camrip', '.tsrip.', '.hdcam', '.hd.cam.', '.hqcam', '.hq.cam.', '.cam.rip.', '.hdts.', '.dvdcam', '.dvdts.', '.cam.', '.telesync.', '.ts.']
 AVC = ['.h.264.', '.h264.', '.x264.', '.avc.']
 
 

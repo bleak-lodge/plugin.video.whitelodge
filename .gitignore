@@ -7,3 +7,4 @@ __pycache__
 temp/*
 .idea
 .vscode
+api_keys.py

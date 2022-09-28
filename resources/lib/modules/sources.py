@@ -119,7 +119,7 @@ class sources:
     def addItem(self, title):
 
         def sourcesDirMeta(metadata):
-            if metadata == None: return metadata
+            if not metadata: return metadata
             allowed = ['icon', 'poster', 'fanart', 'thumb', 'clearlogo', 'clearart', 'discart', 'title', 'year', 'tvshowtitle', 'season', 'episode', 'rating', 'plot', 'trailer', 'mediatype']
             return {k: v for k, v in six.iteritems(metadata) if k in allowed}
 
@@ -141,24 +141,19 @@ class sources:
 
         listMeta = control.setting('source.list.meta')
 
+        kodiVersion = control.getKodiVersion()
+
         poster = meta.get('poster') or control.addonPoster()
-        if control.setting('fanart') == 'true':
-            fanart = meta.get('fanart') or control.addonFanart()
-        else:
-            fanart = control.addonFanart()
+        fanart = meta.get('fanart') or control.addonFanart()
         thumb = meta.get('thumb') or poster or fanart
         clearlogo = meta.get('clearlogo', '') or ''
         clearart = meta.get('clearart', '') or ''
         discart = meta.get('discart', '') or ''
 
-        #banner = meta['banner'] if 'banner' in meta else '0'
-        #if banner == '0': banner = poster
-        #if banner == '0': banner = control.addonBanner()
-
 
         for i in range(len(items)):
             try:
-                label = str(items[i]['label'])
+                label = items[i]['label']
 
                 syssource = urllib_parse.quote_plus(json.dumps([items[i]]))
 
@@ -169,12 +164,30 @@ class sources:
 
                 if listMeta == 'true':
                     item.setArt({'thumb': thumb, 'icon': thumb, 'poster': poster, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart, 'discart': discart})
-                    video_streaminfo = {'codec': 'h264'}
-                    item.addStreamInfo('video', video_streaminfo)
-                    item.setInfo(type='video', infoLabels=control.metadataClean(meta))
+                    if kodiVersion >= 20:
+                        vtag = item.getVideoInfoTag()
+                        vtag.setMediaType('video')
+                        vtag.setTitle(meta['title'])
+                        vtag.setYear(int(meta['year']))
+                        vtag.setRating(float(meta.get('rating', 0)))
+                        vtag.setPlot(meta.get('plot'))
+                        vtag.setTrailer(meta['trailer'])
+                        if 'tvshowtitle' in meta:
+                            vtag.setTvShowTitle(meta['tvshowtitle'])
+                            vtag.setSeason(int(meta['season']))
+                            vtag.setEpisode(int(meta['episode']))
+                    else:
+                        video_streaminfo = {'codec': 'h264'}
+                        item.addStreamInfo('video', video_streaminfo)
+                        item.setInfo(type='video', infoLabels=control.metadataClean(meta))
                 else:
                     item.setArt({'thumb': thumb})
-                    item.setInfo(type='video', infoLabels={})
+
+                    if kodiVersion >= 20:
+                        vtag = item.getVideoInfoTag()
+                        vtag.setMediaType('video')
+                    else:
+                        item.setInfo(type='video', infoLabels={})
 
                 control.addItem(handle=syshandle, url=sysurl, listitem=item, isFolder=False)
             except:
