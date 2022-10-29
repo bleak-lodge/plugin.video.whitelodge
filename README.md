@@ -17,7 +17,7 @@ Supported services and their equivalent add-ons for playback are as follows:
 - NETFLIX          :  `plugin.video.netflix` - CastagnaIT repository
 - PARAMOUNT+       :  `slyguy.paramount.plus` - slyguy repository
 - PLUTO TV         :  `plugin.video.plutotv` - official Kodi repository
-- TUBI TV          :  `plugin.video.tubi.m7` - mhancoc7 repository
+- TUBI TV          :  `plugin.video.tubi.m7` - mhancoc7 repository or `plugin.video.tubitv` by Lunatixz
 - UKTV PLAY        :  `plugin.video.catchuptvandmore` - official Kodi repository
 
 Thanks to the creators/maintainers of aforementioned add-ons.
