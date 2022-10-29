@@ -11,7 +11,7 @@ CURSTREAM_ENABLED = (any((control.condVisibility('System.HasAddon(slyguy.curiosi
 HULU_ENABLED = (control.condVisibility('System.HasAddon(slyguy.hulu)') and control.setting('hulu') == 'true')
 PARAMOUNT_ENABLED = (control.condVisibility('System.HasAddon(slyguy.paramount.plus)') and control.setting('paramount') == 'true')
 CRACKLE_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.crackle)') and control.setting('crackle') == 'true')
-TUBI_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.tubi.m7)') and control.setting('tubi') == 'true')
+TUBI_ENABLED = (any((control.condVisibility('System.HasAddon(plugin.video.tubi.m7)'), control.condVisibility('System.HasAddon(plugin.video.tubitv)'))) and control.setting('tubi') == 'true')
 UKTVPLAY_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.catchuptvandmore)') and control.setting('uktvplay') == 'true')
 PLUTO_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.plutotv)') and control.setting('plutotv') == 'true')
 

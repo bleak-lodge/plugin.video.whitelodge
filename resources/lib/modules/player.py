@@ -11,6 +11,7 @@ from resources.lib.modules import bookmarks
 from resources.lib.modules import control
 from resources.lib.modules import cleantitle
 from resources.lib.modules import playcount
+from resources.lib.modules import source_utils
 from resources.lib.modules import trakt
 from resources.lib.modules import log_utils
 
@@ -358,17 +359,14 @@ class player(xbmc.Player):
 
             codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'ell': 'cp1253', 'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'tur': 'cp1254', 'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
 
-            quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'hdtv']
+            ripTypes = ['BLURAY', 'BD-RIP', 'REMUX', 'DVD-RIP', 'DVD', 'WEB', 'HDTV', 'SDTV', 'HDRIP', 'UHDRIP', 'R5', 'CAM', 'TS', 'TC', 'SCR']
 
             langs = []
-            try:
-                try: langs = langDict[control.setting('subtitles.lang.1')].split(',')
-                except: langs.append(langDict[control.setting('subtitles.lang.1')])
+            try: langs = langDict[control.setting('subtitles.lang.1')].split(',')
             except: pass
-            try:
-                try: langs = langs + langDict[control.setting('subtitles.lang.2')].split(',')
-                except: langs.append(langDict[control.setting('subtitles.lang.2')])
+            try: langs += langDict[control.setting('subtitles.lang.2')].split(',')
             except: pass
+            langs = list(dict.fromkeys(langs))
 
 
             try:
@@ -400,37 +398,46 @@ class player(xbmc.Player):
                 raise Exception('Subtitles available in-stream')
 
 
+            sublanguageid = ','.join(langs)
+            imdbid = re.sub('[^0-9]', '', self.imdb)
+
+            if self.content == 'movie':
+                data = [{'sublanguageid': sublanguageid, 'imdbid': imdbid}]
+            else:
+                data = [{'sublanguageid': sublanguageid, 'imdbid': imdbid, 'season': self.season, 'episode': self.episode}]
+
             un = control.setting('os.user')
             pw = control.setting('os.pass')
 
-            server = xmlrpc_client.Server('http://api.opensubtitles.org/xml-rpc', verbose=0)
+            server = xmlrpc_client.Server('https://api.opensubtitles.org/xml-rpc', verbose=0)
             token = server.LogIn(un, pw, 'en', 'XBMC_Subtitles_Unofficial_v5.2.14')['token']
-
-            sublanguageid = ','.join(langs) ; imdbid = re.sub('[^0-9]', '', self.imdb)
-
-            if not (self.season == None or self.episode == None):
-                result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid, 'season': self.season, 'episode': self.episode}])['data']
-                fmt = ['hdtv']
-            else:
-                result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid}])['data']
-                try: vidPath = self.getPlayingFile()
-                except: vidPath = ''
-                fmt = re.split('\.|\(|\)|\[|\]|\s|\-', vidPath)
-                fmt = [i.lower() for i in fmt]
-                fmt = [i for i in fmt if i in quality]
-
-            filter = []
+            result = server.SearchSubtitles(token, data)['data']
             result = [i for i in result if i['SubSumCD'] == '1']
 
+            try:
+                vidPath = self.getPlayingFile()
+                fmt = source_utils.getFileType(vidPath).strip()
+                fmt = re.split('\s/\s', fmt)
+                fmt = [i for i in fmt if i in ripTypes]
+            except:
+                fmt = []
+
+            filter = []
+
             for lang in langs:
-                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in fmt)]
-                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in quality)]
+                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in source_utils.getFileType(i['MovieReleaseName']) for x in fmt)]
                 filter += [i for i in result if i['SubLanguageID'] == lang]
 
+            if not filter:
+                if control.setting('subtitles.notify') == 'true':
+                    if self.isPlaying() and self.isPlayingVideo():
+                        control.sleep(1000)
+                        control.infoDialog(control.lang(32149).format(sublanguageid.upper()))
+                raise Exception(control.lang(32149).format(sublanguageid))
             try: lang = xbmc.convertLanguage(filter[0]['SubLanguageID'], xbmc.ISO_639_1)
             except: lang = filter[0]['SubLanguageID']
 
-            subname = str(filter[0]['SubFileName'])
+            subname = filter[0]['SubFileName']
 
             content = [filter[0]['IDSubtitleFile'],]
             content = server.DownloadSubtitles(token, content)
@@ -442,7 +449,7 @@ class player(xbmc.Player):
 
             if control.setting('subtitles.utf') == 'true':
                 codepage = codePageDict.get(lang, '')
-                if codepage and not filter[0].get('SubEncoding', '').lower() == 'utf-8':
+                if codepage and not filter[0].get('SubEncoding', 'utf-8').lower() == 'utf-8':
                     try:
                         content_encoded = codecs.decode(content, codepage)
                         content = codecs.encode(content_encoded, 'utf-8')
@@ -459,7 +466,7 @@ class player(xbmc.Player):
             if control.setting('subtitles.notify') == 'true':
                 if self.isPlaying() and self.isPlayingVideo():
                     control.sleep(1000)
-                    control.infoDialog(subname, heading=control.lang(32148).format(str(lang).upper()), time=4000)
+                    control.infoDialog(subname, heading=control.lang(32148).format(lang.upper()), time=4000)
         except:
             log_utils.log('subtitles get fail', 1)
             pass

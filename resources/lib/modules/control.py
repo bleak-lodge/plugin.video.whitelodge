@@ -162,8 +162,8 @@ def autoTraktSubscription(tvshowtitle, year, imdb, tvdb):
 
 
 def addonIcon():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'icon.png')
+    # theme = appearance() ; art = artPath()
+    # if not (art == None and theme in ['-', '']): return os.path.join(art, 'icon.png')
     return addonInfo('icon')
 
 
@@ -187,8 +187,8 @@ def addonBanner():
 
 
 def addonFanart():
-    theme = appearance() ; art = artPath()
-    if not (art == None and theme in ['-', '']): return os.path.join(art, 'fanart.jpg')
+    # theme = appearance() ; art = artPath()
+    # if not (art == None and theme in ['-', '']): return os.path.join(art, 'fanart.jpg')
     return addonInfo('fanart')
 
 

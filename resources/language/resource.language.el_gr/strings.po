@@ -447,6 +447,10 @@ msgctxt "#32148"
 msgid "{} subtitles downloaded"
 msgstr "Κατέβηκαν {} υπότιτλοι"
 
+msgctxt "#32149"
+msgid "{} subtitles not found"
+msgstr "Δεν βρέθηκαν {} υπότιτλοι"
+
 msgctxt "#32200"
 msgid "No Color"
 msgstr "Χωρίς Χρώμα"

@@ -11,7 +11,7 @@ HULU             :  [I]slyguy.hulu[/I] - slyguy repository
 NETFLIX          :  [I]plugin.video.netflix[/I] - CastagnaIT repository
 PARAMOUNT+       :  [I]slyguy.paramount.plus[/I] - slyguy repository
 PLUTO TV         :  [I]plugin.video.plutotv[/I] - official Kodi repository
-TUBI TV          :  [I]plugin.video.tubi.m7[/I] - mhancoc7 repository
+TUBI TV          :  [I]plugin.video.tubi.m7[/I] - mhancoc7 repository or[CR]                    [I]plugin.video.tubitv[/I] by Lunatixz
 UKTV PLAY        :  [I]plugin.video.catchuptvandmore[/I] - official Kodi repository
 
 Thanks to the creators/maintainers of aforementioned add-ons.

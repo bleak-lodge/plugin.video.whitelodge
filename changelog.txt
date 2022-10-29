@@ -1,3 +1,10 @@
+[B][COLOR gold]v1.02.01[/COLOR][/B]
+- Moved Networks icons (Discover section) from online to the Artwork module
+- Replaced most of them with better looking ones - thanks alot J.E.
+- Added a few more TV networks
+- Added support for plugin.video.tubitv by Lunatixz on Official providers
+- Reworked auto-subtitles functionality for hopefully better subtitles matching
+
 [B][COLOR gold]v1.02.00[/COLOR][/B]
 - Compatibility adjustments for Kodi 20's new (faster) list building methods
 

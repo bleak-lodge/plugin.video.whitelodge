@@ -481,7 +481,7 @@ class movies:
             {
                 'name': cleangenre.lang(i[0], self.lang),
                 'url': self.genre_link % i[1] if i[2] else self.keyword_link % i[1],
-                'image': '{}{}{}'.format('genres/', i[1], '.png'),
+                'image': 'genres/{}.png'.format(i[1]),
                 'action': 'movies'
             })
         self.addDirectory(self.list)
@@ -575,7 +575,7 @@ class movies:
             {
                 'name': i,
                 'url': self.certification_link % i if not code else self.tmdb_certification_link % (i, code),
-                'image': '{}{}{}'.format('mpaa/', i, '.png'),
+                'image': 'mpaa/{}.png'.format(i),
                 'action': 'movies'
             })
         self.addDirectory(self.list)

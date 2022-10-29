@@ -451,6 +451,10 @@ msgctxt "#32148"
 msgid "{} subtitles downloaded"
 msgstr ""
 
+msgctxt "#32149"
+msgid "{} subtitles not found"
+msgstr ""
+
 msgctxt "#32200"
 msgid "No Color"
 msgstr ""

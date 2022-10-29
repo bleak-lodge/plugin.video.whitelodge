@@ -211,7 +211,11 @@ class source:
                 if tbv:
                     tbv_url = tbv[0]['urls']['standard_web']
                     tbv_id = tbv_url.split('?')[0].strip('/').split('/')[-1]
-                    streams.append(('tubi tv', 'plugin://plugin.video.tubi.m7/?mode=%splay-tubitv' % tbv_id))
+                    if control.condVisibility('System.HasAddon(plugin.video.tubi.m7)'):
+                        uri = 'plugin://plugin.video.tubi.m7/?mode=%splay-tubitv' % tbv_id
+                    elif control.condVisibility('System.HasAddon(plugin.video.tubitv)'):
+                        uri = 'plugin://plugin.video.tubitv/?mode=GV&url=' + tbv_id
+                    streams.append(('tubi tv', uri))
 
             if providers.UKTVPLAY_ENABLED:
                 ukt = [o for o in offers if o['provider_id'] == 137]

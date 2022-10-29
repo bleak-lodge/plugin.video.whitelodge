@@ -32,7 +32,7 @@ def supported_video_extensions():
 
 
 def get_qual(term):
-    term = '.{}.'.format(term).lower()
+    term = '.{}.'.format(cleantitle.get_title(term)).lower()
     if any(i in term for i in SCR):
         return 'scr'
     elif any(i in term for i in CAM):
@@ -67,7 +67,7 @@ def get_release_quality(release_name, release_link=''):
 
     try:
         if release_link:
-            term = '.'.join((release_name, cleantitle.get_title(release_link)))
+            term = '.'.join((release_name, release_link))
         else:
             term = release_name
 
@@ -76,8 +76,6 @@ def get_release_quality(release_name, release_link=''):
             quality = 'sd'
 
         info = []
-        #if '3d' in fmt or '.3D.' in term: info.append('3D')
-        #if any(i in ['hevc', 'h265', 'h.265', 'x265'] for i in term): info.append('HEVC')
 
         return quality, info
     except:
@@ -103,7 +101,7 @@ def getFileType(url):
         type += ' DVD-RIP /'
     if any(i in url for i in ['.dvd.', '.dvdr.', '.dvd5.', '.dvd9.']):
         type += ' DVD /'
-    if any(i in url for i in ['.web.', '.webdl.', '.webrip.']):
+    if any(i in url for i in ['.web.', '.webdl.', '.webrip.', '.webmux.']):
         type += ' WEB /'
     if '.hdtv.' in url:
         type += ' HDTV /'
