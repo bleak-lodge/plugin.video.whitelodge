@@ -356,10 +356,9 @@ class player(xbmc.Player):
     def getSubs(self):
         try:
             langDict = {'Afrikaans': 'afr', 'Albanian': 'alb', 'Arabic': 'ara', 'Armenian': 'arm', 'Basque': 'baq', 'Bengali': 'ben', 'Bosnian': 'bos', 'Breton': 'bre', 'Bulgarian': 'bul', 'Burmese': 'bur', 'Catalan': 'cat', 'Chinese': 'chi', 'Croatian': 'hrv', 'Czech': 'cze', 'Danish': 'dan', 'Dutch': 'dut', 'English': 'eng', 'Esperanto': 'epo', 'Estonian': 'est', 'Finnish': 'fin', 'French': 'fre', 'Galician': 'glg', 'Georgian': 'geo', 'German': 'ger', 'Greek': 'ell', 'Hebrew': 'heb', 'Hindi': 'hin', 'Hungarian': 'hun', 'Icelandic': 'ice', 'Indonesian': 'ind', 'Italian': 'ita', 'Japanese': 'jpn', 'Kazakh': 'kaz', 'Khmer': 'khm', 'Korean': 'kor', 'Latvian': 'lav', 'Lithuanian': 'lit', 'Luxembourgish': 'ltz', 'Macedonian': 'mac', 'Malay': 'may', 'Malayalam': 'mal', 'Manipuri': 'mni', 'Mongolian': 'mon', 'Montenegrin': 'mne', 'Norwegian': 'nor', 'Occitan': 'oci', 'Persian': 'per', 'Polish': 'pol', 'Portuguese': 'por,pob', 'Portuguese(Brazil)': 'pob,por', 'Romanian': 'rum', 'Russian': 'rus', 'Serbian': 'scc', 'Sinhalese': 'sin', 'Slovak': 'slo', 'Slovenian': 'slv', 'Spanish': 'spa', 'Swahili': 'swa', 'Swedish': 'swe', 'Syriac': 'syr', 'Tagalog': 'tgl', 'Tamil': 'tam', 'Telugu': 'tel', 'Thai': 'tha', 'Turkish': 'tur', 'Ukrainian': 'ukr', 'Urdu': 'urd'}
-
             codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'ell': 'cp1253', 'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'tur': 'cp1254', 'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
-
             ripTypes = ['BLURAY', 'BD-RIP', 'REMUX', 'DVD-RIP', 'DVD', 'WEB', 'HDTV', 'SDTV', 'HDRIP', 'UHDRIP', 'R5', 'CAM', 'TS', 'TC', 'SCR']
+            specialRipTypes = ['EXTENDED', 'THEATRICAL CUT', 'DIRECTORS CUT', 'UNRATED', 'REPACK', 'PROPER']
 
             langs = []
             try: langs = langDict[control.setting('subtitles.lang.1')].split(',')
@@ -416,16 +415,20 @@ class player(xbmc.Player):
 
             try:
                 vidPath = self.getPlayingFile()
-                fmt = source_utils.getFileType(vidPath).strip()
-                fmt = re.split('\s/\s', fmt)
-                fmt = [i for i in fmt if i in ripTypes]
+                fmt = source_utils.getFileType(vidPath)
+                fmt = fmt.split(' / ')
+                fmt0 = [i for i in fmt if i in specialRipTypes]
+                fmt1 = [i for i in fmt if i in ripTypes]
             except:
-                fmt = []
+                fmt0 = fmt1 = []
 
             filter = []
 
             for lang in langs:
-                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in source_utils.getFileType(i['MovieReleaseName']) for x in fmt)]
+                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in source_utils.getFileType(i['MovieReleaseName']) for x in fmt0) and
+                                                                               any(x in source_utils.getFileType(i['MovieReleaseName']) for x in fmt1)]
+                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in source_utils.getFileType(i['MovieReleaseName']) for x in fmt0)]
+                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in source_utils.getFileType(i['MovieReleaseName']) for x in fmt1)]
                 filter += [i for i in result if i['SubLanguageID'] == lang]
 
             if not filter:
@@ -434,12 +437,15 @@ class player(xbmc.Player):
                         control.sleep(1000)
                         control.infoDialog(control.lang(32149).format(sublanguageid.upper()))
                 raise Exception(control.lang(32149).format(sublanguageid))
-            try: lang = xbmc.convertLanguage(filter[0]['SubLanguageID'], xbmc.ISO_639_1)
-            except: lang = filter[0]['SubLanguageID']
 
-            subname = filter[0]['SubFileName']
+            filter = filter[0]
 
-            content = [filter[0]['IDSubtitleFile'],]
+            try: lang = xbmc.convertLanguage(filter['SubLanguageID'], xbmc.ISO_639_1)
+            except: lang = filter['SubLanguageID']
+
+            subname = filter['SubFileName']
+
+            content = [filter['IDSubtitleFile'],]
             content = server.DownloadSubtitles(token, content)
             content = base64.b64decode(content['data'][0]['data'])
             content = gzip.GzipFile(fileobj=six.BytesIO(content)).read()
@@ -449,7 +455,7 @@ class player(xbmc.Player):
 
             if control.setting('subtitles.utf') == 'true':
                 codepage = codePageDict.get(lang, '')
-                if codepage and not filter[0].get('SubEncoding', 'utf-8').lower() == 'utf-8':
+                if codepage and not filter.get('SubEncoding', 'utf-8').lower() == 'utf-8':
                     try:
                         content_encoded = codecs.decode(content, codepage)
                         content = codecs.encode(content_encoded, 'utf-8')

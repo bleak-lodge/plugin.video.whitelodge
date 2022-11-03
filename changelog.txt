@@ -1,3 +1,8 @@
+[B][COLOR gold]v1.02.02[/COLOR][/B]
+- Added ITV Hub on supported services
+  *add-on for playback is plugin.video.itvhub by dimkroon
+- Some more subtitles matching tweaks
+
 [B][COLOR gold]v1.02.01[/COLOR][/B]
 - Moved Networks icons (Discover section) from online to the Artwork module
 - Replaced most of them with better looking ones - thanks alot J.E.

@@ -104,12 +104,16 @@ class source:
                     r = jw.get_episodes(str(jw_id[0]))
                     item = r['items']
                     item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
-                    if not item:
-                        r = jw.get_episodes(str(jw_id[0]), page='2')
-                        item = r['items']
-                        item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
                     if item:
                         result = item[0]
+                    else:
+                        for p in range(2, 5):
+                            r = jw.get_episodes(str(jw_id[0]), page=p)
+                            item = r['items']
+                            item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
+                            if item:
+                                result = item[0]
+                                break
 
             if not result:
                 raise Exception('%s not found in jw database' % title)
@@ -118,7 +122,7 @@ class source:
             offers = result.get('offers')
             if not offers:
                 raise Exception('%s not available in %s' % (title, self.country))
-            #log_utils.log('justwatch offers: ' + repr(offers))
+            log_utils.log('justwatch offers: ' + repr(offers))
 
             streams = []
 
@@ -230,6 +234,12 @@ class source:
                     ptv_url = ptv[0]['urls']['deeplink_rokuos']
                     ptv_id = re.findall('contentID=(.+?)&', ptv_url)[0]
                     streams.append(('pluto tv', 'plugin://plugin.video.plutotv/play/vod/' + ptv_id))
+
+            if providers.ITV_ENABLED:
+                itv = [o for o in offers if o['provider_id'] == 41]
+                if itv:
+                    itv_url = itv[0]['urls']['standard_web']
+                    streams.append(('itv hub', 'plugin://plugin.video.itvhub/resources/lib/main/play_episode/?url=' + quote_plus(itv_url)))
 
             if streams:
                 for s in streams:

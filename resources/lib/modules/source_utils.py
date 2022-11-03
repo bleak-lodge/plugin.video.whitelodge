@@ -82,109 +82,122 @@ def get_release_quality(release_name, release_link=''):
         return 'sd', []
 
 
-def getFileType(url):
+def getFileType(title):
 
+    title = cleantitle.get_title(title).lower()
     try:
-        url = cleantitle.get_title(url)
+        name_strip = re.split(r'\.\d{4}\.|s(?:eason\.)?\d+(?:\.)?e(?:pisode\.)?\d+|season(?:s)?\.\d+', title)[1:]
+        if name_strip:
+           title = '.'.join(name_strip)
     except:
-        url = six.ensure_str(url, errors='ignore')
-    url = '.{}.'.format(url).lower()
-    type = ''
+        pass
+    title = '.{}.'.format(title)
+    fmt = ''
 
-    if any(i in url for i in ['.bluray.', '.blu.ray.']):
-        type += ' BLURAY /'
-    if any(i in url for i in ['.bd.r.', '.bdr.', '.bd.rip.', '.bdrip.', '.br.rip.', '.brrip.']):
-        type += ' BD-RIP /'
-    if 'remux.' in url:
-        type += ' REMUX /'
-    if any(i in url for i in ['.dvdrip.', '.dvd.rip.']):
-        type += ' DVD-RIP /'
-    if any(i in url for i in ['.dvd.', '.dvdr.', '.dvd5.', '.dvd9.']):
-        type += ' DVD /'
-    if any(i in url for i in ['.web.', '.webdl.', '.webrip.', '.webmux.']):
-        type += ' WEB /'
-    if '.hdtv.' in url:
-        type += ' HDTV /'
-    if '.sdtv.' in url:
-        type += ' SDTV /'
-    if any(i in url for i in ['.hdrip.', '.hd.rip.']):
-        type += ' HDRIP /'
-    if any(i in url for i in ['.uhdrip.', '.uhd.rip.']):
-        type += ' UHDRIP /'
-    if '.r5.' in url:
-        type += ' R5 /'
-    if any(i in url for i in ['.cam.', '.hdcam.', '.camrip.']):
-        type += ' CAM /'
-    if any(i in url for i in ['.ts.', '.telesync.', '.hdts.', '.pdvd.']):
-        type += ' TS /'
-    if any(i in url for i in ['.tc.', '.telecine.', '.hdtc.']):
-        type += ' TC /'
-    if any(i in url for i in ['.scr.', '.screener.', '.dvdscr.', '.dvd.scr.']):
-        type += ' SCR /'
-    if '.xvid.' in url:
-        type += ' XVID /'
-    if '.avi.' in url:
-        type += ' AVI /'
-    if any(i in url for i in AVC):
-        type += ' H.264 /'
-    if any(i in url for i in ['.h.265.', '.h256.', '.x265.', '.hevc.']):
-        type += ' HEVC /'
-    if '.hi10p.' in url:
-        type += ' HI10P /'
-    if '.10bit.' in url:
-        type += ' 10BIT /'
-    if '.3d.' in url:
-        type += ' 3D /'
-    if any(i in url for i in ['.hdr.', '.hdr10.', '.hdr10plus.', '.hlg.']):
-        type += ' HDR /'
-    if any(i in url for i in ['.dv.', '.dolby.vision.', '.dolbyvision.', '.dovi.']):
-        type += ' HDR - DOLBY VISION /'
-    if '.imax.' in url:
-        type += ' IMAX /'
-    if any(i in url for i in ['.ac3.', '.ac.3.']):
-        type += ' AC3 /'
-    if '.aac.' in url:
-        type += ' AAC /'
-    if '.aac5.1.' in url:
-        type += ' AAC / 5.1 /'
-    if any(i in url for i in ['.dd.', '.dolbydigital.', '.dolby.digital.']):
-        type += ' DD /'
-    if any(i in url for i in ['.truehd.', '.true.hd.']):
-        type += ' TRUEHD /'
-    if '.atmos.' in url:
-        type += ' ATMOS /'
-    if any(i in url for i in ['.dolby.digital.plus.', '.dolbydigital.plus.', '.dolbydigitalplus.', '.ddplus.', '.dd.plus.', '.ddp.', '.eac3.', '.eac.3.']):
-        type += ' DD+ /'
-    if '.dts.' in url:
-        type += ' DTS /'
-    if any(i in url for i in ['.hdma.', '.hd.ma.']):
-        type += ' HD.MA /'
-    if any(i in url for i in ['.hdhra.', '.hd.hra.']):
-        type += ' HD.HRA /'
-    if any(i in url for i in ['.dtsx.', '.dts.x.']):
-        type += ' DTS:X /'
-    if '.dd5.1.' in url:
-        type += ' DD / 5.1 /'
-    if '.ddp5.1.' in url:
-        type += ' DD+ / 5.1 /'
-    if any(i in url for i in ['.5.1.', '.6ch.']):
-        type += ' 5.1 /'
-    if any(i in url for i in ['.7.1.', '.8ch.']):
-        type += ' 7.1 /'
-    if '.korsub.' in url:
-        type += ' HC-SUBS /'
-    if any(i in url for i in ['.subs.', '.subbed.', '.sub.']):
-        type += ' SUBS /'
-    if any(i in url for i in ['.dub.', '.dubbed.', '.dublado.']):
-        type += ' DUB /'
-    if '.repack.' in url:
-        type += ' REPACK /'
-    if '.proper.' in url:
-        type += ' PROPER /'
-    if '.nuked.' in url:
-        type += ' NUKED /'
-    type = type.rstrip('/')
-    return type
+    if any(i in title for i in ['.bluray.', '.blu.ray.']):
+        fmt += ' BLURAY /'
+    if any(i in title for i in ['.bd.r.', '.bdr.', '.bd.rip.', '.bdrip.', '.br.rip.', '.brrip.']):
+        fmt += ' BD-RIP /'
+    if 'remux.' in title:
+        fmt += ' REMUX /'
+    if any(i in title for i in ['.dvdrip.', '.dvd.rip.']):
+        fmt += ' DVD-RIP /'
+    if any(i in title for i in ['.dvd.', '.dvdr.', '.dvd5.', '.dvd9.']):
+        fmt += ' DVD /'
+    if any(i in title for i in ['.web.', '.webdl.', '.webrip.', '.webmux.']):
+        fmt += ' WEB /'
+    if '.hdtv.' in title:
+        fmt += ' HDTV /'
+    if '.sdtv.' in title:
+        fmt += ' SDTV /'
+    if any(i in title for i in ['.hdrip.', '.hd.rip.']):
+        fmt += ' HDRIP /'
+    if any(i in title for i in ['.uhdrip.', '.uhd.rip.']):
+        fmt += ' UHDRIP /'
+    if '.r5.' in title:
+        fmt += ' R5 /'
+    if any(i in title for i in ['.cam.', '.hdcam.', '.camrip.']):
+        fmt += ' CAM /'
+    if any(i in title for i in ['.ts.', '.telesync.', '.hdts.', '.pdvd.']):
+        fmt += ' TS /'
+    if any(i in title for i in ['.tc.', '.telecine.', '.hdtc.']):
+        fmt += ' TC /'
+    if any(i in title for i in ['.scr.', '.screener.', '.dvdscr.', '.dvd.scr.']):
+        fmt += ' SCR /'
+    if '.xvid.' in title:
+        fmt += ' XVID /'
+    if '.avi.' in title:
+        fmt += ' AVI /'
+    if any(i in title for i in AVC):
+        fmt += ' H.264 /'
+    if any(i in title for i in ['.h.265.', '.h256.', '.x265.', '.hevc.']):
+        fmt += ' HEVC /'
+    if '.av1.' in title:
+        fmt += ' AV1 /'
+    if '.hi10p.' in title:
+        fmt += ' HI10P /'
+    if '.10bit.' in title:
+        fmt += ' 10BIT /'
+    if '.3d.' in title:
+        fmt += ' 3D /'
+    if any(i in title for i in ['.hdr.', '.hdr10.', '.hdr10plus.', '.hlg.']):
+        fmt += ' HDR /'
+    if any(i in title for i in ['.dv.', '.dolby.vision.', '.dolbyvision.', '.dovi.']):
+        fmt += ' HDR - DOLBY VISION /'
+    if '.imax.' in title:
+        fmt += ' IMAX /'
+    if any(i in title for i in ['.ac3.', '.ac.3.']):
+        fmt += ' AC3 /'
+    if '.aac.' in title:
+        fmt += ' AAC /'
+    if '.aac5.1.' in title:
+        fmt += ' AAC / 5.1 /'
+    if any(i in title for i in ['.dd.', '.dolbydigital.', '.dolby.digital.']):
+        fmt += ' DD /'
+    if any(i in title for i in ['.truehd.', '.true.hd.']):
+        fmt += ' TRUEHD /'
+    if '.atmos.' in title:
+        fmt += ' ATMOS /'
+    if any(i in title for i in ['.dolby.digital.plus.', '.dolbydigital.plus.', '.dolbydigitalplus.', '.ddplus.', '.dd.plus.', '.ddp.', '.eac3.', '.eac.3.']):
+        fmt += ' DD+ /'
+    if '.dts.' in title:
+        fmt += ' DTS /'
+    if any(i in title for i in ['.hdma.', '.hd.ma.']):
+        fmt += ' HD.MA /'
+    if any(i in title for i in ['.hdhra.', '.hd.hra.']):
+        fmt += ' HD.HRA /'
+    if any(i in title for i in ['.dtsx.', '.dts.x.']):
+        fmt += ' DTS:X /'
+    if '.dd5.1.' in title:
+        fmt += ' DD / 5.1 /'
+    if '.ddp5.1.' in title:
+        fmt += ' DD+ / 5.1 /'
+    if any(i in title for i in ['.5.1.', '.6ch.']):
+        fmt += ' 5.1 /'
+    if any(i in title for i in ['.7.1.', '.8ch.']):
+        fmt += ' 7.1 /'
+    if '.korsub.' in title:
+        fmt += ' HC-SUBS /'
+    if any(i in title for i in ['.subs.', '.subbed.', '.sub.']):
+        fmt += ' SUBS /'
+    if any(i in title for i in ['.dub.', '.dubbed.', '.dublado.']):
+        fmt += ' DUB /'
+    if '.extended.' in title:
+        fmt += ' EXTENDED /'
+    if '.theatrical.' in title:
+        fmt += ' THEATRICAL CUT /'
+    if '.directors.cut.' in title:
+        fmt += ' DIRECTORS CUT /'
+    if '.unrated.' in title:
+        fmt += ' UNRATED /'
+    if '.repack.' in title:
+        fmt += ' REPACK /'
+    if '.proper.' in title:
+        fmt += ' PROPER /'
+    if '.nuked.' in title:
+        fmt += ' NUKED /'
+    fmt = fmt.rstrip('/').strip()
+    return fmt
 
 
 def check_sd_url(release_link):

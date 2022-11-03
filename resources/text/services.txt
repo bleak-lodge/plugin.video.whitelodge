@@ -8,6 +8,7 @@ CURIOSITY STREAM :  [I]slyguy.curiositystream[/I] - slyguy or[CR]               
 DISNEY+          :  [I]slyguy.disney.plus[/I] - slyguy repository
 HBO MAX          :  [I]slyguy.hbo.max[/I] - slyguy repository
 HULU             :  [I]slyguy.hulu[/I] - slyguy repository
+ITV HUB          :  [I]plugin.video.itvhub[/I] - standalone by dimkroon
 NETFLIX          :  [I]plugin.video.netflix[/I] - CastagnaIT repository
 PARAMOUNT+       :  [I]slyguy.paramount.plus[/I] - slyguy repository
 PLUTO TV         :  [I]plugin.video.plutotv[/I] - official Kodi repository

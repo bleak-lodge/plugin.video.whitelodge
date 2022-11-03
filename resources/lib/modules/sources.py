@@ -663,19 +663,18 @@ class sources:
             t = ''
             if n:
                 t = n
+                try: size_info = self.sources[i].get('info', '').split(' /')[0]
+                except: size_info = ''
+                if size_info and size_info.strip().lower().endswith('gb'):
+                    t = ' / '.join((size_info, t))
             else:
                 #f1 = self.sources[i].get('info', '') or ''
                 f1 = ' / '.join(['%s' % info.strip() for info in self.sources[i].get('info', '').split('|')])
                 f2 = '.'.join((n, u)) if n else u
                 f2 = source_utils.getFileType(f2)
                 t = ' / '.join((f1, f2))
-            try: size_info = self.sources[i].get('info', '').split(' /')[0]
-            except: size_info = ''
-            if size_info and size_info.strip().lower().endswith('gb'):
-                t = ' / '.join((size_info, t))
-            t = t.strip(' /')
             if t:
-                t = '[COLOR %s][I]%s[/I][/COLOR]' % (sec_identify, t)
+                t = '[COLOR %s][I]%s[/I][/COLOR]' % (sec_identify, t.strip(' /'))
 
             if double_line:
                 if o:
