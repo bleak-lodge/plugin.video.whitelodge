@@ -186,7 +186,7 @@ def getFileType(title):
         fmt += ' EXTENDED /'
     if '.theatrical.' in title:
         fmt += ' THEATRICAL CUT /'
-    if '.directors.cut.' in title:
+    if '.director' in title:
         fmt += ' DIRECTORS CUT /'
     if '.unrated.' in title:
         fmt += ' UNRATED /'

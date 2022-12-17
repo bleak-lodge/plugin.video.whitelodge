@@ -55,6 +55,7 @@ class movies:
         self.user = str(control.setting('fanart.tv.user')) + str(control.setting('tm.user'))
         self.lang = control.apiLanguage()['tmdb']
         self.items_per_page = str(control.setting('items.per.page')) or '20'
+        self.imdb_sort = 'alpha,asc' if control.setting('imdb.sort.order') == '1' else 'date_added,desc'
         self.hq_artwork = control.setting('hq.artwork') or 'false'
         self.trailer_source = control.setting('trailer.source') or '2'
         self.country = control.setting('official.country') or 'US'
@@ -107,10 +108,12 @@ class movies:
         self.boxoffice_link = 'https://www.imdb.com/search/title?title_type=movie,tvMovie&production_status=released&sort=boxoffice_gross_us,desc&count=%s&start=1' % self.items_per_page
 
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
-        self.imdblist_link = 'https://www.imdb.com/list/%s/?view=detail&sort=date_added,desc&title_type=movie,short,tvMovie,video&start=1'
-        self.imdblist2_link = 'https://www.imdb.com/list/%s/?view=detail&sort=alpha,asc&title_type=movie,short,tvMovie,video&start=1'
-        self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist?sort=date_added,desc' % self.imdb_user
-        self.imdbwatchlist2_link = 'https://www.imdb.com/user/ur%s/watchlist?sort=alpha,asc' % self.imdb_user
+        # As of Dec'22 defining various title_type in url results on 0 items on imdb watchlist/personal lists.
+        # Temp solution to fetch all items and filter movie/series types later, via the Director info
+        # (movie types always have Director tag on imdb, while series types never do).
+        # self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&title_type=movie,short,tvMovie,video&start=1' % ('%s', self.imdb_sort)
+        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&start=1' % ('%s', self.imdb_sort)
+        self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist' % self.imdb_user
 
         self.trending_link = 'https://api.trakt.tv/movies/trending?limit=%s&page=1' % self.items_per_page
         self.mosts_link = 'https://api.trakt.tv/movies/%s/%s?limit=%s&page=1' % ('%s', '%s', self.items_per_page)
@@ -841,10 +844,6 @@ class movies:
             if url == self.imdbwatchlist_link:
                 url = cache.get(imdb_watchlist_id, 8640, url)
                 url = self.imdblist_link % url
-
-            elif url == self.imdbwatchlist2_link:
-                url = cache.get(imdb_watchlist_id, 8640, url)
-                url = self.imdblist2_link % url
             #log_utils.log('imdb_url: ' + repr(url))
 
             result = client.request(url)
@@ -969,6 +968,8 @@ class movies:
                     director = six.ensure_str(director, errors='ignore')
                 except:
                     director = '0'
+                if director == '0':
+                    continue
 
                 try:
                     cast = re.findall('Stars(?:s|):(.+?)(?:\||</div>)', item)[0]
@@ -1013,11 +1014,6 @@ class movies:
         except:
             pass
 
-        if control.setting('imdb.sort.order') == '1':
-            list = self.imdblist2_link
-        else:
-            list = self.imdblist_link
-
         for item in items:
             try:
                 name = client.parseDOM(item, 'a')[0]
@@ -1026,7 +1022,7 @@ class movies:
 
                 url = client.parseDOM(item, 'a', ret='href')[0]
                 url = url.split('/list/', 1)[-1].strip('/')
-                url = list % url
+                url = self.imdblist_link % url
                 url = client.replaceHTMLCodes(url)
                 url = six.ensure_str(url, errors='replace')
 

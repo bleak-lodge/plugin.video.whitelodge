@@ -122,7 +122,7 @@ class source:
             offers = result.get('offers')
             if not offers:
                 raise Exception('%s not available in %s' % (title, self.country))
-            log_utils.log('justwatch offers: ' + repr(offers))
+            #log_utils.log('justwatch offers: ' + repr(offers))
 
             streams = []
 
