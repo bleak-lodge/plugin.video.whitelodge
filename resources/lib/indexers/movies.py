@@ -108,11 +108,7 @@ class movies:
         self.boxoffice_link = 'https://www.imdb.com/search/title?title_type=movie,tvMovie&production_status=released&sort=boxoffice_gross_us,desc&count=%s&start=1' % self.items_per_page
 
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
-        # As of Dec'22 defining various title_type in url results on 0 items on imdb watchlist/personal lists.
-        # Temp solution to fetch all items and filter movie/series types later, via the Director info
-        # (movie types always have Director tag on imdb, while series types never do).
-        # self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&title_type=movie,short,tvMovie,video&start=1' % ('%s', self.imdb_sort)
-        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&start=1' % ('%s', self.imdb_sort)
+        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&title_type=movie,short,tvMovie,video&start=1' % ('%s', self.imdb_sort)
         self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist' % self.imdb_user
 
         self.trending_link = 'https://api.trakt.tv/movies/trending?limit=%s&page=1' % self.items_per_page
@@ -968,8 +964,8 @@ class movies:
                     director = six.ensure_str(director, errors='ignore')
                 except:
                     director = '0'
-                if director == '0':
-                    continue
+                # if director == '0':
+                    # continue
 
                 try:
                     cast = re.findall('Stars(?:s|):(.+?)(?:\||</div>)', item)[0]
