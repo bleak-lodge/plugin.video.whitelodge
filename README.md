@@ -29,10 +29,11 @@ It also supports Trakt and IMDb watchlists and personal user lists, as well as l
 ***This project uses the TMDb and JustWatch services.***
 
 
-##Installation:
+## Installation:
 
 Repository zip: [download](https://github.com/bleak-lodge/repository.bleak-lodge/raw/main/repository.bleak-lodge/repository.bleak-lodge-1.0.zip) or
-Kodi file manager source for repository: `https://bleak-lodge.github.io`
+
+Kodi file manager source for repository: `https://bleak-lodge.github.io/`
 
 
 ## Screenshots:
