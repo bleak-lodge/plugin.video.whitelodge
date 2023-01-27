@@ -1,5 +1,9 @@
+[B][COLOR gold]v1.03.00[/COLOR][/B]
+- Enabled reuse language invoker Kodi feature
+- Fixed ITV hub add-on uri
+
 [B][COLOR gold]v1.02.04[/COLOR][/B]
-- Reverted IMDb fix - it's been sorted their side
+- Reverted IMDb fix, it's been sorted their side
 
 [B][COLOR gold]v1.02.03[/COLOR][/B]
 - IMDb watchlist/personal lists fix

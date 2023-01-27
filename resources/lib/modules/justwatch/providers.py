@@ -7,16 +7,16 @@ PRIME_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.amazon-tes
 HBO_ENABLED = (control.condVisibility('System.HasAddon(slyguy.hbo.max)') and control.setting('hbo.max') == 'true')
 DISNEY_ENABLED = (control.condVisibility('System.HasAddon(slyguy.disney.plus)') and control.setting('disney.plus') == 'true')
 IPLAYER_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.iplayerwww)') and control.setting('iplayer') == 'true')
-ITV_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.itvhub)') and control.setting('itv') == 'true')
 CURSTREAM_ENABLED = (any((control.condVisibility('System.HasAddon(slyguy.curiositystream)'), control.condVisibility('System.HasAddon(plugin.video.curiositystream)'))) and control.setting('curstream') == 'true')
 HULU_ENABLED = (control.condVisibility('System.HasAddon(slyguy.hulu)') and control.setting('hulu') == 'true')
+ITV_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.itvhub)') and control.setting('itv') == 'true')
 PARAMOUNT_ENABLED = (control.condVisibility('System.HasAddon(slyguy.paramount.plus)') and control.setting('paramount') == 'true')
 CRACKLE_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.crackle)') and control.setting('crackle') == 'true')
 TUBI_ENABLED = (any((control.condVisibility('System.HasAddon(plugin.video.tubi.m7)'), control.condVisibility('System.HasAddon(plugin.video.tubitv)'))) and control.setting('tubi') == 'true')
 UKTVPLAY_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.catchuptvandmore)') and control.setting('uktvplay') == 'true')
 PLUTO_ENABLED = (control.condVisibility('System.HasAddon(plugin.video.plutotv)') and control.setting('plutotv') == 'true')
 
-SCRAPER_INIT = any(e for e in [NETFLIX_ENABLED, PRIME_ENABLED, HBO_ENABLED, DISNEY_ENABLED, ITV_ENABLED, IPLAYER_ENABLED, CURSTREAM_ENABLED, HULU_ENABLED, PARAMOUNT_ENABLED, CRACKLE_ENABLED, TUBI_ENABLED, UKTVPLAY_ENABLED, PLUTO_ENABLED])
+SCRAPER_INIT = any(e for e in [NETFLIX_ENABLED, PRIME_ENABLED, HBO_ENABLED, DISNEY_ENABLED, IPLAYER_ENABLED, CURSTREAM_ENABLED, HULU_ENABLED, ITV_ENABLED, PARAMOUNT_ENABLED, CRACKLE_ENABLED, TUBI_ENABLED, UKTVPLAY_ENABLED, PLUTO_ENABLED])
 
 
 def enabled_services():

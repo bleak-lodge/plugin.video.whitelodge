@@ -239,7 +239,7 @@ class source:
                 itv = [o for o in offers if o['provider_id'] == 41]
                 if itv:
                     itv_url = itv[0]['urls']['standard_web']
-                    streams.append(('itv hub', 'plugin://plugin.video.itvhub/resources/lib/main/play_episode/?url=' + quote_plus(itv_url)))
+                    streams.append(('itv hub', 'plugin://plugin.video.itvhub/resources/lib/main/play_title/?url=' + quote_plus(itv_url)))
 
             if streams:
                 for s in streams:

@@ -4,6 +4,9 @@
     Whitelodge Add-on
 '''
 
-from sys import argv
+import sys
 from resources.lib.modules import router
-router.routing(argv[2])
+
+router.routing(sys.argv[2])
+if router.external():
+    sys.exit(1)

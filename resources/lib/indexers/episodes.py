@@ -1099,9 +1099,9 @@ class episodes:
 
         for item in items:
             try:
-                if not 'english' in item['show']['language'].lower(): raise Exception()
+                if not 'english' in item['show']['language'].lower(): continue
 
-                if limit == 'True' and not 'scripted' in item['show']['type'].lower(): raise Exception()
+                if limit == 'True' and not 'scripted' in item['show']['type'].lower(): continue
 
                 title = item['name']
                 if not title: raise Exception()
@@ -1109,11 +1109,11 @@ class episodes:
 
                 season = item['season']
                 season = re.sub('[^0-9]', '', '%01d' % int(season))
-                if season == '0': raise Exception()
+                if season == '0': continue
 
                 episode = item['number']
                 episode = re.sub('[^0-9]', '', '%01d' % int(episode))
-                if episode == '0': raise Exception()
+                if episode == '0': continue
 
                 tvshowtitle = item['show']['name']
                 if not tvshowtitle: raise Exception()
