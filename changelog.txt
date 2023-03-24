@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.03.01[/COLOR][/B]
+- Fixed Netflix official episode ids parsing
+
 [B][COLOR gold]v1.03.00[/COLOR][/B]
 - Enabled reuse language invoker Kodi feature
 - Fixed ITV hub add-on uri

@@ -133,8 +133,9 @@ class source:
                     nfx_id = nfx_id.rstrip('/').split('/')[-1]
                     if content == 'movies':
                         netflix_id = nfx_id
-                    else: # justwatch returns show ids for nf - get episode ids from instantwatcher
-                        netflix_id = self.get_nf_ep_id(nfx_id, data['season'], data['episode'])
+                    else: # justwatch returns show ids for nf - get episode ids from reelgood
+                        #netflix_id = self.get_nf_ep_id(nfx_id, data['season'], data['episode'])
+                        netflix_id = self.get_rg_ep_id(title, year, data['season'], data['episode'], nfx=True)
                     if netflix_id:
                         streams.append(('netflix', 'plugin://plugin.video.netflix/play_strm/%s/' % netflix_id))
 
@@ -206,7 +207,7 @@ class source:
                             crk_id = crk[0]['urls']['deeplink_android_tv']
                             crk_id = re.findall('intent://Media/(.+?)#', crk_id, flags=re.I)[0]
                         except:
-                            crk_id = self.get_crk_ep_id(title, year, data['season'], data['episode'])
+                            crk_id = self.get_rg_ep_id(title, year, data['season'], data['episode'], crk=True)
                     if crk_id:
                         streams.append(('crackle', 'plugin://plugin.video.crackle/?id=%s&mode=103&type=%s' % (crk_id, content)))
 
@@ -255,27 +256,6 @@ class source:
         return url
 
 
-    def get_nf_ep_id(self, show_id, season, episode):
-        try:
-            countryDict = {'AR': '21', 'AU': '23', 'BE': '26', 'BR': '29', 'CA': '33', 'CO': '36', 'CZ': '307', 'FR': '45', 'DE': '39', 'GR': '327', 'HK': '331', 'HU': '334',
-                           'IS': '265', 'IN': '337', 'IL': '336', 'IT': '269', 'JP': '267', 'LT': '357', 'MY': '378', 'MX': '65', 'NL': '67', 'PL': '392', 'PT': '268', 'RU': '402',
-                           'SG': '408', 'SK': '412', 'ZA': '447', 'KR': '348', 'ES': '270', 'SE': '73', 'CH': '34', 'TH': '425', 'TR': '432', 'GB': '46', 'US': '78'}
-
-            code = countryDict.get(self.country, '78')
-            url = 'https://www.instantwatcher.com/netflix/%s/title/%s' % (code, show_id)
-            r = requests.get(url, timeout=10).text
-            r = client.parseDOM(r, 'div', attrs={'class': 'tdChildren-titles'})[0]
-            seasons = re.findall(r'(<div class="iw-title netflix-title list-title".+?<div class="grandchildren-titles"></div></div>)', r, flags=re.I|re.S)
-            _season = [s for s in seasons if re.findall(r'>Season (.+?)</a>', s, flags=re.I|re.S)[0] == season][0]
-            episodes = client.parseDOM(_season, 'a', ret='data-title-id')
-            episode_id = episodes[int(episode)]
-
-            return episode_id
-        except:
-            log_utils.log('get_nf_ep_id fail', 1)
-            return
-
-
     def get_bbc_ep_url(self, url, season, episode):
         try:
             import simplejson as json
@@ -305,7 +285,7 @@ class source:
             return
 
 
-    def get_crk_ep_id(self, title, year, season, episode):
+    def get_rg_ep_id(self, title, year, season, episode, nfx=False, crk=False):
         try:
             title = title.replace(' ', '-').lower()
             url = 'https://reelgood.com/show/' + '-'.join((title, year))
@@ -315,10 +295,37 @@ class source:
             sequence = '%s.%04d' % (season, int(episode))
             sequence = sequence.rstrip('0')
             m = re.compile('"sequence_number":' + sequence + ',"aired_at":".+?","availability":\[(.+?)\]').findall(r)[0]
-            crk_id = re.compile('"source_name":"crackle","access_type":0,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
+            ep_id = None
+            if nfx:
+                ep_id = re.compile('"source_name":"netflix","access_type":2,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
+            elif crk:
+                ep_id = re.compile('"source_name":"crackle","access_type":0,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
 
-            return crk_id
+            return ep_id
         except:
             log_utils.log('get_crk_ep_id fail', 1)
             return
+
+
+    # def get_nf_ep_id(self, show_id, season, episode):
+        # # site has changed and doesn't provide episode ids anymore
+        # try:
+            # countryDict = {'AR': '21', 'AU': '23', 'BE': '26', 'BR': '29', 'CA': '33', 'CO': '36', 'CZ': '307', 'FR': '45', 'DE': '39', 'GR': '327', 'HK': '331', 'HU': '334',
+                           # 'IS': '265', 'IN': '337', 'IL': '336', 'IT': '269', 'JP': '267', 'LT': '357', 'MY': '378', 'MX': '65', 'NL': '67', 'PL': '392', 'PT': '268', 'RU': '402',
+                           # 'SG': '408', 'SK': '412', 'ZA': '447', 'KR': '348', 'ES': '270', 'SE': '73', 'CH': '34', 'TH': '425', 'TR': '432', 'GB': '46', 'US': '78'}
+
+            # code = countryDict.get(self.country, '78')
+            # url = 'https://www.instantwatcher.com/netflix/%s/title/%s' % (code, show_id)
+            # r = requests.get(url, timeout=10).text
+            # r = client.parseDOM(r, 'div', attrs={'class': 'tdChildren-titles'})[0]
+            # seasons = re.findall(r'(<div class="iw-title netflix-title list-title".+?<div class="grandchildren-titles"></div></div>)', r, flags=re.I|re.S)
+            # _season = [s for s in seasons if re.findall(r'>Season (.+?)</a>', s, flags=re.I|re.S)[0] == season][0]
+            # episodes = client.parseDOM(_season, 'a', ret='data-title-id')
+            # episode_id = episodes[int(episode)]
+
+            # return episode_id
+        # except:
+            # log_utils.log('get_nf_ep_id fail', 1)
+            # return
+
 
