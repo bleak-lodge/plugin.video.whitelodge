@@ -118,7 +118,7 @@ class movies:
         self.traktlist_link = 'https://api.trakt.tv/users/%s/lists/%s/items'
         self.traktcollection_link = 'https://api.trakt.tv/users/me/collection/movies'
         self.traktwatchlist_link = 'https://api.trakt.tv/users/me/watchlist/movies'
-        self.traktfeatured_link = 'https://api.trakt.tv/recommendations/movies?limit=40'
+        self.traktfeatured_link = 'https://api.trakt.tv/recommendations/movies?ignore_collected=true&ignore_watchlisted=true&limit=40'
         self.trakthistory_link = 'https://api.trakt.tv/users/me/history/movies?limit=%s&page=1' % self.items_per_page
         self.onDeck_link = 'https://api.trakt.tv/sync/playback/movies?limit=%s' % self.items_per_page
         # self.search_link = 'https://api.trakt.tv/search/movie?limit=20&page=1&query='
@@ -142,7 +142,7 @@ class movies:
             if u in self.trakt_link and '/users/' in url:
                 try:
                     if url == self.trakthistory_link: raise Exception()
-                    if not '/users/me/' in url: raise Exception()
+                    #if not '/users/me/' in url: raise Exception()
                     if trakt.getActivity() > cache.timeout(self.trakt_list, url, self.trakt_user): raise Exception()
                     self.list = cache.get(self.trakt_list, 720, url, self.trakt_user)
                 except:
@@ -205,7 +205,7 @@ class movies:
         for (id, term) in dbcur.fetchall():
             if term not in str(lst):
                 delete_option = True
-                navigator.navigator().addDirectoryItem(term.title(), 'movieSearchterm&name=%s&code=%s' % (term, code), 'search.png', 'DefaultMovies.png')
+                navigator.navigator().addDirectoryItem(term.title(), 'movieSearchterm&name=%s&code=%s' % (term, code), 'search.png', 'DefaultMovies.png', context=(32644, 'movieDeleteterm&name=%s' % term))
                 lst += [(term)]
         dbcur.close()
 
@@ -248,6 +248,17 @@ class movies:
         dbcur.close()
         url = self.tm_search_link % urllib_parse.quote(q)
         self.get(url, code=code)
+
+
+    def delete_term(self, q):
+        control.idle()
+
+        dbcon = database.connect(control.searchFile)
+        dbcur = dbcon.cursor()
+        dbcur.execute("DELETE FROM movies WHERE term = ?", (q,))
+        dbcon.commit()
+        dbcur.close()
+        control.refresh()
 
 
     def mosts(self):

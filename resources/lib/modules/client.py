@@ -222,7 +222,10 @@ def request(url, close=True, redirect=True, error=False, verify=True, proxy=None
             if response.code == 503:
 
                 if 'cf-browser-verification' in response.read(5242880):
-                    from resources.lib.modules import cfscrape
+                    if six.PY3:
+                        from resources.lib.modules import cfscrape
+                    else:
+                        from resources.lib.modules import cfscrape_py2 as cfscrape
 
                     netloc = '{0}://{1}'.format(urlparse(url).scheme, urlparse(url).netloc)
 

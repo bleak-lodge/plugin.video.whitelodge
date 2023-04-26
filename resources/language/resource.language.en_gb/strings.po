@@ -176,11 +176,11 @@ msgid "History"
 msgstr ""
 
 msgctxt "#32037"
-msgid "Progress"
+msgid "Progress (Recently Watched)"
 msgstr ""
 
 msgctxt "#32038"
-msgid "Episodes"
+msgid "Progress (Recently Aired)"
 msgstr ""
 
 msgctxt "#32039"
@@ -637,10 +637,6 @@ msgstr ""
 
 msgctxt "#32324"
 msgid "In Theaters"
-msgstr ""
-
-msgctxt "#32325"
-msgid "New Episodes"
 msgstr ""
 
 msgctxt "#32326"
@@ -1169,4 +1165,8 @@ msgstr ""
 
 msgctxt "#32643"
 msgid "Search TV Shows on My Services"
+msgstr ""
+
+msgctxt "#32644"
+msgid "[I]Remove term[/I]"
 msgstr ""

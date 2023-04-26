@@ -457,7 +457,8 @@ class episodes:
         #self.mycalendar_link = 'https://api.trakt.tv/calendars/my/shows/date[29]/60/'
         self.mycalendar_link = 'https://api.trakt.tv/calendars/my/shows/date[30]/31/' #go back 30 and show all shows aired until tomorrow
         self.trakthistory_link = 'https://api.trakt.tv/users/me/history/shows?limit=%s' % self.items_per_page
-        self.progress_link = 'https://api.trakt.tv/users/me/watched/shows'
+        self.progresswatched_link = 'https://api.trakt.tv/users/me/watched/shows?wathced'
+        self.progressaired_link = 'https://api.trakt.tv/users/me/watched/shows?aired'
         self.hiddenprogress_link = 'https://api.trakt.tv/users/hidden/progress_watched?limit=1000&type=show'
         self.calendar_link = 'https://api.tvmaze.com/schedule?date=%s'
         self.onDeck_link = 'https://api.trakt.tv/sync/playback/episodes?limit=%s' % self.items_per_page
@@ -499,10 +500,17 @@ class episodes:
             try: url = getattr(self, url + '_link')
             except: pass
 
-            if self.trakt_link in url and url == self.progress_link:
+            if self.trakt_link in url and url == self.progresswatched_link:
                 self.blist = cache.get(self.trakt_progress_list, 720, url, self.trakt_user, self.lang)
                 self.list = []
                 self.list = cache.get(self.trakt_progress_list, 0, url, self.trakt_user, self.lang)
+                self.list = sorted(self.list, key=lambda k: k['_sort_key'], reverse=True)
+
+            elif self.trakt_link in url and url == self.progressaired_link:
+                self.blist = cache.get(self.trakt_progress_list, 720, url, self.trakt_user, self.lang)
+                self.list = []
+                self.list = cache.get(self.trakt_progress_list, 0, url, self.trakt_user, self.lang)
+                self.list = sorted(self.list, key=lambda k: k['premiered'], reverse=True)
 
             elif self.trakt_link in url and url == self.mycalendar_link:
                 self.blist = cache.get(self.trakt_episodes_list, 720, url, self.trakt_user, self.lang)
@@ -553,7 +561,7 @@ class episodes:
             setting = control.setting('tv.widget')
 
         if setting == '2':
-            self.calendar(self.progress_link)
+            self.calendar(self.progresswatched_link)
         elif setting == '3':
             self.calendar(self.mycalendar_link)
         else:
@@ -746,14 +754,13 @@ class episodes:
 
     def trakt_progress_list(self, url, user, lang):
         try:
-            url += '?extended=full'
+            url = url.split('?')[0] + '?extended=full'
             result = trakt.getTraktAsJson(url)
             #log_utils.log('prog_res: ' + str(result))
             items = []
         except:
             return
 
-        sortorder = control.setting('prgr.sortorder')
         for item in result:
             try:
                 num_1 = 0
@@ -939,14 +946,6 @@ class episodes:
         for i in items: threads.append(workers.Thread(items_list, i))
         [i.start() for i in threads]
         [i.join() for i in threads]
-
-
-        try:
-            if sortorder == '0':
-                self.list = sorted(self.list, key=lambda k: k['premiered'], reverse=True)
-            else:
-                self.list = sorted(self.list, key=lambda k: k['_sort_key'], reverse=True)
-        except: pass
 
         return self.list
 

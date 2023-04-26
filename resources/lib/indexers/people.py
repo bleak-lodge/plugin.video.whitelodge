@@ -59,7 +59,7 @@ class People:
         for (id, term) in dbcur.fetchall():
             if term not in str(lst):
                 delete_option = True
-                navigator.navigator().addDirectoryItem(term.title(), 'peopleSearchterm&name=%s&content=%s' % (term, content), 'people-search.png', 'DefaultMovies.png')
+                navigator.navigator().addDirectoryItem(term.title(), 'peopleSearchterm&name=%s&content=%s' % (term, content), 'people-search.png', 'DefaultMovies.png', context=(32644, 'peopleDeleteterm&name=%s' % term))
                 lst += [(term)]
         dbcur.close()
 
@@ -102,6 +102,17 @@ class People:
         dbcur.close()
         url = self.person_search_link + urllib_parse.quote_plus(q)
         self.persons(url, content=content)
+
+
+    def delete_term(self, q):
+        control.idle()
+
+        dbcon = database.connect(control.searchFile)
+        dbcur = dbcon.cursor()
+        dbcur.execute("DELETE FROM people WHERE term = ?", (q,))
+        dbcon.commit()
+        dbcur.close()
+        control.refresh()
 
 
     def bio_txt(self, url, name):

@@ -1,3 +1,10 @@
+[B][COLOR gold]v1.03.02[/COLOR][/B]
+- Rearranged personal menus items (My Movies/My TV Shows)
+- Made 2 separate Trakt Progress lists (Recently Watched/Recently Aired)
+  instead of having one or the other via setting
+- Added context menu option to remove saved search terms
+- Updated 3rd party libs
+
 [B][COLOR gold]v1.03.01[/COLOR][/B]
 - Fixed Netflix official episode ids parsing
 
