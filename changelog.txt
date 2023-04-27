@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.03.03[/COLOR][/B]
+- Fixed issue for devices with old SSL versions
+
 [B][COLOR gold]v1.03.02[/COLOR][/B]
 - Rearranged personal menus items (My Movies/My TV Shows)
 - Made 2 separate Trakt Progress lists (Recently Watched/Recently Aired)
