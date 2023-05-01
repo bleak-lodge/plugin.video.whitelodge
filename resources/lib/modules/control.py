@@ -367,7 +367,6 @@ def getCurrentViewId():
 def refresh():
     return execute('Container.Refresh')
 
-
 def busy():
     if getKodiVersion() >= 18: return execute('ActivateWindow(busydialognocancel)')
     else: return execute('ActivateWindow(busydialog)')
@@ -391,9 +390,8 @@ def metadataClean(metadata): # Filter out non-existing/custom keys. Otherise the
 
 
 def installAddon(addon_id):
-    addon_path = os.path.join(transPath('special://home/addons'), addon_id)
-    if not os.path.exists(addon_path) == True:
-        xbmc.executebuiltin('InstallAddon(%s)' % (addon_id))
+    if not condVisibility('System.HasAddon(%s)' % addon_id):
+        xbmc.executebuiltin('InstallAddon(%s)' % addon_id)
     else:
         infoDialog('{0} is already installed'.format(addon_id), sound=True)
 

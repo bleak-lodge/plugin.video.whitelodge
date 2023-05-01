@@ -3,6 +3,7 @@
 from resources.lib.modules import control
 from resources.lib.modules import client
 from resources.lib.modules import cache
+from resources.lib.modules import utils
 from resources.lib.modules import log_utils
 from resources.lib.indexers import navigator
 
@@ -118,19 +119,22 @@ class People:
     def bio_txt(self, url, name):
         url = self.bio_link % url
         r = cache.get(client.request, 168, url)
-
-        try: born = client.parseDOM(r, 'time', ret='datetime')[0]
-        except: born = ''
-        try: died = client.parseDOM(r, 'time', ret='datetime')[1]
-        except: died = ''
-
+        r = six.ensure_text(r)
+        r = re.compile('type="application/json">({"props":.+?)</script><script>').findall(r)[0]
+        r = utils.json_loads_as_str(r)['props']['pageProps']['contentData']['entityMetadata']
         try:
-            bio = client.parseDOM(r, 'div', attrs={'class': r'soda odd'})[0]
-            bio = client.parseDOM(bio, 'p')[0]
-            bio = client.replaceHTMLCodes(bio)
-            bio = six.ensure_str(bio, errors='ignore')
-            bio = bio.replace('<br />', '[CR]')
-            bio = re.sub(r'<.*?>', '', bio)
+            born = r['birthDate']['displayableProperty']['value']['plainText']
+        except:
+            born = ''
+        try:
+            if r['deathStatus'] == 'DEAD':
+                died = r['deathDate']['displayableProperty']['value']['plainText']
+            else:
+                died = ''
+        except:
+            died = ''
+        try:
+            bio = r['bio']['text']['plainText']
         except:
             bio = ''
 
@@ -197,19 +201,25 @@ class People:
 
     def getPeople(self, name, url):
         try:
-            select = control.selectDialog(['Movies', 'TV Shows', 'Biography'], heading=name)
-            if select == -1: return
-            elif select == 0:
-                from resources.lib.indexers import movies
-                movies.movies().get(self.person_movie_link % url)
-            elif select == 1:
-                from resources.lib.indexers import tvshows
-                tvshows.tvshows().get(self.person_tv_link % url)
-            elif select == 2:
-                self.bio_txt(url, name)
+            while True:
+                select = control.selectDialog(['Movies', 'TV Shows', 'Biography'], heading=name)
+                if select == -1:
+                    break
+                    return
+                elif select == 0:
+                    from resources.lib.indexers import movies
+                    movies.movies().get(self.person_movie_link % url)
+                    break
+                elif select == 1:
+                    from resources.lib.indexers import tvshows
+                    tvshows.tvshows().get(self.person_tv_link % url)
+                    break
+                elif select == 2:
+                    self.bio_txt(url, name)
         except:
             log_utils.log('getPeople', 1)
             pass
+
 
 
     def addDirectory(self, items, content):
