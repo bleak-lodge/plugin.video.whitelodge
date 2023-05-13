@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.03.05[/COLOR][/B]
+- Fixed official scraper for episodes
+
 [B][COLOR gold]v1.03.04[/COLOR][/B]
 - Fixed biography on People menu
 - Other People and Cast context menu fixes and improvements

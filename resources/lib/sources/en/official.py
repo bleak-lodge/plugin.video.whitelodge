@@ -97,23 +97,29 @@ class source:
                 jw0 = JustWatch(country='US')
                 r = jw0.search_for_item(query=title.lower(), content_types=['show'], release_year_from=int(year)-1, release_year_until=int(year)+1)
                 items = r['items']
-                #log_utils.log('jw items: ' + repr(items))
                 jw_id = [i['id'] for i in items if source_utils.is_match(' '.join((i['title'], str(i['original_release_year']))), title, year, self.aliases)]
 
                 if jw_id:
-                    r = jw.get_episodes(str(jw_id[0]))
-                    item = r['items']
-                    item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
-                    if item:
-                        result = item[0]
-                    else:
-                        for p in range(2, 5):
-                            r = jw.get_episodes(str(jw_id[0]), page=p)
-                            item = r['items']
-                            item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
-                            if item:
-                                result = item[0]
-                                break
+                    r = jw.get_title(jw_id[0], content_type='show')
+                    seasons = r['seasons']
+                    season_id = [s['id'] for s in seasons if s['season_number'] == int(data['season'])][0]
+                    r = jw.get_title(season_id, content_type='show_season')
+                    episodes = r['episodes']
+                    result = [e for e in episodes if e['episode_number'] == int(data['episode'])][0]
+
+                    # r = jw.get_episodes(str(jw_id[0])) # newest_episodes endpoint doesn't seem to exist anymore in jw api
+                    # item = r['items']
+                    # item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
+                    # if item:
+                        # result = item[0]
+                    # else:
+                        # for p in range(2, 5):
+                            # r = jw.get_episodes(str(jw_id[0]), page=p)
+                            # item = r['items']
+                            # item = [i for i in item if i['season_number'] == int(data['season']) and i['episode_number'] == int(data['episode'])]
+                            # if item:
+                                # result = item[0]
+                                # break
 
             if not result:
                 raise Exception('%s not found in jw database' % title)

@@ -205,15 +205,12 @@ class People:
                 select = control.selectDialog(['Movies', 'TV Shows', 'Biography'], heading=name)
                 if select == -1:
                     break
-                    return
                 elif select == 0:
                     from resources.lib.indexers import movies
-                    movies.movies().get(self.person_movie_link % url)
-                    break
+                    return movies.movies().get(self.person_movie_link % url)
                 elif select == 1:
                     from resources.lib.indexers import tvshows
-                    tvshows.tvshows().get(self.person_tv_link % url)
-                    break
+                    return tvshows.tvshows().get(self.person_tv_link % url)
                 elif select == 2:
                     self.bio_txt(url, name)
         except:
@@ -223,6 +220,7 @@ class People:
 
 
     def addDirectory(self, items, content):
+        import sys
         if items == None or len(items) == 0: return #control.idle() ; sys.exit()
 
         sysaddon = sys.argv[0]
