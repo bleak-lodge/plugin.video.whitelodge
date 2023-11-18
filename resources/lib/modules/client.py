@@ -304,7 +304,7 @@ def request(url, close=True, redirect=True, error=False, verify=True, proxy=None
 
                 result = six.ensure_text(result, errors='ignore')
 
-            return result, response_code, headers, content, cookie
+            return result, response_code, headers, content, cookie, response.geturl()
 
         elif output == 'geturl':
 

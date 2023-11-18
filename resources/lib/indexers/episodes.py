@@ -1156,11 +1156,11 @@ class episodes:
 
                 try: duration = str(item['show']['runtime'])
                 except: duration = ''
-                if not duration: duration = '0'
+                if not duration or duration == 'None': duration = '0'
 
                 try: rating = str(item['show']['rating']['average'])
                 except: rating = ''
-                if not rating or rating == '0.0': rating = '0'
+                if rating in [None, 'None', '0.0']: rating = '0'
 
                 votes = '0'
 

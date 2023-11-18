@@ -265,7 +265,7 @@ class channels:
             duration = str(item.get('runtime', 0)) or '0'
 
             rating = str(item.get('vote_average', '')) or '0'
-            votes = item.get('vote_count', '') or '0'
+            votes = str(item.get('vote_count', '')) or '0'
 
             castwiththumb = []
             try:

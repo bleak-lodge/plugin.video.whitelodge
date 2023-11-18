@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.04.00[/COLOR][/B]
+- Fixed IMDb Movies/TV shows/People lists after IMDb search page changes
+
 [B][COLOR gold]v1.03.05[/COLOR][/B]
 - Fixed official scraper for episodes
 
