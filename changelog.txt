@@ -1,3 +1,9 @@
+[B][COLOR gold]v1.05.00[/COLOR][/B]
+- Added TMDb as main lists provider - optional, enable in settings
+    Note: TMDb lists are hardcoded to 20 items per page
+- Added page counter on Next Page items
+- Various other lists tweaks and additions
+
 [B][COLOR gold]v1.04.00[/COLOR][/B]
 - Fixed IMDb Movies/TV shows/People lists after IMDb search page changes
 

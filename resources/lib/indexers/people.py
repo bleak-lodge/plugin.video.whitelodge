@@ -28,7 +28,7 @@ class People:
         self.items_per_page = str(control.setting('items.per.page')) or '20'
 
         self.personlist_link = 'https://www.imdb.com/search/name?gender=male,female&count=50&start=1'
-        self.person_search_link = 'https://www.imdb.com/search/name?count=50&name='
+        self.person_search_link = 'https://www.imdb.com/search/name?name=%s&count=50'
         self.person_movie_link = 'https://www.imdb.com/search/title?title_type=movie,short,tvMovie&production_status=released&role=%s&sort=year,desc&count=%s&start=1' % ('%s', self.items_per_page)
         self.person_tv_link = 'https://www.imdb.com/search/title?title_type=tvSeries,tvMiniSeries&release_date=,date[0]&role=%s&sort=year,desc&count=%s&start=1' % ('%s', self.items_per_page)
         self.bio_link = 'https://www.imdb.com/name/%s/bio/'
@@ -87,7 +87,7 @@ class People:
         dbcur.execute("INSERT INTO people VALUES (?,?)", (None,q))
         dbcon.commit()
         dbcur.close()
-        url = self.person_search_link + urllib_parse.quote_plus(q)
+        url = self.person_search_link % urllib_parse.quote_plus(q)
         self.persons(url, content=content)
 
 
@@ -101,7 +101,7 @@ class People:
         dbcur.execute("INSERT INTO people VALUES (?,?)", (None, q))
         dbcon.commit()
         dbcur.close()
-        url = self.person_search_link + urllib_parse.quote_plus(q)
+        url = self.person_search_link % urllib_parse.quote_plus(q)
         self.persons(url, content=content)
 
 
@@ -165,7 +165,13 @@ class People:
                 next = client.replaceHTMLCodes(next)
                 next = six.ensure_str(next, errors='ignore')
             except:
-                next = ''
+                next = page = ''
+
+            if next:
+                if '&page=' in url:
+                    page = re.findall('&page=(\d+)', url)[0]
+                else:
+                    page = '1'
 
             for item in items:
                 try:
@@ -195,7 +201,7 @@ class People:
                     except:
                         info = ''
 
-                    self.list.append({'name': name, 'id': id, 'image': image, 'plot': info, 'next': next})
+                    self.list.append({'name': name, 'id': id, 'image': image, 'plot': info, 'page': page, 'next': next})
                 except:
                     pass
 
@@ -203,18 +209,23 @@ class People:
             try:
                 data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result)[0]
                 data = utils.json_loads_as_str(data)
-                items = data['props']['pageProps']['searchResults']['nameResults']['nameListItems']
-                items = items[-50:]
+                data = data['props']['pageProps']['searchResults']['nameResults']['nameListItems']
+                items = data[-50:]
                 #log_utils.log(repr(items))
             except:
                 return
 
             try:
                 cur = re.findall('&count=(\d+)', url)[0]
+                if int(cur) > len(data):
+                    items = data[-(len(data) - int(cur) + 50):]
+                    raise Exception()
                 next = re.sub('&count=\d+', '&count=%s' % str(int(cur) + 50), url)
                 #log_utils.log('next_url: ' + next)
+                page = int(cur) // 50
             except:
-                next = ''
+                log_utils.log('next_fail', 1)
+                next = page = ''
 
             for item in items:
                 try:
@@ -235,7 +246,7 @@ class People:
 
                     info = '[I]%s[/I][CR]Known for: [I]%s[/I][CR][CR]%s' % (job, known_for, bio)
 
-                    self.list.append({'name': name, 'id': id, 'image': image, 'plot': info, 'next': next})
+                    self.list.append({'name': name, 'id': id, 'image': image, 'plot': info, 'page': page, 'next': next})
                 except:
                     log_utils.log('person_fail', 1)
                     pass
@@ -260,7 +271,6 @@ class People:
         except:
             log_utils.log('getPeople', 1)
             pass
-
 
 
     def addDirectory(self, items, content):
@@ -328,6 +338,8 @@ class People:
 
             icon = control.addonNext()
             url = '%s?action=persons&url=%s&content=%s' % (sysaddon, urllib_parse.quote_plus(next), content)
+
+            if 'page' in items[0] and items[0]['page']: nextMenu += '[I] (%s)[/I]' % str(int(items[0]['page']) + 1)
 
             try: item = control.item(label=nextMenu, offscreen=True)
             except: item = control.item(label=nextMenu)

@@ -44,7 +44,7 @@ class channels:
         self.lang = control.apiLanguage()['tmdb']
 
         self.tm_user = control.setting('tm.user') or api_keys.tmdb_key
-        self.tmdb_api_link = 'https://api.themoviedb.org/3/movie/%s?api_key=%s&language=%s&append_to_response=credits,external_ids' % ('%s', self.tm_user, self.lang)
+        self.tmdb_api_link = 'https://api.themoviedb.org/3/movie/%s?api_key=%s&language=%s&append_to_response=credits,release_dates,external_ids' % ('%s', self.tm_user, self.lang)
         self.tm_img_link = 'https://image.tmdb.org/t/p/w%s%s'
         self.related_link = 'https://api.themoviedb.org/3/movie/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
         # self.related_link = 'https://api.trakt.tv/movies/%s/related'
@@ -100,10 +100,10 @@ class channels:
         self_items = []
         filtered_items = set()
 
-        for t, y, c, r in self.items:
+        for t, y, c in self.items:
            if not t in filtered_items:
               filtered_items.add(t)
-              self_items.append((t, y, c, r))
+              self_items.append((t, y, c))
 
         threads = []
         for i in range(0, len(self_items)): threads.append(workers.Thread(self.items_list, self_items[i]))
@@ -135,18 +135,7 @@ class channels:
             title = result['t']
             title = title.replace('(%s)' % year, '').strip()
 
-            try:
-                rated = result['m'][4]
-            except:
-                rated = '0'
-            if rated == 'PG': pass
-            elif rated == 'U': rated = 'G'
-            elif '12' in rated: rated = 'PG-13'
-            elif rated == '15': rated = 'R'
-            elif '18' in rated: rated = 'NC-17'
-            else: rated = '0'
-
-            self.items.append((title, year, channel, rated))
+            self.items.append((title, year, channel))
         except:
             pass
 
@@ -264,6 +253,12 @@ class channels:
 
             duration = str(item.get('runtime', 0)) or '0'
 
+            try:
+                mpaa = item['release_dates']['results']
+                mpaa = [x['certification'] for i in mpaa for x in i['release_dates'] if i['iso_3166_1'] == 'US' and x['certification'] != '' and x['note'] == ''][0] or '0'
+            except:
+                mpaa = '0'
+
             rating = str(item.get('vote_average', '')) or '0'
             votes = str(item.get('vote_count', '')) or '0'
 
@@ -378,7 +373,7 @@ class channels:
             self.list.append({'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'poster': poster, 'banner': banner, 'fanart': fanart,
                     'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'discart': discart, 'premiered': premiered, 'genre': genre, 'duration': duration,
                     'director': director, 'writer': writer, 'castwiththumb': castwiththumb, 'plot': plot, 'tagline': tagline, 'status': status, 'studio': studio, 'country': country,
-                    'rating': rating, 'votes': votes, 'channel': i[2], 'mpaa': i[3]})
+                    'rating': rating, 'votes': votes, 'channel': i[2], 'mpaa': mpaa})
         except:
             pass
 

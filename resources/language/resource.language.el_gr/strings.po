@@ -203,6 +203,10 @@ msgctxt "#32043"
 msgid "[B]Whitelodge[/B] : Settings"
 msgstr "[B]Whitelodge[/B] : Ρυθμίσεις"
 
+msgctxt "#32046"
+msgid "[B]Whitelodge[/B] : Maintenance"
+msgstr "[B]Whitelodge[/B] : Συντήρηση"
+
 msgctxt "#32049"
 msgid "[B]Whitelodge[/B] : Viewtypes"
 msgstr "[B]Whitelodge[/B] : Προβολές"
@@ -991,6 +995,14 @@ msgstr "Εμφάνιση μη μεταδομένων σεζόν/επεισοδί
 msgctxt "#32571"
 msgid "Hide movies in cinema"
 msgstr "Απόκρυψη ταινιών που προβάλλονται στις αίθουσες"
+
+msgctxt "#32573"
+msgid "Primary Lists Provider"
+msgstr "Κύριος Πάροχος Λιστών"
+
+msgctxt "#32579"
+msgid "Upcoming"
+msgstr "Αναμένονται"
 
 msgctxt "#32580"
 msgid "Recently Released"

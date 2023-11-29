@@ -51,7 +51,7 @@ def routing(_argv):
 
     rtype = params.get('rtype')
 
-    code = params.get('code')
+    code = params.get('code') or ''
 
     windowedtrailer = params.get('windowedtrailer')
     windowedtrailer = int(windowedtrailer) if windowedtrailer in ('0', '1') else 0
@@ -169,19 +169,19 @@ def routing(_argv):
 
     elif action == 'movieLanguages':
         from resources.lib.indexers import movies
-        movies.movies().languages(code)
+        movies.movies().languages(code, tmdb)
 
     elif action == 'movieCertificates':
         from resources.lib.indexers import movies
-        movies.movies().certifications(code)
+        movies.movies().certifications(code, tmdb)
 
     elif action == 'movieYears':
         from resources.lib.indexers import movies
-        movies.movies().years(code)
+        movies.movies().years(code, tmdb)
 
     elif action == 'movieDecades':
         from resources.lib.indexers import movies
-        movies.movies().decades(code)
+        movies.movies().decades(code, tmdb)
 
     elif action == 'movieGenres':
         from resources.lib.indexers import movies
@@ -243,9 +243,29 @@ def routing(_argv):
         from resources.lib.indexers import tvshows
         tvshows.tvshows().genres()
 
+    elif action == 'tvTmdbGenres':
+        from resources.lib.indexers import tvshows
+        tvshows.tvshows().tmdb_genres(code)
+
     elif action == 'tvNetworks':
         from resources.lib.indexers import tvshows
         tvshows.tvshows().networks()
+
+    elif action == 'tvYears':
+        from resources.lib.indexers import tvshows
+        tvshows.tvshows().years(code, tmdb)
+
+    elif action == 'tvDecades':
+        from resources.lib.indexers import tvshows
+        tvshows.tvshows().decades(code, tmdb)
+
+    elif action == 'tvLanguages':
+        from resources.lib.indexers import tvshows
+        tvshows.tvshows().languages(code, tmdb)
+
+    elif action == 'tvCertificates':
+        from resources.lib.indexers import tvshows
+        tvshows.tvshows().certifications(code)
 
     elif action == 'tvServicesMenu':
         from resources.lib.indexers import navigator
@@ -254,18 +274,6 @@ def routing(_argv):
     elif action == 'tvServices':
         from resources.lib.indexers import tvshows
         tvshows.tvshows().services(code)
-
-    elif action == 'tvLanguages':
-        from resources.lib.indexers import tvshows
-        tvshows.tvshows().languages(code)
-
-    elif action == 'tvTmdbGenres':
-        from resources.lib.indexers import tvshows
-        tvshows.tvshows().tmdb_genres(code)
-
-    elif action == 'tvCertificates':
-        from resources.lib.indexers import tvshows
-        tvshows.tvshows().certifications()
 
     elif action == 'tvUserlists':
         from resources.lib.indexers import tvshows
