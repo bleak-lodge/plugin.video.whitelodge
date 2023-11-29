@@ -388,8 +388,8 @@ msgid "Username"
 msgstr "Όνομα χρήστη"
 
 msgctxt "#32118"
-msgid "Enter your Opensubtitles.org log-in credentials on 'Accounts' tab"
-msgstr "Εισάγετε τα Opensubtitles.org στοιχεία σας στην καρτέλα 'Λογαριασμοί'"
+msgid "For more than 5 subtitle downloads per 24h, enter your[CR]Opensubtitles.com credentials on 'Accounts' tab"
+msgstr "Για περισσότερες από 5 λήψεις ανα 24ωρο, εξουσιοδοτήστε τον[CR]Opensubtitles.com λογαριασμό σας στην καρτέλα 'Λογαριασμοί'"
 
 msgctxt "#32119"
 msgid "Select"
