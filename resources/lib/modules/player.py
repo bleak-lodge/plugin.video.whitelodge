@@ -52,6 +52,13 @@ class player(xbmc.Player):
                 item.setArt({'icon': thumb, 'thumb': thumb, 'tvshow.poster': poster, 'season.poster': poster, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart})
 
             if control.getKodiVersion() < 20:
+                castwiththumb = meta.get('castwiththumb')
+                if castwiththumb and not castwiththumb == '0':
+                    if control.getKodiVersion() >= 18:
+                        item.setCast(castwiththumb)
+                    else:
+                        cast = [(p['name'], p['role']) for p in castwiththumb]
+                        meta.update({'cast': cast})
                 item.setInfo(type='video', infoLabels=control.metadataClean(meta))
             else:
                 vtag = item.getVideoInfoTag()
@@ -71,6 +78,15 @@ class player(xbmc.Player):
                 vtag.setPremiered(meta.get('premiered'))
                 vtag.setIMDBNumber(meta.get('imdb'))
                 vtag.setUniqueIDs({'imdb': meta.get('imdb', ''), 'tmdb': str(meta.get('tmdb', '0'))})
+                cast = []
+                if 'castwiththumb' in meta and not meta['castwiththumb'] == '0':
+                    for p in meta['castwiththumb']:
+                        cast.append(control.actor(p['name'], p['role'], 0, p['thumbnail']))
+                elif 'cast' in meta and not meta['cast'] == '0':
+                    for p in meta['cast']:
+                        cast.append(control.actor(p, '', 0, ''))
+                vtag.setCast(cast)
+
                 if 'tvshowtitle' in meta:
                     vtag.setTvShowTitle(meta.get('tvshowtitle'))
                     vtag.setSeason(int(meta['season']))
@@ -96,7 +112,7 @@ class player(xbmc.Player):
         def playerMeta(metadata):
             if not metadata: return metadata
             allowed = ['title', 'tvshowtitle', 'originaltitle', 'label', 'year', 'season', 'episode', 'imdbnumber', 'imdb', 'tmdb', 'premiered',
-                       'genre', 'mpaa', 'rating', 'votes', 'plot', 'tagline', 'duration', 'studio', 'director', 'mediatype']
+                       'genre', 'mpaa', 'rating', 'votes', 'plot', 'tagline', 'duration', 'studio', 'director', 'castwiththumb', 'mediatype']
             return {k: v for k, v in six.iteritems(metadata) if k in allowed}
 
         try:

@@ -1352,14 +1352,19 @@ class movies:
                 duration = ''
             if not duration: duration = '0'
 
-            try:
-                mpaa = self.list[i]['mpaa']
-            except:
+            mpaa = self.list[i]['mpaa']
+            if mpaa == '0':
                 try:
-                    mpaa = item['release_dates']['results']
-                    mpaa = [x['certification'] for i in mpaa for x in i['release_dates'] if i['iso_3166_1'] == 'US' and x['certification'] != '' and x['note'] == ''][0] or '0'
+                    m = item['release_dates']['results']
+                    m = [i['release_dates'] for i in m if i['iso_3166_1'] == 'US'][0]
+                    for c in m:
+                        if c['certification']:
+                            if c['type'] not in [3, 4, 5, 6]:
+                                continue
+                            mpaa = c['certification']
+                            break
                 except:
-                    mpaa = '0'
+                    pass
 
             # rating = self.list[i]['rating']
             # votes = self.list[i]['votes']
@@ -1604,6 +1609,8 @@ class movies:
                 cm.append((addToLibrary, 'RunPlugin(%s?action=movieToLibrary&name=%s&title=%s&year=%s&imdb=%s&tmdb=%s)' % (sysaddon, sysname, systitle, year, imdb, tmdb)))
 
                 cm.append((clearProviders, 'RunPlugin(%s?action=clearCacheProviders)' % sysaddon))
+
+                #cm.append(('[I]Clear All Cache[/I]', 'RunPlugin(%s?action=clearAllCache)' % sysaddon))
 
                 art = {'icon': poster, 'thumb': poster, 'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape}
 

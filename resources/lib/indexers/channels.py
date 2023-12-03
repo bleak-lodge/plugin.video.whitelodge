@@ -253,11 +253,18 @@ class channels:
 
             duration = str(item.get('runtime', 0)) or '0'
 
+            mpaa = '0'
             try:
-                mpaa = item['release_dates']['results']
-                mpaa = [x['certification'] for i in mpaa for x in i['release_dates'] if i['iso_3166_1'] == 'US' and x['certification'] != '' and x['note'] == ''][0] or '0'
+                m = item['release_dates']['results']
+                m = [i['release_dates'] for i in m if i['iso_3166_1'] == 'US'][0]
+                for c in m:
+                    if c['certification']:
+                        if c['type'] not in [3, 4, 5, 6]:
+                            continue
+                        mpaa = c['certification']
+                        break
             except:
-                mpaa = '0'
+                pass
 
             rating = str(item.get('vote_average', '')) or '0'
             votes = str(item.get('vote_count', '')) or '0'

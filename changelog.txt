@@ -1,3 +1,10 @@
+[B][COLOR gold]v1.05.03[/COLOR][/B]
+- Fixed Official scraper by utilising JustWatch's GraphQL API
+
+[B][COLOR gold]v1.05.02[/COLOR][/B]
+- Added certification info on TMDb movie lists
+- Pass cast info on player
+
 [B][COLOR gold]v1.05.01[/COLOR][/B]
 - Automatic subtitles download now uses the new Opensubtitles.com API
     For more than 5 subtitle downloads per 24h, enter your
