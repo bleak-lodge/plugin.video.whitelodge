@@ -71,11 +71,9 @@ class source:
             content_type = ['MOVIE'] if content == 'movies' else ['SHOW']
 
 
-            node = search(title, content_type, {'min': int(year)-1, 'max': int(year)+1}, self.country, 'en', 10, False)
+            node = search(title, content_type, {'min': int(year)-1, 'max': int(year)+1}, self.country)
             node = node['data']['popularTitles']['edges']
-            #log_utils.log('simplejustwatch node: ' + repr(node))
-            result = [i['node'] for i in node if i['node']['content']['externalIds']['imdbId'] == data['imdb']]
-            result += [i['node'] for i in node if i['node']['content']['externalIds']['tmdbId'] == data['tmdb']]
+            result = [i['node'] for i in node if (i['node']['content']['externalIds']['imdbId'] == data['imdb'] or i['node']['content']['externalIds']['tmdbId'] == data['tmdb'])]
             #result += [i['node'] for i in node if source_utils.is_match(' '.join((i['node']['content']['title'], str(i['node']['content']['originalReleaseYear']))), title, year, self.aliases)]
             result = result[0]
             if not result:
@@ -84,16 +82,17 @@ class source:
             if content == 'tvshows':
                 node = node_by_id(result['id'], self.country)
                 node = node['data']['node']['seasons']
-                season = [s['episodes'] for s in node if s['content']['seasonNumber'] == int(data['season'])][0]
-                result = [e for e in season if e['content']['episodeNumber'] == int(data['episode'])][0]
+                node = [s['episodes'] for s in node if s['content']['seasonNumber'] == int(data['season'])][0]
+                result = [e for e in node if e['content']['episodeNumber'] == int(data['episode'])][0]
 
-            #log_utils.log('simplejustwatch result: ' + repr(result))
+            #log_utils.log('justwatch_graphql result: ' + repr(result))
 
-            #offers = offers_by_id(result['id'], self.country)
             offers = result['offers']
+            #offers = offers_by_id(result['id'], self.country)
+            #offers = offers['data']['node']['flatrate']
             if not offers:
                 raise Exception('%s not available in %s' % (title, self.country))
-            #log_utils.log('simplejustwatch offers: ' + repr(offers))
+            #log_utils.log('justwatch_graphql offers: ' + repr(offers))
 
 
             streams = []
@@ -115,7 +114,7 @@ class source:
                         pass
 
             if providers.PRIME_ENABLED:
-                prv = [o for o in offers if o['package']['packageId'] in [9, 119, 613, 582] and o['monetizationType'].lower() in ['free', 'ads', 'flatrate']]
+                prv = [o for o in offers if o['package']['packageId'] in [9, 119, 613, 582]]
                 if prv:
                     try:
                         prime_id = prv[0]['standardWebURL']
@@ -125,7 +124,7 @@ class source:
                         pass
 
             if providers.HBO_ENABLED:
-                hbm = [o for o in offers if o['package']['packageId'] in [616, 384, 27, 425, 1899] and o['monetizationType'].lower() in ['free', 'ads', 'flatrate']]
+                hbm = [o for o in offers if o['package']['packageId'] in [616, 384, 27, 425, 1899]]
                 if hbm:
                     try:
                         hbo_id = hbm[0]['standardWebURL']
@@ -135,7 +134,7 @@ class source:
                         pass
 
             if providers.DISNEY_ENABLED:
-                dnp = [o for o in offers if o['package']['packageId'] == 337 and o['monetizationType'].lower() in ['free', 'ads', 'flatrate']]
+                dnp = [o for o in offers if o['package']['packageId'] == 337]
                 if dnp:
                     try:
                         disney_id = dnp[0]['standardWebURL']
@@ -201,7 +200,7 @@ class source:
                             crk_id = crk_id.rstrip('/').split('/')[-1]
                         else:
                             try:
-                                crk_id = crk[0]['standardWebURL'] #need deeplink
+                                crk_id = crk[0]['deeplinkAndroid']
                                 crk_id = re.findall('intent://Media/(.+?)#', crk_id, flags=re.I)[0]
                             except:
                                 crk_id = self.get_rg_ep_id(title, year, data['season'], data['episode'], crk=True)
@@ -238,7 +237,7 @@ class source:
                 ptv = [o for o in offers if o['package']['packageId'] == 300]
                 if ptv:
                     try:
-                        ptv_url = ptv[0]['standardWebURL'] #need deeplinkRoku
+                        ptv_url = ptv[0]['deeplinkRoku']
                         ptv_id = re.findall('contentID=(.+?)&', ptv_url)[0]
                         streams.append(('pluto tv', 'plugin://plugin.video.plutotv/play/vod/' + ptv_id))
                     except:
