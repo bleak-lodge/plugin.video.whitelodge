@@ -196,7 +196,7 @@ class navigator:
         self.addDirectoryItem(32043, 'openSettings&query=0.0', 'tools.png', 'DefaultAddonProgram.png', isFolder=False)
         self.addDirectoryItem(32049, 'viewsNavigator', 'tools.png', 'DefaultAddonProgram.png')
         self.addDirectoryItem(32556, 'libraryNavigator', 'tools.png', 'DefaultAddonProgram.png')
-        self.addDirectoryItem('[B]Whitelodge[/B] : Maintenance', 'cacheNavigator', 'tools.png', 'DefaultAddonProgram.png')
+        self.addDirectoryItem(32046, 'cacheNavigator', 'tools.png', 'DefaultAddonProgram.png')
         self.addDirectoryItem('[B]Whitelodge[/B] : Log Functions', 'logNavigator', 'tools.png', 'DefaultAddonProgram.png')
         self.addDirectoryItem(32073, 'authTrakt', 'trakt.png', 'DefaultAddonProgram.png', isFolder=False)
 

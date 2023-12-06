@@ -166,7 +166,7 @@ _GRAPHQL_OFFERS_QUERY = """
             ... on MovieOrShowOrSeasonOrEpisode {
                 flatrate: offers(
                     country: $country,
-                    platform: $platform
+                    platform: $platform,
                     filter: $filterFlatrate
                 ) {
                     ...TitleOffer

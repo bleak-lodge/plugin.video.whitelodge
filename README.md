@@ -14,7 +14,7 @@ Supported services and their equivalent add-ons for playback are as follows:
 - DISNEY+          :  `slyguy.disney.plus` - slyguy repository
 - HBO MAX          :  `slyguy.hbo.max` - slyguy repository
 - HULU             :  `slyguy.hulu` - slyguy repository
-- ITV HUB          :  `plugin.video.itvhub` - standalone by dimkroon
+- ITVX             :  `plugin.video.viwx` - official Kodi repository
 - NETFLIX          :  `plugin.video.netflix` - CastagnaIT repository
 - PARAMOUNT+       :  `slyguy.paramount.plus` - slyguy repository
 - PLUTO TV         :  `plugin.video.plutotv` - official Kodi repository

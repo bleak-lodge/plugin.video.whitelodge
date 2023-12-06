@@ -450,13 +450,13 @@ class libepisodes:
 
                     items.append({'tvshowtitle': tvshowtitle, 'year': year, 'imdb': imdb, 'tmdb': tmdb})
                 except:
-                    log_utils.log('lib_ep_upd0', 1)
+                    #log_utils.log('lib_ep_upd0', 1)
                     pass
 
             items = [i for x, i in enumerate(items) if i not in items[x + 1:]]
             if len(items) == 0: raise Exception()
         except:
-            log_utils.log('lib_ep_upd1', 1)
+            #log_utils.log('lib_ep_upd1', 1)
             return
 
         try:
@@ -560,7 +560,7 @@ class libepisodes:
                     libtvshows().strmFile(i)
                     files_added += 1
                 except:
-                    log_utils.log('lib_ep_upd5', 1)
+                    #log_utils.log('lib_ep_upd5', 1)
                     pass
 
         if self.infoDialog == True:
