@@ -96,30 +96,22 @@ class movies:
         self.tmdb_providers_added_link = 'https://api.themoviedb.org/3/discover/movie?api_key=%s&primary_release_date.gte=%s&primary_release_date.lte=%s&sort_by=primary_release_date.desc&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, self.year_date, self.today_date, '%s', self.country)
 
         ## IMDb ##
-        self.keyword_link = 'https://www.imdb.com/search/title?title_type=feature,short,tv_movie&release_date=,date[0]&keywords=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.customlist_link = 'https://www.imdb.com/list/%s/?view=detail&sort=list_order,asc&title_type=feature,tv_movie&start=1'
-        self.oscars_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&groups=best_picture_winner&sort=year,desc&count=%s&start=1' % self.items_per_page
-        self.theaters_link = 'https://www.imdb.com/search/title?title_type=feature&release_date=date[120],date[0]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        self.year_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&year=%s,%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', '%s', self.items_per_page)
-        self.added_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&languages=en&num_votes=500,&production_status=released&release_date=%s,%s&sort=release_date,desc&count=%s&start=1' % (self.year_date, self.today_date, self.items_per_page)
-        self.rating_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&genres=!documentary&num_votes=10000,&release_date=,date[0]&sort=user_rating,desc&count=%s&start=1' % self.items_per_page
+        self.genre_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=%s&release_date=,date[0]&sort=moviemeter,asc&count=%s'% ('%s', self.items_per_page)
+        self.year_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=%s,%s&sort=moviemeter,asc&count=%s'% ('%s', '%s', self.items_per_page)
+        self.language_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=,date[0]&sort=moviemeter,asc&primary_language=%s&count=%s'% ('%s', self.items_per_page)
+        self.certification_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&certificates=US:%s&release_date=,date[0]&sort=moviemeter,asc&count=%s' % ('%s', self.items_per_page)
 
-        # if self.hidecinema == 'true':
-            # self.popular_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&groups=top_1000&release_date=,date[90]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-            # self.views_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&sort=num_votes,desc&release_date=,date[90]&count=%s&start=1' % self.items_per_page
-            # self.featured_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&release_date=date[365],date[90]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-            # self.genre_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie,documentary&release_date=,date[90]&genres=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-            # self.language_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&primary_language=%s&sort=moviemeter,asc&release_date=,date[90]&count=%s&start=1' % ('%s', self.items_per_page)
-            # self.certification_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&certificates=us:%s&sort=moviemeter,asc&release_date=,date[90]&count=%s&start=1' % ('%s', self.items_per_page)
-            # self.boxoffice_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&sort=boxoffice_gross_us,desc&release_date=,date[90]&count=%s&start=1' % self.items_per_page
-        # else:
-        self.popular_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&groups=top_1000&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        self.views_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&sort=num_votes,desc&count=%s&start=1' % self.items_per_page
-        self.featured_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&release_date=date[365],date[60]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        self.genre_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&release_date=,date[0]&genres=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.language_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&primary_language=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.certification_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&certificates=us:%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.boxoffice_link = 'https://www.imdb.com/search/title?title_type=feature,tv_movie&production_status=released&sort=boxoffice_gross_us,desc&count=%s&start=1' % self.items_per_page
+        self.popular_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=,date[0]&sort=moviemeter,asc&groups=top_1000&count=%s' % self.items_per_page
+        self.featured_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=date[365],date[60]&sort=moviemeter,asc&count=%s' % self.items_per_page
+        self.rating_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=!documentary&release_date=,date[0]&sort=user_rating,desc&num_votes=10000,&count=%s' % self.items_per_page
+        self.views_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=num_votes,desc&count=%s' % self.items_per_page
+        self.theaters_link = 'https://www.imdb.com/search/title/?title_type=feature&release_date=date[120],date[0]&sort=moviemeter,asc&count=%s' % self.items_per_page
+        self.boxoffice_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=boxoffice_gross_us,desc&count=%s' % self.items_per_page
+        self.added_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=%s,%s&sort=release_date,desc&num_votes=500,&languages=en&count=%s' % (self.year_date, self.today_date, self.items_per_page)
+        self.oscars_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=year,desc&groups=best_picture_winner&count=%s' % self.items_per_page
+
+        self.keyword_link = 'https://www.imdb.com/search/title/?title_type=feature,short,tv_movie&release_date=,date[0]&sort=moviemeter,asc&keywords=%s&count=%s' % ('%s', self.items_per_page)
+        self.customlist_link = 'https://www.imdb.com/list/%s/?view=detail&sort=list_order,asc&title_type=feature,tv_movie&start=1'
 
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
         self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&title_type=movie,short,tvMovie,video&start=1' % ('%s', self.imdb_sort)

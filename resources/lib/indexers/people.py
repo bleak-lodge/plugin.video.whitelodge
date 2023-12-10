@@ -27,16 +27,17 @@ class People:
 
         self.items_per_page = str(control.setting('items.per.page')) or '20'
 
-        self.personlist_link = 'https://www.imdb.com/search/name?gender=male,female&count=50&start=1'
-        self.person_search_link = 'https://www.imdb.com/search/name?name=%s&count=50'
-        self.person_movie_link = 'https://www.imdb.com/search/title?title_type=movie,short,tvMovie&production_status=released&role=%s&sort=year,desc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.person_tv_link = 'https://www.imdb.com/search/title?title_type=tvSeries,tvMiniSeries&release_date=,date[0]&role=%s&sort=year,desc&count=%s&start=1' % ('%s', self.items_per_page)
+        self.personlist_link = 'https://www.imdb.com/search/name/?gender=male,female&count=50'
+        self.person_search_link = 'https://www.imdb.com/search/name/?name=%s&count=50'
+        self.person_movie_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&role=%s&sort=year,desc&count=%s' % ('%s', self.items_per_page)
+        self.person_tv_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&release_date=,date[0]&role=%s&sort=year,desc&count=%s' % ('%s', self.items_per_page)
         self.bio_link = 'https://www.imdb.com/name/%s/bio/'
 
 
     def persons(self, url=None, content=''):
         if not url:
             url = self.personlist_link
+        #log_utils.log(url)
         self.list = cache.get(self.imdb_person_list, 24, url)
         self.addDirectory(self.list, content)
         return self.list

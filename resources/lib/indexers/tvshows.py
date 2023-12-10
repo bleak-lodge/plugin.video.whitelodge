@@ -96,18 +96,17 @@ class tvshows:
         self.tmdb_providers_premiere_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&first_air_date.gte=%s&first_air_date.lte=%s&sort_by=primary_release_date.desc&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, self.year_date, self.today_date, '%s', self.country)
 
         ## IMDb ##
-        self.popular_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&num_votes=100,&release_date=,date[0]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        self.airing_link = 'https://www.imdb.com/search/title?title_type=tv_episode&release_date=date[1],date[0]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        self.active_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&num_votes=10,&production_status=active&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        # self.premiere_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&languages=en&num_votes=10,&release_date=date[60],date[0]&sort=moviemeter,asc&count=%s&start=1' % self.items_per_page
-        self.premiere_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&languages=en&num_votes=10,&release_date=date[60],date[0]&sort=release_date,desc&count=%s&start=1' % self.items_per_page
-        self.rating_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&genres=!documentary&num_votes=10000,&release_date=,date[0]&sort=user_rating,desc&count=%s&start=1' % self.items_per_page
-        self.views_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&num_votes=100,&release_date=,date[0]&sort=num_votes,desc&count=%s&start=1' % self.items_per_page
-        self.genre_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&release_date=,date[0]&genres=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
+        self.genre_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&genres=%s&release_date=,date[0]&sort=moviemeter,asc&count=%s' % ('%s', self.items_per_page)
+        self.year_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&release_date=%s,%s&sort=moviemeter,asc&count=%s' % ('%s', '%s', self.items_per_page)
+        self.language_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&sort=moviemeter,asc&num_votes=100,&primary_language=%s&count=%s' % ('%s', self.items_per_page)
+        self.certification_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&certificates=US:%s&release_date=,date[0]&sort=moviemeter,asc&count=%s'% ('%s', self.items_per_page)
+
+        self.popular_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&release_date=,date[0]&sort=moviemeter,asc&num_votes=100,&count=%s'% self.items_per_page
+        self.rating_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&genres=!documentary&release_date=,date[0]&sort=user_rating,desc&num_votes=10000,&count=%s' % self.items_per_page
+        self.views_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&release_date=,date[0]&sort=num_votes,desc&num_votes=100,&count=%s' % self.items_per_page
+        self.airing_link = 'https://www.imdb.com/search/title/?title_type=tv_episode&release_date=date[1],date[0]&sort=moviemeter,asc&count=%s' % self.items_per_page
+        self.premiere_link = 'https://www.imdb.com/search/title/?title_type=tv_series,tv_miniseries&release_date=date[60],date[0]&sort=release_date,desc&num_votes=10,&languages=en&count=%s' % self.items_per_page
         self.keyword_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&release_date=,date[0]&keywords=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.language_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&num_votes=100,&production_status=released&primary_language=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.certification_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&release_date=,date[0]&certificates=us:%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
-        self.year_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&production_status=released&year=%s,%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', '%s', self.items_per_page)
 
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
         self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&title_type=tvSeries,tvMiniSeries&start=1' % ('%s', self.imdb_sort)
