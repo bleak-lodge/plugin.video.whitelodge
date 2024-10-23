@@ -11,6 +11,7 @@ from resources.lib.modules import client
 from resources.lib.modules import control
 from resources.lib.modules import log_utils
 from resources.lib.modules import utils
+from resources.lib.modules import imdb_api
 
 
 class YT_trailer:
@@ -241,7 +242,6 @@ class TMDb_trailer:
 class IMDb_trailer:
     def __init__(self):
         self.mode = control.setting('trailer.select') or '1'
-        self.imdb_link = 'https://www.imdb.com/_json/video/'
 
     def play(self, imdb, name, tmdb='', season='', episode='', windowedtrailer=0):
         try:
@@ -250,7 +250,8 @@ class IMDb_trailer:
             item_dict = self.get_items(imdb, name)
             if not item_dict: raise Exception('IMDb_trailer failed, trying TMDb')
             elif item_dict == 'canceled': return
-            url, title, plot = item_dict['video'], item_dict['title'], item_dict['description']
+            url = self.resolve_imdb(item_dict['id'])
+            title, plot = item_dict['title'], item_dict['description']
 
             icon = control.infoLabel('ListItem.Icon')
 
@@ -277,33 +278,28 @@ class IMDb_trailer:
 
     def get_items(self, imdb, name):
         try:
-            link = self.imdb_link + imdb
-            r = cache.get(client.request, 24, link)
-            items = utils.json_loads_as_str(r)
-
-            listItems = items['playlists'][imdb]['listItems']
-            videoMetadata = items['videoMetadata']
+            listItems = cache.get(imdb_api._get_imdb_trailers, 48, imdb)
+            log_utils.log(repr(listItems))
+            listItems = listItems['data']['title']['primaryVideos']['edges']
             vids_list = []
             for item in listItems:
                 try:
-                    desc = item.get('description') or ''
-                    videoId = item['videoId']
-                    metadata = videoMetadata[videoId]
-                    title = metadata['title']
-                    icon = metadata['smallSlate']['url2x']
-                    related_to = metadata.get('primaryConst') or imdb
-                    if (not related_to == imdb) and (not name.lower() in ' '.join((title, desc)).lower()):
-                        continue
-                    videoUrl = [i['videoUrl'] for i in metadata['encodings'] if i['definition'] == '1080p'] + \
-                               [i['videoUrl'] for i in metadata['encodings'] if i['definition'] == '720p'] + \
-                               [i['videoUrl'] for i in metadata['encodings'] if i['definition'] in ['480p', '360p', 'SD']]
-                    if not videoUrl: continue
-                    vids_list.append({'title': title, 'icon': icon, 'description': desc, 'video': videoUrl[0]})
+                    item = item['node']
+                    desc = item['description']['value'] or ''
+                    videoId = item['id']
+                    title = item['name']['value']
+                    icon = item['thumbnail']['url']
+                    content_type = item['contentType']['displayName']['value']
+                    if icon: icon = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', icon)
+                    # related_to = item['primaryTitle']['id'] or imdb
+                    # if (not related_to == imdb) and (not name.lower() in ' '.join((title, desc)).lower()):
+                        # continue
+                    vids_list.append({'id': videoId, 'title': title, 'icon': icon, 'description': desc, 'type': content_type})
                 except:
                     pass
 
             if not vids_list: return
-            vids_list = [v for v in vids_list if 'trailer' in v['title'].lower()] + [v for v in vids_list if 'trailer' not in v['title'].lower()]
+            vids_list = [v for v in vids_list if 'trailer' in v['type'].lower()] + [v for v in vids_list if 'trailer' not in v['type'].lower()]
 
             if self.mode == '1':
                 vids = []
@@ -323,6 +319,24 @@ class IMDb_trailer:
         except:
             log_utils.log('IMDb_trailer get_items fail', 1)
             return
+
+    def resolve_imdb(self, video_id):
+        try:
+            vidurl = 'https://www.imdb.com/video/{0}/'.format(video_id)
+            headers = {
+                'Referer': 'https://www.imdb.com/',
+                'Origin': 'https://www.imdb.com'
+            }
+            r = cache.get(client.request, 48, vidurl, headers=headers)
+            r = re.findall(r'("playbackURLs":\[.+?\])', r)[0]
+            r = '{'+r+'}'
+            vids = utils.json_loads_as_str(r)
+            #log_utils.log(repr(vids))
+            vid = [i['url'] for i in vids['playbackURLs'] if i['videoMimeType'] == 'MP4'][0]
+            return vid
+        except:
+            log_utils.log('IMDb_trailer resolve fail', 1)
+            return None
 
 
 def resolve(url):

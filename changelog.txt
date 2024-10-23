@@ -1,3 +1,8 @@
+[B][COLOR gold]v1.05.08[/COLOR][/B]
+- Fixed IMDb user lists and Watchlist
+- Fixed trailers from imdb
+- Fixed More Keywords category
+
 [B][COLOR gold]v1.05.06[/COLOR][/B]
 - Fixed IMDb lists (again)
 
