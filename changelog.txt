@@ -1,3 +1,8 @@
+[B][COLOR gold]v1.05.10[/COLOR][/B]
+- Fixed IMDb user lists sort order
+- Added pagination and cacheing on IMDb user lists and Watchlist
+- Some cleanup
+
 [B][COLOR gold]v1.05.08[/COLOR][/B]
 - Fixed IMDb user lists and Watchlist
 - Fixed trailers from imdb

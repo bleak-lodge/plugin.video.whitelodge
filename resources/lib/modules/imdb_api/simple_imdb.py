@@ -2,7 +2,7 @@
 
 import requests
 
-from .query import get_imdb_list, get_imdb_trailers
+from .query import get_imdb_trailers
 
 _GRAPHQL_IMDB_API_URL = 'https://graphql.imdb.com'
 _GRAPHQL_IMDB_API_URL2 = 'https://graphql.prod.api.imdb.a2z.com/'

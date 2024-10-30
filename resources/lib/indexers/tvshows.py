@@ -109,8 +109,8 @@ class tvshows:
         self.keyword_link = 'https://www.imdb.com/search/title?title_type=tv_series,tv_miniseries&release_date=,date[0]&keywords=%s&sort=moviemeter,asc&count=%s&start=1' % ('%s', self.items_per_page)
 
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
-        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&mode=detail&title_type=tvSeries,tvMiniSeries&start=1' % ('%s', self.imdb_sort)
-        self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist/?sort=%s&title_type=tv_series,tv_miniseries' % (self.imdb_user, self.imdb_sort)
+        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&title_type=tv_series,tv_miniseries&start=0' % ('%s', self.imdb_sort)
+        self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist/?sort=%s&title_type=tv_series,tv_miniseries&start=0' % (self.imdb_user, self.imdb_sort)
 
         ## Trakt ##
         self.trending_link = 'https://api.trakt.tv/shows/trending?limit=%s&page=1' % self.items_per_page
@@ -155,10 +155,6 @@ class tvshows:
 
             elif u in self.trakt_link:
                 self.list = cache.get(self.trakt_list, 24, url, self.trakt_user)
-                if idx == True: self.worker()
-
-            elif u in self.imdb_link and ('/user/' in url or '/list/' in url):
-                self.list = cache.get(self.imdb_list, 1, url)
                 if idx == True: self.worker()
 
             elif u in self.imdb_link:
@@ -805,15 +801,9 @@ class tvshows:
 
     def imdb_list(self, url):
         try:
-            dupes = []
-
             url = url.split('&ref')[0]
             for i in re.findall('date\[(\d+)\]', url):
                 url = url.replace('date[%s]' % i, (self.datetime - datetime.timedelta(days = int(i))).strftime('%Y-%m-%d'))
-
-            count_ = re.findall('&count=(\d+)', url)
-            if len(count_) == 1 and int(count_[0]) > 250:
-                url = url.replace('&count=%s' % count_[0], '&count=250')
 
             # def imdb_watchlist_id(url):
                 # r = client.request(url)
@@ -827,168 +817,54 @@ class tvshows:
                 # url = self.imdblist_link % url
 
             # log_utils.log('imdb_url: ' + repr(url))
-
-            result = client.request(url, output='extended')
         except:
             log_utils.log('imdb_list fail', 1)
             return
 
-        if '__NEXT_DATA__' not in result[0]:
-            try:
-                result = result[0].replace('\n', ' ')
+        def imdb_userlist(link):
+            result = client.request(link)
+            #log_utils.log(result[0])
+            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result)[0]
+            data = utils.json_loads_as_str(data)
+            if '/list/' in link:
+                data = data['props']['pageProps']['mainColumnData']['list']['titleListItemSearch']['edges']
+            elif '/user/' in link:
+                data = data['props']['pageProps']['mainColumnData']['predefinedList']['titleListItemSearch']['edges']
+            data = [item['listItem'] for item in data if item['listItem']['titleType']['id'] in ['tvSeries', 'tvMiniSeries']]
+            return data
 
-                items = client.parseDOM(result, 'div', attrs = {'class': 'lister-item .*?'})
-                items += client.parseDOM(result, 'div', attrs = {'class': 'list_item.*?'})
+        if '/list/' in url or '/user/' in url:
+            try:
+                data = cache.get(imdb_userlist, 24, url.split('&start')[0])
+                if not data: raise Exception()
             except:
                 return
 
             try:
-                result = result.replace(r'"class=".*?ister-page-nex', '" class="lister-page-nex')
-                next = client.parseDOM(result, 'a', ret='href', attrs = {'class': r'.*?ister-page-nex.*?'})
-
-                if len(next) == 0:
-                    next = client.parseDOM(result, 'div', attrs = {'class': u'pagination'})[0]
-                    next = zip(client.parseDOM(next, 'a', ret='href'), client.parseDOM(next, 'a'))
-                    next = [i[0] for i in next if 'Next' in i[1]]
-
-                next = url.replace(urllib_parse.urlparse(url).query, urllib_parse.urlparse(next[0]).query)
-                next = client.replaceHTMLCodes(next)
-                next = six.ensure_str(next, errors='ignore')
-            except:
-                next = page = ''
-
-            if next:
-                if '&page=' in url:
-                    page = re.findall('&page=(\d+)', url)[0]
+                start = re.findall('&start=(\d+)', url)[0]
+                items = data[int(start):(int(start) + int(self.items_per_page))]
+                if (int(start) + int(self.items_per_page)) >= len(data):
+                    next = page = ''
                 else:
-                    page = '1'
-
-            for item in items:
-                try:
-                    # try:
-                        # director = re.findall(r'Director(?:s|):(.+?)(?:\||</div>)', item)[0]
-                        # director = client.parseDOM(director, 'a')
-                        # if director:
-                            # continue
-                    # except:
-                        # pass
-
-                    title = client.parseDOM(item, 'a')[1]
-                    title = client.replaceHTMLCodes(title)
-                    title = six.ensure_str(title)
-
-                    year = client.parseDOM(item, 'span', attrs = {'class': r'lister-item-year.*?'})
-                    year += client.parseDOM(item, 'span', attrs = {'class': r'year_type'})
-                    try: year = re.findall(r'(\d{4})', str(year)[0])[0]
-                    except: year = '0'
-                    year = six.ensure_str(year)
-
-                    #if int(year) > int(self.datetime.strftime('%Y')): raise Exception()
-
-                    imdb = client.parseDOM(item, 'a', ret='href')[0]
-                    imdb = re.findall('(tt\d*)', imdb)[0]
-                    imdb = six.ensure_str(imdb)
-
-                    if imdb in dupes: raise Exception()
-                    dupes.append(imdb)
-
-                    try: poster = client.parseDOM(item, 'img', ret='loadlate')[0]
-                    except: poster = '0'
-                    if '/sash/' in poster or '/nopicture/' in poster: poster = '0'
-                    else:
-                        poster = re.sub('(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
-                        poster = client.replaceHTMLCodes(poster)
-                        poster = six.ensure_str(poster)
-
-                    rating = votes = '0'
-                    try:
-                        rating = client.parseDOM(item, 'span', attrs = {'class': 'rating-rating'})[0]
-                        rating = client.parseDOM(rating, 'span', attrs = {'class': 'value'})[0]
-                    except:
-                        pass
-                    if rating == '0':
-                        try:
-                            rating = client.parseDOM(item, 'div', ret='data-value', attrs = {'class': '.*?imdb-rating'})[0]
-                        except:
-                            pass
-                    if rating == '0':
-                        try:
-                            rating = client.parseDOM(item, 'span', attrs = {'class': '.*?_rating'})[0]
-                        except:
-                            pass
-                    if rating == '0':
-                        try:
-                            rating = client.parseDOM(item, 'div', attrs = {'class': 'col-imdb-rating'})[0]
-                            rating = client.parseDOM(rating, 'strong', ret='title')[0]
-                            rating = re.findall(r'(.+?) base', rating)[0]
-                        except:
-                            pass
-                    if not rating or not rating.split('.')[0].isdigit():
-                        rating = '0'
-
-                    try:
-                        votes = client.parseDOM(item, 'div', ret='title', attrs = {'class': '.*?rating-list'})[0]
-                        votes = re.findall(r'\((.+?) vote(?:s|)\)', votes)[0]
-                    except:
-                        pass
-                    if votes == '0':
-                        try:
-                            votes = client.parseDOM(item, 'span', ret='data-value')[0]
-                        except:
-                            pass
-                    if votes == '0':
-                        try:
-                            votes = client.parseDOM(item, 'div', attrs = {'class': 'col-imdb-rating'})[0]
-                            votes = client.parseDOM(votes, 'strong', ret='title')[0]
-                            votes = re.findall(r'base on (.+?) votes', votes)[0]
-                        except:
-                            pass
-                    if not votes or not votes.split(',')[0].isdigit():
-                        votes = '0'
-
-                    plot = '0'
-                    try: plot = client.parseDOM(item, 'p', attrs = {'class': 'text-muted'})[0]
-                    except: pass
-                    if plot == '0':
-                        try: plot = client.parseDOM(item, 'div', attrs = {'class': 'item_description'})[0]
-                        except: pass
-                    if plot == '0':
-                        try: plot = client.parseDOM(item, 'p')[1]
-                        except: pass
-                    if plot == '': plot = '0'
-                    if plot and not plot == '0':
-                        plot = plot.rsplit('<span>', 1)[0].strip()
-                        plot = re.sub(r'<.+?>|</.+?>', '', plot)
-                        plot = client.replaceHTMLCodes(plot)
-                        plot = six.ensure_str(plot)
-
-                    try:
-                        cast = re.findall('Stars(?:s|):(.+?)(?:\||</div>)', item)[0]
-                        cast = client.replaceHTMLCodes(cast)
-                        cast = six.ensure_str(cast, errors='ignore')
-                        cast = client.parseDOM(cast, 'a')
-                        if not cast: cast = '0'
-                    except:
-                        cast = '0'
-
-                    self.list.append({'title': title, 'originaltitle': title, 'year': year, 'rating': rating, 'votes': votes, 'plot': plot,
-                                      'cast': cast, 'imdb': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'page': page, 'next': next})
-                except:
-                    log_utils.log('imdb_list', 1)
-                    pass
+                    next = re.sub('&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
+                    #log_utils.log('next_url: ' + next)
+                    page = (int(start) + int(self.items_per_page)) // int(self.items_per_page)
+            except:
+                #log_utils.log('next_fail', 1)
+                return
 
         else:
+            count_ = re.findall('&count=(\d+)', url)
+            if len(count_) == 1 and int(count_[0]) > 250:
+                url = url.replace('&count=%s' % count_[0], '&count=250')
+
             try:
+                result = client.request(url, output='extended')
+                #log_utils.log(result[0])
                 data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result[0])[0]
                 data = utils.json_loads_as_str(data)
-                #log_utils.log(repr(data))
-                if '/list/' in url:
-                    data = items = data['props']['pageProps']['mainColumnData']['list']['titleListItemSearch']['edges']
-                elif '/user/' in url:
-                    data = items = data['props']['pageProps']['mainColumnData']['predefinedList']['titleListItemSearch']['edges']
-                else:
-                    data = data['props']['pageProps']['searchResults']['titleResults']['titleListItems']
-                    items = data[-int(self.items_per_page):]
+                data = data['props']['pageProps']['searchResults']['titleResults']['titleListItems']
+                items = data[-int(self.items_per_page):]
                 #log_utils.log(repr(items))
             except:
                 return
@@ -999,49 +875,45 @@ class tvshows:
                     items = data[-(len(data) - int(count_[0]) + int(self.items_per_page)):]
                     raise Exception()
                 next = re.sub('&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result[5])
-                #next = re.sub('&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), url)
                 #log_utils.log('next_url: ' + next)
                 page = int(cur) // int(self.items_per_page)
             except:
-                log_utils.log('next_fail', 1)
+                #log_utils.log('next_fail', 1)
                 next = page = ''
 
-            for item in items:
-                try:
-                    if '/list/' in url or '/user/' in url:
-                        item = item['listItem']
-                        if not item['titleType']['id'] in ['tvSeries', 'tvMiniSeries']:
-                            continue
-                        try: mpaa = item['certificate']['rating'] or '0'
-                        except: mpaa = '0'
-                        genre = ' / '.join([i['genre']['text'] for i in item['titleGenres']['genres']]) or '0'
-                        title = item['originalTitleText']['text']
-                        plot = item['plot']['plotText']['plainText'] or '0'
-                        poster = item['primaryImage']['url']
-                        if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
-                        else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
-                        rating = str(item['ratingsSummary']['aggregateRating']) or '0'
-                        votes = str(item['ratingsSummary']['voteCount']) or '0'
-                        year = str(item['releaseYear']['year']) or '0'
-                        imdb = item['id']
-                    else:
-                        mpaa = item.get('certificate', '0') or '0'
-                        genre = ' / '.join([i for i in item['genres']]) or '0'
-                        title = item['originalTitleText']
-                        plot = item['plot'] or '0'
-                        poster = item['primaryImage']['url']
-                        if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
-                        else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
-                        rating = str(item['ratingSummary']['aggregateRating']) or '0'
-                        votes = str(item['ratingSummary']['voteCount']) or '0'
-                        year = str(item['releaseYear']) or '0'
-                        imdb = item['titleId']
+        for item in items:
+            try:
+                if '/list/' in url or '/user/' in url:
+                    try: mpaa = item['certificate']['rating'] or '0'
+                    except: mpaa = '0'
+                    genre = ' / '.join([i['genre']['text'] for i in item['titleGenres']['genres']]) or '0'
+                    title = item['originalTitleText']['text']
+                    plot = item['plot']['plotText']['plainText'] or '0'
+                    poster = item['primaryImage']['url']
+                    if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
+                    else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
+                    rating = str(item['ratingsSummary']['aggregateRating']) or '0'
+                    votes = str(item['ratingsSummary']['voteCount']) or '0'
+                    year = str(item['releaseYear']['year']) or '0'
+                    imdb = item['id']
+                else:
+                    mpaa = item.get('certificate', '0') or '0'
+                    genre = ' / '.join([i for i in item['genres']]) or '0'
+                    title = item['originalTitleText']
+                    plot = item['plot'] or '0'
+                    poster = item['primaryImage']['url']
+                    if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
+                    else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
+                    rating = str(item['ratingSummary']['aggregateRating']) or '0'
+                    votes = str(item['ratingSummary']['voteCount']) or '0'
+                    year = str(item['releaseYear']) or '0'
+                    imdb = item['titleId']
 
-                    self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': genre, 'rating': rating, 'votes': votes, 'mpaa': mpaa,
-                                      'plot': plot, 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0', 'page': page, 'next': next})
-                except:
-                    log_utils.log('imdb_json_list fail', 1)
-                    pass
+                self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': genre, 'rating': rating, 'votes': votes, 'mpaa': mpaa,
+                                  'plot': plot, 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0', 'page': page, 'next': next})
+            except:
+                log_utils.log('imdb_json_list fail', 1)
+                pass
 
         return self.list
 
@@ -1060,7 +932,7 @@ class tvshows:
                 name = six.ensure_str(name, errors='ignore')
 
                 url = client.parseDOM(item, 'a', ret='href')[0]
-                url = url.split('/list/', 1)[-1].strip('/')
+                url = re.findall(r'(ls\d+)/', url)[0]
                 url = self.imdblist_link % url
                 url = client.replaceHTMLCodes(url)
                 url = six.ensure_str(url, errors='replace')

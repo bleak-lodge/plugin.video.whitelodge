@@ -279,7 +279,7 @@ class IMDb_trailer:
     def get_items(self, imdb, name):
         try:
             listItems = cache.get(imdb_api._get_imdb_trailers, 48, imdb)
-            log_utils.log(repr(listItems))
+            #log_utils.log(repr(listItems))
             listItems = listItems['data']['title']['primaryVideos']['edges']
             vids_list = []
             for item in listItems:
@@ -288,8 +288,8 @@ class IMDb_trailer:
                     desc = item['description']['value'] or ''
                     videoId = item['id']
                     title = item['name']['value']
-                    icon = item['thumbnail']['url']
                     content_type = item['contentType']['displayName']['value']
+                    icon = item['thumbnail']['url']
                     if icon: icon = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', icon)
                     # related_to = item['primaryTitle']['id'] or imdb
                     # if (not related_to == imdb) and (not name.lower() in ' '.join((title, desc)).lower()):
