@@ -7,9 +7,10 @@ from .query import get_imdb_trailers
 _GRAPHQL_IMDB_API_URL = 'https://graphql.imdb.com'
 _GRAPHQL_IMDB_API_URL2 = 'https://graphql.prod.api.imdb.a2z.com/'
 headers = {
-        'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
         'Referer': 'https://www.imdb.com/',
-        'Origin': 'https://www.imdb.com'
+        'Origin': 'https://www.imdb.com',
+        'Content-Type': 'application/json'
 }
 
 

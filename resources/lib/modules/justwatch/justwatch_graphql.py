@@ -6,6 +6,12 @@ from .query import prepare_search_request, get_node_by_id, get_offers_by_id
 
 
 _GRAPHQL_API_URL = 'https://apis.justwatch.com/graphql'
+headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+        'Referer': 'https://www.justwatch.com/',
+        'Origin': 'https://www.justwatch.com',
+        'Content-Type': 'application/json'
+}
 
 
 def search(title, object_types=[], years={}, country='US', count=10):
@@ -22,7 +28,7 @@ def search(title, object_types=[], years={}, country='US', count=10):
         JustWatch json response
     """
     request = prepare_search_request(title, object_types, years, country, count)
-    response = requests.post(_GRAPHQL_API_URL, json=request)
+    response = requests.post(_GRAPHQL_API_URL, headers=headers, json=request)
     #log_utils.log('Search: ' + repr(response.json()))
     response.raise_for_status()
     return response.json()
@@ -30,7 +36,7 @@ def search(title, object_types=[], years={}, country='US', count=10):
 
 def node_by_id(id, country='US'):
     request = get_node_by_id(id, country)
-    response = requests.post(_GRAPHQL_API_URL, json=request)
+    response = requests.post(_GRAPHQL_API_URL, headers=headers, json=request)
     #log_utils.log('Ep_node: ' + repr(response.json()))
     response.raise_for_status()
     return response.json()
@@ -38,7 +44,7 @@ def node_by_id(id, country='US'):
 
 def offers_by_id(id, country='US'):
     request = get_offers_by_id(id, country)
-    response = requests.post(_GRAPHQL_API_URL, json=request)
+    response = requests.post(_GRAPHQL_API_URL, headers=headers, json=request)
     #log_utils.log('Offers: ' + repr(response.json()))
     response.raise_for_status()
     return response.json()

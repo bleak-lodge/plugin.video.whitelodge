@@ -250,8 +250,8 @@ class IMDb_trailer:
             item_dict = self.get_items(imdb, name)
             if not item_dict: raise Exception('IMDb_trailer failed, trying TMDb')
             elif item_dict == 'canceled': return
+            title = item_dict['title']
             url = self.resolve_imdb(item_dict['id'])
-            title, plot = item_dict['title'], item_dict['description']
 
             icon = control.infoLabel('ListItem.Icon')
 
@@ -259,12 +259,13 @@ class IMDb_trailer:
             item.setArt({'icon': icon, 'thumb': icon, 'poster': icon})
             item.setProperty('IsPlayable', 'true')
             if control.getKodiVersion() < 20:
-                item.setInfo(type='video', infoLabels={'title': title, 'plot': plot})
+                item.setInfo(type='video', infoLabels={'title': title, 'plot': item_dict['description'], 'tagline': item_dict['type']})
             else:
                 vtag = item.getVideoInfoTag()
                 vtag.setMediaType('video')
                 vtag.setTitle(title)
-                vtag.setPlot(plot)
+                vtag.setTagLine(item_dict['type'])
+                vtag.setPlot(item_dict['description'])
             control.resolve(handle=int(sys.argv[1]), succeeded=True, listitem=item)
 
             if windowedtrailer == 1:
@@ -305,7 +306,7 @@ class IMDb_trailer:
                 vids = []
                 for v in vids_list:
                     if control.getKodiVersion() >= 17:
-                        li = control.item(label=v['title'])
+                        li = control.item(label=v['title'], label2=v['type'])
                         li.setArt({'icon': v['icon'], 'thumb': v['icon'], 'poster': v['icon']})
                         vids.append(li)
                     else:
@@ -324,6 +325,7 @@ class IMDb_trailer:
         try:
             vidurl = 'https://www.imdb.com/video/{0}/'.format(video_id)
             headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
                 'Referer': 'https://www.imdb.com/',
                 'Origin': 'https://www.imdb.com'
             }
