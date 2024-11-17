@@ -124,12 +124,22 @@ class source:
                         pass
 
             if providers.HBO_ENABLED:
-                hbm = [o for o in offers if o['package']['packageId'] in [616, 384, 27, 425, 1899]]
+                hbm = [o for o in offers if o['package']['packageId'] in [616, 384, 27, 425]]
                 if hbm:
                     try:
                         hbo_id = hbm[0]['standardWebURL']
                         hbo_id = hbo_id.rstrip('/').split('/')[-1]
                         streams.append(('hbo max', 'plugin://slyguy.hbo.max/?_=play&slug=' + hbo_id))
+                    except:
+                        pass
+
+            if providers.MAX_ENABLED:
+                ma_x = [o for o in offers if o['package']['packageId'] == 1899]
+                if ma_x:
+                    try:
+                        max_id = ma_x[0]['deeplinkAndroid']
+                        max_id = re.findall(r'/watch/(.+?)#', max_id)[0]
+                        streams.append(('max', 'plugin://slyguy.max/?_=play&id=' + max_id))
                     except:
                         pass
 
@@ -186,7 +196,7 @@ class source:
                 if pmp:
                     try:
                         pmp_url = pmp[0]['standardWebURL']
-                        pmp_id = pmp_url.split('?')[0].split('/')[-1] if content == 'movies' else re.findall('/video/(.+?)/', pmp_url)[0]
+                        pmp_id = pmp_url.split('?')[0].split('/')[-1] if content == 'movies' else re.findall(r'/video/(.+?)/', pmp_url)[0]
                         streams.append(('paramount+', 'plugin://slyguy.paramount.plus/?_=play&id=' + pmp_id))
                     except:
                         pass
@@ -201,7 +211,7 @@ class source:
                         else:
                             try:
                                 crk_id = crk[0]['deeplinkAndroid']
-                                crk_id = re.findall('intent://Media/(.+?)#', crk_id, flags=re.I)[0]
+                                crk_id = re.findall(r'intent://Media/(.+?)#', crk_id, flags=re.I)[0]
                             except:
                                 crk_id = self.get_rg_ep_id(title, year, data['season'], data['episode'], crk=True)
                         if crk_id:
@@ -238,7 +248,7 @@ class source:
                 if ptv:
                     try:
                         ptv_url = ptv[0]['deeplinkRoku']
-                        ptv_id = re.findall('contentID=(.+?)&', ptv_url)[0]
+                        ptv_id = re.findall(r'contentID=(.+?)&', ptv_url)[0]
                         streams.append(('pluto tv', 'plugin://plugin.video.plutotv/play/vod/' + ptv_id))
                     except:
                         pass
@@ -274,16 +284,16 @@ class source:
             except: seriesId = None
 
             r = requests.get(url, timeout=10).text
-            eps = re.findall('__IPLAYER_REDUX_STATE__\s*=\s*({.+?});</script>', r)[0]
+            eps = re.findall(r'__IPLAYER_REDUX_STATE__\s*=\s*({.+?});</script>', r)[0]
             eps = json.loads(eps)
 
             if seriesId:
                 seasons = eps['header']['availableSlices']
-                series_id = [s['id'] for s in seasons if re.sub('[^0-9]', '', s['title']) == season][0]
+                series_id = [s['id'] for s in seasons if re.sub(r'[^0-9]', '', s['title']) == season][0]
                 if not series_id == seriesId:
                     url = url.replace(seriesId, series_id)
                     r = requests.get(url, timeout=10).text
-                    eps = re.findall('__IPLAYER_REDUX_STATE__\s*=\s*({.+?});</script>', r)[0]
+                    eps = re.findall(r'__IPLAYER_REDUX_STATE__\s*=\s*({.+?});</script>', r)[0]
                     eps = json.loads(eps)
 
             eps = eps['entities']
@@ -298,18 +308,18 @@ class source:
     def get_rg_ep_id(self, title, year, season, episode, nfx=False, crk=False):
         try:
             title = title.replace(' ', '-').lower()
-            url = 'https://reelgood.com/show/' + '-'.join((title, year))
+            url = 'https://reelgood.com/show/{0}/season/{1}/episode-{2}'.format('-'.join((title, year)), season, episode)
             r = client.request(url)
             #log_utils.log('r: ' + r)
             r = r.replace('\\u002F', '/')
             sequence = '%s.%04d' % (season, int(episode))
             sequence = sequence.rstrip('0')
-            m = re.compile('"sequence_number":' + sequence + ',.+?","availability":\[(.+?)\]').findall(r)[0]
+            m = re.compile(r'"sequence_number":' + sequence + ',.+?","availability":\[(.+?)\]').findall(r)[0]
             ep_id = None
             if nfx:
-                ep_id = re.compile('"source_name":"netflix","access_type":2,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
+                ep_id = re.compile(r'"source_name":"netflix","access_type":2,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
             elif crk:
-                ep_id = re.compile('"source_name":"crackle","access_type":0,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
+                ep_id = re.compile(r'"source_name":"crackle","access_type":0,"source_data":\{"links":\{.+?\},"references":\{.*?"web":\{"episode_id":"(.+?)"').findall(m)[0]
             #log_utils.log(ep_id)
 
             return ep_id

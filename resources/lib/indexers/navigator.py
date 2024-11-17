@@ -124,7 +124,6 @@ class navigator:
             self.addDirectoryItem(32018, 'tvshows&url=popular', 'most-popular.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32023, 'tvshows&url=rating', 'highly-rated.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32019, 'tvshows&url=views', 'most-voted.png', 'DefaultTVShows.png')
-            self.addDirectoryItem(32024, 'tvshows&url=airing', 'airing-today.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32026, 'tvshows&url=premiere', 'new-tvshows.png', 'DefaultTVShows.png')
         else:
             self.addDirectoryItem(32011, 'tvTmdbGenres&code=', 'genres.png', 'DefaultTVShows.png')
@@ -138,8 +137,8 @@ class navigator:
             self.addDirectoryItem(32018, 'tvshows&url=tmdb_pop', 'most-popular.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32023, 'tvshows&url=tmdb_rating', 'highly-rated.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32019, 'tvshows&url=tmdb_voted', 'most-voted.png', 'DefaultTVShows.png')
-            self.addDirectoryItem(32024, 'tvshows&url=tmdb_airing', 'airing-today.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32026, 'tvshows&url=tmdb_premiere', 'new-tvshows.png', 'DefaultTVShows.png')
+        self.addDirectoryItem(32024, 'tvshows&url=tmdb_airing', 'airing-today.png', 'DefaultTVShows.png')
         self.addDirectoryItem(32025, 'tvshows&url=tmdb_active', 'returning-tvshows.png', 'DefaultTVShows.png')
         self.addDirectoryItem(32006, 'calendar&url=added', 'latest-episodes.png', 'DefaultRecentlyAddedEpisodes.png', queue=True)
         self.addDirectoryItem(32027, 'calendars', 'calendar.png', 'DefaultRecentlyAddedEpisodes.png')

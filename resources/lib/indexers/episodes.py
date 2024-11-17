@@ -212,12 +212,16 @@ class seasons:
 
         for s_item in seasons:
             try:
+                #log_utils.log(repr(s_item))
                 season = str(s_item['season_number'])
+
+                try: total_episodes = str(s_item['episode_count'])
+                except: total_episodes = '*'
+                if total_episodes == '0': total_episodes = '*'
 
                 premiered = s_item['air_date'] or '0'
                 if status == 'Ended': pass
-                #elif not premiered or premiered == '0': raise Exception()
-                elif int(re.sub('[^0-9]', '', str(premiered))) > int(re.sub('[^0-9]', '', str(self.today_date))):
+                elif (int(re.sub('[^0-9]', '', str(premiered))) > int(re.sub('[^0-9]', '', str(self.today_date)))) or total_episodes == '*':
                     unaired = 'true'
                     if self.showunaired != 'true': raise Exception()
 
@@ -233,7 +237,7 @@ class seasons:
 
                 self.list.append({'season': season, 'tvshowtitle': tvshowtitle, 'year': year, 'premiered': premiered, 'status': status, 'studio': studio, 'genre': genre, 'duration': duration,
                                   'mpaa': mpaa, 'castwiththumb': castwiththumb, 'plot': plot, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': tvdb, 'poster': poster, 'fanart': fanart,
-                                  'banner': banner,'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'unaired': unaired})
+                                  'banner': banner,'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'unaired': unaired, 'total_episodes': total_episodes})
             except:
                 log_utils.log('seasons_dir Exception', 1)
                 pass
@@ -254,8 +258,11 @@ class seasons:
 
         kodiVersion = control.getKodiVersion()
 
-        try: indicators = playcount.getSeasonIndicators(items[0]['imdb'])
-        except: pass
+        try:
+            indicators = playcount.getTVShowIndicators()
+            indicators = [i for i in indicators if i[0] == items[0]['imdb']]
+        except:
+            indicators = []
 
         if self.trailer_source == '0': trailerAction = 'tmdb_trailer'
         elif self.trailer_source == '1': trailerAction = 'yt_trailer'
@@ -307,8 +314,9 @@ class seasons:
                 #log_utils.log('sysmeta: ' + str(sysmeta))
 
                 meta = dict((k,v) for k, v in six.iteritems(i) if not v == '0')
+                meta.update({'title': label})
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
-                meta.update({'mediatype': 'tvshow'})
+                meta.update({'mediatype': 'season'})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s&season=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb, season)})
                 if not 'duration' in meta: meta.update({'duration': '45'})
                 elif meta['duration'] == '0': meta.update({'duration': '45'})
@@ -324,11 +332,14 @@ class seasons:
                 meta.update({'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape})
 
                 try:
-                    overlay = int(playcount.getSeasonOverlay(indicators, imdb, season))
+                    season_indicators = [i for i in indicators[0][2] if i[0] == int(season)]
+                    overlay = 7 if len(season_indicators) >= int(i['total_episodes']) else 6
                     if overlay == 7: meta.update({'playcount': 1, 'overlay': 7})
                     else: meta.update({'playcount': 0, 'overlay': 6})
                 except:
+                    season_indicators = []
                     overlay = 6
+                    meta.update({'playcount': 0, 'overlay': 6})
 
                 url = '%s?action=episodes&tvshowtitle=%s&year=%s&imdb=%s&tmdb=%s&meta=%s&season=%s' % (sysaddon, systitle, year, imdb, tmdb, sysmeta, season)
 
@@ -361,6 +372,16 @@ class seasons:
                 try: item = control.item(label=label, offscreen=True)
                 except: item = control.item(label=label)
 
+                total_episodes = i.get('total_episodes', '*')
+                watched_episodes = len(season_indicators)
+                try: season_progress = int((float(watched_episodes)/int(total_episodes))*100) or 0
+                except: season_progress = 0
+                try: unwatched_episodes = int(total_episodes) - watched_episodes
+                except: unwatched_episodes = total_episodes
+
+                item.setProperties({'TotalEpisodes': total_episodes, 'WatchedEpisodes': str(watched_episodes), 'UnWatchedEpisodes': str(unwatched_episodes),
+                                    'WatchedProgress': str(season_progress)})
+
                 item.setArt(art)
                 item.addContextMenuItems(cm)
 
@@ -381,6 +402,7 @@ class seasons:
                 else:
                     vtag = item.getVideoInfoTag()
                     vtag.setMediaType('season')
+                    vtag.setTitle(label)
                     vtag.setTvShowTitle(i['tvshowtitle'])
                     vtag.setSeason(int(season))
                     vtag.setPlot(meta.get('plot'))
@@ -879,9 +901,6 @@ class episodes:
                 if not title: title = '0'
 
                 season = str(item['season_number'])
-                #season = '%01d' % season
-                #if int(season) == 0:# and self.specials != 'true':
-                    #raise Exception()
 
                 episode = item['episode_number']
                 episode = '%01d' % episode
@@ -978,7 +997,6 @@ class episodes:
             try:
                 if tmdb == '0': raise Exception()
 
-                #if i['season'] == '0': raise Exception()
                 url = self.tmdb_episode_link % (tmdb, i['season'], i['episode'])
                 r = self.session.get(url, timeout=16)
                 r.encoding = 'utf-8'
@@ -988,12 +1006,8 @@ class episodes:
                 if not title: title = i['title']
 
                 season = str(item['season_number'])
-                #season = '%01d' % season
-                #if int(season) == 0:# and self.specials != 'true':
-                    #raise Exception()
 
                 episode = str(item['episode_number'])
-                #episode = '%01d' % episode
 
                 try: still_path = item['still_path']
                 except: still_path = ''
@@ -1418,7 +1432,7 @@ class episodes:
 
         isPlayable = True if not 'plugin' in control.infoLabel('Container.PluginName') else False
 
-        indicators = playcount.getTVShowIndicators(refresh=True)
+        indicators = playcount.getTVShowIndicators()
 
         if self.trailer_source == '0': trailerAction = 'tmdb_trailer'
         elif self.trailer_source == '1': trailerAction = 'yt_trailer'
@@ -1535,7 +1549,7 @@ class episodes:
                         cm.append((watchedMenu, 'RunPlugin(%s?action=episodePlaycount&imdb=%s&tmdb=%s&season=%s&episode=%s&query=7)' % (sysaddon, imdb, tmdb, season, episode)))
                         meta.update({'playcount': 0, 'overlay': 6})
                 except:
-                    pass
+                    overlay = 6
 
                 if traktCredentials == True:
                     cm.append((traktManagerMenu, 'RunPlugin(%s?action=traktManager&name=%s&tmdb=%s&content=tvshow)' % (sysaddon, systvshowtitle, tmdb)))
@@ -1611,9 +1625,6 @@ class episodes:
                     vtag.setIMDBNumber(imdb)
                     vtag.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
 
-                    if overlay > 6:
-                        vtag.setPlaycount(1)
-
                     cast = []
                     if 'castwiththumb' in i and not i['castwiththumb'] == '0':
                         for p in i['castwiththumb']:
@@ -1622,6 +1633,13 @@ class episodes:
                         for p in i['cast']:
                             cast.append(control.actor(p, '', 0, ''))
                     vtag.setCast(cast)
+
+                    if overlay > 6:
+                        vtag.setPlaycount(1)
+
+                    offset = bookmarks.get('episode', imdb, season, episode, True)
+                    if float(offset) > 120:
+                        vtag.setResumePoint(float(offset))#, float(meta['duration']))
 
                 control.addItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
             except:

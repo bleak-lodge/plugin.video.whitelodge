@@ -10,7 +10,7 @@ def getMovieIndicators(refresh=False):
     try:
         if trakt.getTraktIndicatorsInfo() == True: raise Exception()
         indicators_ = bookmarks._indicators()
-        return indicators_
+        return [i[2] for i in indicators_]
     except:
         pass
     try:
@@ -25,12 +25,22 @@ def getMovieIndicators(refresh=False):
 
 
 def getTVShowIndicators(refresh=False):
-    # try:
-        # if trakt.getTraktIndicatorsInfo() == True: raise Exception()
-        # indicators_ = bookmarks._indicators()
-        # return indicators_
-    # except:
-        # pass
+    try:
+        if trakt.getTraktIndicatorsInfo() == True: raise Exception()
+        indicators_ = bookmarks._indicators()
+        indicators_ = [(i[2], 0, [(int(i[3]), int(i[4]))]) for i in indicators_]
+        indicators = []
+        n = {}
+        for k, t, s in indicators_:
+            if k not in n:
+                indicators.append((k, t, s))
+                n[k] = len(n)
+            else:
+                indicators[n[k]][2].extend(s)
+        return indicators
+    except:
+        pass
+
     try:
         if trakt.getTraktIndicatorsInfo() == False: raise Exception()
         if refresh == False: timeout = 720
@@ -67,7 +77,7 @@ def getMovieOverlay(indicators_, imdb):
 def getTVShowOverlay(indicators_, imdb, tmdb):
     try:
         if trakt.getTraktIndicatorsInfo():
-            playcount = [i[0] for i in indicators_ if i[0] == tmdb and len(i[2]) >= int(i[1])]
+            playcount = [i[0] for i in indicators_ if i[0] == imdb and len(i[2]) >= int(i[1])]
             playcount = 7 if len(playcount) > 0 else 6
             return str(playcount)
         # else:
@@ -96,7 +106,7 @@ def getEpisodeOverlay(indicators_, imdb, tmdb, season, episode):
             overlay = bookmarks._get_watched('episode', imdb, season, episode)
             return str(overlay)
         else:
-            playcount = [i[2] for i in indicators_ if i[0] == tmdb]
+            playcount = [i[2] for i in indicators_ if i[0] == imdb]
             playcount = playcount[0] if len(playcount) > 0 else []
             playcount = [i for i in playcount if int(season) == int(i[0]) and int(episode) == int(i[1])]
             overlay = 7 if len(playcount) > 0 else 6

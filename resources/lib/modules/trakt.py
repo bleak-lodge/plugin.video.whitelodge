@@ -30,6 +30,14 @@ if V2_API_KEY == "" or CLIENT_SECRET == "":
     V2_API_KEY = api_keys.trakt_client_id
     CLIENT_SECRET = api_keys.trakt_secret
 
+
+from resources.lib.modules.ratelimit import limits, sleep_and_retry
+@sleep_and_retry
+@limits(calls=1, period=1)
+def check_limit():
+    return
+
+
 def __getTrakt(url, post=None):
     try:
         url = urllib_parse.urljoin(BASE_URL, url) if not url.startswith(BASE_URL) else url
@@ -49,6 +57,7 @@ def __getTrakt(url, post=None):
         if not post:
             r = requests.get(url, headers=headers, timeout=30)
         else:
+            check_limit()
             r = requests.post(url, data=post, headers=headers, timeout=30)
         r.encoding = 'utf-8'
 
@@ -77,6 +86,7 @@ def __getTrakt(url, post=None):
         # result = client.request(oauth, post=json.dumps(opost), headers=headers)
         # result = utils.json_loads_as_str(result)
 
+        check_limit()
         result = requests.post(oauth, data=json.dumps(opost), headers=headers, timeout=30).json()
         log_utils.log('Trakt token refresh: ' + repr(result))
 
@@ -93,6 +103,7 @@ def __getTrakt(url, post=None):
         if not post:
             r = requests.get(url, headers=headers, timeout=30)
         else:
+            check_limit()
             r = requests.post(url, data=post, headers=headers, timeout=30)
         r.encoding = 'utf-8'
         return r.text, r.headers
@@ -362,7 +373,7 @@ def syncTVShows(user):
     try:
         if getTraktCredentialsInfo() == False: return
         indicators = getTraktAsJson('/users/me/watched/shows?extended=full')
-        indicators = [(i['show']['ids']['tmdb'], i['show']['aired_episodes'], sum([[(s['number'], e['number']) for e in s['episodes']] for s in i['seasons']], [])) for i in indicators]
+        indicators = [(i['show']['ids']['imdb'], i['show']['aired_episodes'], sum([[(s['number'], e['number']) for e in s['episodes']] for s in i['seasons']], [])) for i in indicators]
         indicators = [(str(i[0]), int(i[1]), i[2]) for i in indicators]
         return indicators
     except:

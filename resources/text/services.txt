@@ -9,6 +9,7 @@ DISNEY+          :  [I]slyguy.disney.plus[/I] - slyguy repository
 HBO MAX          :  [I]slyguy.hbo.max[/I] - slyguy repository
 HULU             :  [I]slyguy.hulu[/I] - slyguy repository
 ITVX             :  [I]plugin.video.viwx[/I] - official Kodi repository
+MAX              :  [I]slyguy.max[/I] - slyguy repository
 NETFLIX          :  [I]plugin.video.netflix[/I] - CastagnaIT repository
 PARAMOUNT+       :  [I]slyguy.paramount.plus[/I] - slyguy repository
 PLUTO TV         :  [I]plugin.video.plutotv[/I] - official Kodi repository

@@ -62,7 +62,6 @@ class movies:
         self.hq_artwork = control.setting('hq.artwork') or 'false'
         self.trailer_source = control.setting('trailer.source') or '2'
         self.country = control.setting('official.country') or 'US'
-        #self.hidecinema = control.setting('hidecinema') or 'false'
 
         self.fanart_tv_art_link = 'http://webservice.fanart.tv/v3/movies/%s'
         self.fanart_tv_level_link = 'http://webservice.fanart.tv/v3/level'
@@ -775,7 +774,6 @@ class movies:
                 #if int(year) > int((self.datetime).strftime('%Y')): raise Exception()
 
                 imdb = item.get('ids', {}).get('imdb')
-                #if imdb == None or imdb == '': raise Exception()
                 if not imdb: imdb = '0'
                 else: imdb = 'tt' + re.sub(r'[^0-9]', '', str(imdb))
 
@@ -1561,13 +1559,6 @@ class movies:
                     vtag.setIMDBNumber(imdb)
                     vtag.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
 
-                    if overlay > 6:
-                        vtag.setPlaycount(1)
-
-                    offset = bookmarks.get('movie', imdb, '', '', True)
-                    if float(offset) > 120:
-                        vtag.setResumePoint(float(offset))#, float(meta['duration']))
-
                     cast = []
                     if 'castwiththumb' in i and not i['castwiththumb'] == '0':
                         for p in i['castwiththumb']:
@@ -1576,6 +1567,13 @@ class movies:
                         for p in i['cast']:
                             cast.append(control.actor(p, '', 0, ''))
                     vtag.setCast(cast)
+
+                    if overlay > 6:
+                        vtag.setPlaycount(1)
+
+                    offset = bookmarks.get('movie', imdb, '', '', True)
+                    if float(offset) > 120:
+                        vtag.setResumePoint(float(offset))#, float(meta['duration']))
 
                 control.addItem(handle=syshandle, url=url, listitem=item, isFolder=False)
             except:

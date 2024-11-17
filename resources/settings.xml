@@ -38,11 +38,12 @@
         <setting id="hbo.max" subsetting="true" type="bool" label="HBO MAX" default="true" visible="eq(-8,true)" enable="System.HasAddon(slyguy.hbo.max)" />
         <setting id="hulu" subsetting="true" type="bool" label="HULU" default="true" visible="eq(-9,true)" enable="System.HasAddon(slyguy.hulu)" />
         <setting id="itv" subsetting="true" type="bool" label="ITV HUB" default="true" visible="eq(-10,true)" enable="System.HasAddon(plugin.video.itvhub)" />
-        <setting id="netflix" subsetting="true" type="bool" label="NETFLIX" default="true" visible="eq(-11,true)" enable="System.HasAddon(plugin.video.netflix)" />
-        <setting id="paramount" subsetting="true" type="bool" label="PARAMOUNT+" default="true" visible="eq(-12,true)" enable="System.HasAddon(slyguy.paramount.plus)" />
-        <setting id="plutotv" subsetting="true" type="bool" label="PLUTO TV" default="true" visible="eq(-13,true)" enable="System.HasAddon(plugin.video.plutotv)" />
-        <setting id="tubi" subsetting="true" type="bool" label="TUBI TV" default="true" visible="eq(-14,true)" enable="System.HasAddon(plugin.video.tubi.m7)" />
-        <setting id="uktvplay" subsetting="true" type="bool" label="UKTV PLAY" default="true" visible="eq(-15,true)" enable="System.HasAddon(plugin.video.catchuptvandmore)" />
+        <setting id="max" subsetting="true" type="bool" label="MAX" default="true" visible="eq(-11,true)" enable="System.HasAddon(slyguy.max)" />
+        <setting id="netflix" subsetting="true" type="bool" label="NETFLIX" default="true" visible="eq(-12,true)" enable="System.HasAddon(plugin.video.netflix)" />
+        <setting id="paramount" subsetting="true" type="bool" label="PARAMOUNT+" default="true" visible="eq(-13,true)" enable="System.HasAddon(slyguy.paramount.plus)" />
+        <setting id="plutotv" subsetting="true" type="bool" label="PLUTO TV" default="true" visible="eq(-14,true)" enable="System.HasAddon(plugin.video.plutotv)" />
+        <setting id="tubi" subsetting="true" type="bool" label="TUBI TV" default="true" visible="eq(-15,true)" enable="System.HasAddon(plugin.video.tubi.m7)" />
+        <setting id="uktvplay" subsetting="true" type="bool" label="UKTV PLAY" default="true" visible="eq(-16,true)" enable="System.HasAddon(plugin.video.catchuptvandmore)" />
     </category>
 
     <category label="32338">

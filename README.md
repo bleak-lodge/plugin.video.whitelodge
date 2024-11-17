@@ -15,6 +15,7 @@ Supported services and their equivalent add-ons for playback are as follows:
 - HBO MAX          :  `slyguy.hbo.max` - slyguy repository
 - HULU             :  `slyguy.hulu` - slyguy repository
 - ITVX             :  `plugin.video.viwx` - official Kodi repository
+- MAX              :  `slyguy.max` - slyguy repository
 - NETFLIX          :  `plugin.video.netflix` - CastagnaIT repository
 - PARAMOUNT+       :  `slyguy.paramount.plus` - slyguy repository
 - PLUTO TV         :  `plugin.video.plutotv` - official Kodi repository

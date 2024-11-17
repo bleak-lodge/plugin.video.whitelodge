@@ -1,3 +1,11 @@
+[B][COLOR gold]v1.05.14[/COLOR][/B]
+- Watched indicators for local and Trakt fixes
+- Applied rate limiting on some Trakt API interactions
+- Fixed Netflix official episode ids parsing
+- Added MAX official provider
+    played through slyguy.max add-on from the slyguy repository
+    WIP - playback probably doesn't work yet
+
 [B][COLOR gold]v1.05.11[/COLOR][/B]
 - Fixed Official scraper
 - IMDb trailers tweaks

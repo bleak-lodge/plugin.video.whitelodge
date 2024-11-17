@@ -356,7 +356,7 @@ class player(xbmc.Player):
             return
         bookmarks.reset(self.currentTime, self.totalTime, self.content, self.imdb, self.season, self.episode)
         if (trakt.getTraktCredentialsInfo() == True and control.setting('trakt.scrobble') == 'true'):
-            bookmarks.set_scrobble(self.currentTime, self.totalTime, self.content, self.imdb, self.tmdb, self.season, self.episode)
+            bookmarks.set_scrobble(self.currentTime, self.totalTime, self.content, self.imdb, self.season, self.episode)
 
         if float(self.currentTime / self.totalTime) >= 0.92:
             self.libForPlayback()
