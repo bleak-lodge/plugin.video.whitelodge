@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.05.15[/COLOR][/B]
+- Fixed some issues with reuse language invoker
+
 [B][COLOR gold]v1.05.14[/COLOR][/B]
 - Watched indicators for local and Trakt fixes
 - Applied rate limiting on some Trakt API interactions

@@ -367,8 +367,9 @@ class navigator:
         log_utils.empty_log()
 
     def addDirectoryItem(self, name, query, thumb, icon, plot='[CR]', context=None, queue=False, isAction=True, isFolder=True):
-        sysaddon = sys.argv[0]
-        syshandle = int(sys.argv[1])
+        from sys import argv
+        sysaddon = argv[0]
+        syshandle = int(argv[1])
         try: name = control.lang(name)
         except: pass
         url = '%s?action=%s' % (sysaddon, query) if isAction == True else query
@@ -390,6 +391,7 @@ class navigator:
         control.addItem(handle=syshandle, url=url, listitem=item, isFolder=isFolder)
 
     def endDirectory(self, cache=True):
-        syshandle = int(sys.argv[1])
+        from sys import argv
+        syshandle = int(argv[1])
         control.content(syshandle, '')
         control.directory(syshandle, cacheToDisc=cache)
