@@ -1260,6 +1260,13 @@ class tvshows:
             status = item.get('status', '')
             if not status : status = '0'
 
+            if status in ['Ended', 'Canceled']:
+                cache_upd = 360
+            elif not item.get('next_episode_to_air'):
+                cache_upd = 168
+            else:
+                cache_upd = 24
+
             try: studio = item['networks'][0]['name']
             except: studio = ''
             if not studio: studio = '0'
@@ -1396,9 +1403,9 @@ class tvshows:
             poster = poster3 or poster2 or poster1
             fanart = fanart2 or fanart1
 
-            item = {'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': tvdb, 'poster': poster, 'fanart': fanart, 'banner': banner,
-                    'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'premiered': premiered, 'studio': studio, 'genre': genre, 'duration': duration, 'mpaa': mpaa,
-                    'castwiththumb': castwiththumb, 'plot': plot, 'status': status, 'tagline': tagline, 'country': country, 'total_episodes': total_episodes, 'total_seasons': total_seasons}
+            item = {'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': tvdb, 'poster': poster, 'fanart': fanart, 'banner': banner, 'clearlogo': clearlogo,
+                    'clearart': clearart, 'landscape': landscape, 'premiered': premiered, 'studio': studio, 'genre': genre, 'duration': duration, 'mpaa': mpaa, 'castwiththumb': castwiththumb,
+                    'plot': plot, 'status': status, 'tagline': tagline, 'country': country, 'total_episodes': total_episodes, 'total_seasons': total_seasons, 'mediatype': 'tvshow', 'cache_upd': cache_upd}
             item = dict((k,v) for k, v in six.iteritems(item) if not v == '0')
             self.list[i].update(item)
 
@@ -1478,7 +1485,7 @@ class tvshows:
 
                 meta = dict((k,v) for k, v in six.iteritems(i) if not v == '0')
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
-                meta.update({'mediatype': 'tvshow'})
+                if not 'mediatype' in meta: meta.update({'mediatype': 'tvshow'})
                 meta.update({'tvshowtitle': i['title']})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb)})
                 if not 'duration' in meta: meta.update({'duration': '45'})

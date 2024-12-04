@@ -22,17 +22,20 @@ def fetch(items, lang='en', user=''):
         try:
             dbcur.execute("SELECT * FROM meta WHERE (imdb = '%s' and lang = '%s' and user = '%s' and not imdb = '0') or (tmdb = '%s' and lang = '%s' and user = '%s' and not tmdb = '0')" % \
                                                     (items[i]['imdb'], lang, user, items[i]['tmdb'], lang, user))
+
             match = dbcur.fetchone()
+            if match:
+                t1 = int(match[6])
+                item = eval(six.ensure_str(match[5]))
 
-            t1 = int(match[6])
-            update = (abs(t2 - t1) / 3600) >= 720
-            if update == True: raise Exception()
+                upd = item.get('cache_upd') or 360
+                update = (abs(t2 - t1) / 3600) >= upd
+                if update == True: raise Exception()
 
-            item = eval(six.ensure_str(match[5]))
-            item = dict((k,v) for k, v in six.iteritems(item) if not v == '0')
+                item = dict((k,v) for k, v in six.iteritems(item) if not v == '0')
 
-            items[i].update(item)
-            items[i].update({'metacache': True})
+                items[i].update(item)
+                items[i].update({'metacache': True})
         except:
             pass
 

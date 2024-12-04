@@ -237,7 +237,7 @@ class seasons:
 
                 self.list.append({'season': season, 'tvshowtitle': tvshowtitle, 'year': year, 'premiered': premiered, 'status': status, 'studio': studio, 'genre': genre, 'duration': duration,
                                   'mpaa': mpaa, 'castwiththumb': castwiththumb, 'plot': plot, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': tvdb, 'poster': poster, 'fanart': fanart,
-                                  'banner': banner,'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'unaired': unaired, 'total_episodes': total_episodes})
+                                  'banner': banner,'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'unaired': unaired, 'total_episodes': total_episodes, 'mediatype': 'season'})
             except:
                 log_utils.log('seasons_dir Exception', 1)
                 pass
@@ -319,7 +319,7 @@ class seasons:
                 meta = dict((k,v) for k, v in six.iteritems(i) if not v == '0')
                 meta.update({'title': label})
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
-                meta.update({'mediatype': 'season'})
+                if not 'mediatype' in meta: meta.update({'mediatype': 'season'})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s&season=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb, season)})
                 if not 'duration' in meta: meta.update({'duration': '45'})
                 elif meta['duration'] == '0': meta.update({'duration': '45'})

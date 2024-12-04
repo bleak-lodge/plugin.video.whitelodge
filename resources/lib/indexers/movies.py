@@ -955,7 +955,7 @@ class movies:
                     rating = str(item['ratingsSummary']['aggregateRating']) or '0'
                     votes = str(item['ratingsSummary']['voteCount']) or '0'
                     year = str(item['releaseYear']['year']) or '0'
-                    duration = item['runtime']['seconds']
+                    duration = item.get('runtime', {}).get('seconds', 0)
                     if duration: duration = str(int(duration / 60))
                     else: duration = '0'
                     imdb = item['id']
@@ -970,7 +970,7 @@ class movies:
                     rating = str(item['ratingSummary']['aggregateRating']) or '0'
                     votes = str(item['ratingSummary']['voteCount']) or '0'
                     year = str(item['releaseYear']) or '0'
-                    duration = item['runtime']
+                    duration = item.get('runtime')
                     if duration: duration = str(int(duration / 60))
                     else: duration = '0'
                     imdb = item['titleId']
@@ -1197,14 +1197,19 @@ class movies:
                     en_tagline = en_trans_item.get('tagline', '')
                     if en_tagline: tagline = en_tagline
 
+            status = item.get('status') or '0'
+
             premiered = item.get('release_date') or '0'
+
+            if premiered == '0' or (int(re.sub('[^0-9]', '', str(premiered))) > int(re.sub('[^0-9]', '', str(self.today_date)))):
+                cache_upd = 48
+            else:
+                cache_upd = 360
 
             try: _year = re.findall('(\d{4})', premiered)[0]
             except: _year = ''
             if not _year : _year = '0'
             year = self.list[i]['year'] if not self.list[i]['year'] == '0' else _year
-
-            status = item.get('status') or '0'
 
             try: studio = item['production_companies'][0]['name']
             except: studio = ''
@@ -1364,9 +1369,9 @@ class movies:
             poster = poster3 or poster2 or poster1
             fanart = fanart2 or fanart1
 
-            item = {'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'poster': poster, 'banner': banner, 'fanart': fanart,
-                    'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'discart': discart, 'premiered': premiered, 'genre': genre, 'duration': duration, 'mpaa': mpaa,
-                    'director': director, 'writer': writer, 'castwiththumb': castwiththumb, 'plot': plot, 'tagline': tagline, 'status': status, 'studio': studio, 'country': country}
+            item = {'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'poster': poster, 'banner': banner, 'fanart': fanart, 'clearlogo': clearlogo,
+                    'clearart': clearart, 'landscape': landscape, 'discart': discart, 'premiered': premiered, 'genre': genre, 'duration': duration, 'mpaa': mpaa, 'director': director, 'writer': writer,
+                    'castwiththumb': castwiththumb, 'plot': plot, 'tagline': tagline, 'status': status, 'studio': studio, 'country': country, 'mediatype': 'movie', 'cache_upd': cache_upd}
             item = dict((k,v) for k, v in six.iteritems(item) if not v == '0')
             self.list[i].update(item)
 

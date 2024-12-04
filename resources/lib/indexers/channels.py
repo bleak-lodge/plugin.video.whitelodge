@@ -380,7 +380,7 @@ class channels:
             self.list.append({'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'poster': poster, 'banner': banner, 'fanart': fanart,
                     'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'discart': discart, 'premiered': premiered, 'genre': genre, 'duration': duration,
                     'director': director, 'writer': writer, 'castwiththumb': castwiththumb, 'plot': plot, 'tagline': tagline, 'status': status, 'studio': studio, 'country': country,
-                    'rating': rating, 'votes': votes, 'channel': i[2], 'mpaa': mpaa})
+                    'rating': rating, 'votes': votes, 'channel': i[2], 'mpaa': mpaa, 'mediatype': 'video'})
         except:
             pass
 
