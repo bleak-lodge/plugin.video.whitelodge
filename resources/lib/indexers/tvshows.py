@@ -1306,10 +1306,18 @@ class tvshows:
                 else:
                     total_episodes = str(item['number_of_episodes'])
             except:
-                total_episodes = '*'
-            if total_episodes == '0': total_episodes = '*'
+                total_episodes = '0'
 
-            total_seasons = str(item.get('total_seasons', '0'))
+            total_seasons = str(item.get('number_of_seasons', '0'))
+
+            try:
+                crew = item['aggregate_credits']['crew']
+                director = ', '.join([d['name'] for d in crew if any([x['job'] == 'Director' for x in d['jobs']])])
+                writer = ', '.join([w['name'] for w in crew if any([x['job'] in ['Writer', 'Screenplay', 'Author', 'Novel', 'Characters'] for x in w['jobs']])])
+            except:
+                director = writer = ''
+            if not director: director = '0'
+            if not writer: writer = '0'
 
             castwiththumb = []
             try:
@@ -1403,9 +1411,10 @@ class tvshows:
             poster = poster3 or poster2 or poster1
             fanart = fanart2 or fanart1
 
-            item = {'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': tvdb, 'poster': poster, 'fanart': fanart, 'banner': banner, 'clearlogo': clearlogo,
-                    'clearart': clearart, 'landscape': landscape, 'premiered': premiered, 'studio': studio, 'genre': genre, 'duration': duration, 'mpaa': mpaa, 'castwiththumb': castwiththumb,
-                    'plot': plot, 'status': status, 'tagline': tagline, 'country': country, 'total_episodes': total_episodes, 'total_seasons': total_seasons, 'mediatype': 'tvshow', 'cache_upd': cache_upd}
+            item = {'title': title, 'originaltitle': title, 'label': label, 'year': year, 'imdb': imdb, 'tmdb': tmdb, 'tvdb': tvdb, 'poster': poster, 'fanart': fanart, 'banner': banner,
+                    'clearlogo': clearlogo, 'clearart': clearart, 'landscape': landscape, 'premiered': premiered, 'studio': studio, 'genre': genre, 'duration': duration, 'mpaa': mpaa,
+                    'director': director, 'writer': writer, 'castwiththumb': castwiththumb, 'plot': plot, 'status': status, 'tagline': tagline, 'country': country,
+                    'total_episodes': total_episodes, 'total_seasons': total_seasons, 'mediatype': 'tvshow', 'cache_upd': cache_upd}
             item = dict((k,v) for k, v in six.iteritems(item) if not v == '0')
             self.list[i].update(item)
 
@@ -1456,6 +1465,7 @@ class tvshows:
 
         infoMenu = control.lang(32101)
 
+        list_items = []
         for i in items:
             try:
                 label = i['label'] if 'label' in i and not i['label'] == '0' else i['title']
@@ -1549,15 +1559,15 @@ class tvshows:
                 item.setArt(art)
                 item.addContextMenuItems(cm)
 
-                total_episodes = i.get('total_episodes', '*')
+                total_episodes = i.get('total_episodes', '0')
                 watched_episodes = len(show_indicators)
-                try: show_progress = int((float(watched_episodes)/int(total_episodes))*100) or 0
-                except: show_progress = 0
-                try: unwatched_episodes = int(total_episodes) - watched_episodes
+                try: show_progress = str(int((float(watched_episodes)/int(total_episodes))*100)) or '0'
+                except: show_progress = '0'
+                try: unwatched_episodes = str(int(total_episodes) - watched_episodes)
                 except: unwatched_episodes = total_episodes
 
-                item.setProperties({'TotalEpisodes': total_episodes, 'WatchedEpisodes': str(watched_episodes), 'UnWatchedEpisodes': str(unwatched_episodes),
-                                    'WatchedProgress': str(show_progress), 'TotalSeasons': i.get('total_seasons', '0')})
+                item.setProperties({'TotalEpisodes': total_episodes, 'WatchedEpisodes': str(watched_episodes), 'UnWatchedEpisodes': unwatched_episodes,
+                                    'WatchedProgress': show_progress, 'TotalSeasons': i.get('total_seasons', '0')})
 
                 if kodiVersion < 20:
                     castwiththumb = i.get('castwiththumb')
@@ -1599,6 +1609,10 @@ class tvshows:
                     vtag.setTvShowStatus(meta.get('status'))
                     vtag.setIMDBNumber(imdb)
                     vtag.setUniqueIDs({'imdb': imdb, 'tmdb': tmdb})
+                    vtag.setDirectors(meta.get('director', '').split(', '))
+                    vtag.setWriters(meta.get('writer', '').split(', '))
+                    vtag.setSeason(int(i.get('total_seasons', '0'))) # for Estuary Available seasons info
+                    vtag.setEpisode(int(total_episodes)) # for Estuary Available episodes info
 
                     if overlay > 6:
                         vtag.setPlaycount(1)
@@ -1612,7 +1626,8 @@ class tvshows:
                             cast.append(control.actor(p, '', 0, ''))
                     vtag.setCast(cast)
 
-                control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+                #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+                list_items.append((url, item, True))
             except:
                 log_utils.log('addir_fail0', 1)
                 pass
@@ -1633,10 +1648,12 @@ class tvshows:
             item.setArt({'icon': icon, 'thumb': icon, 'poster': icon, 'banner': icon, 'fanart': addonFanart})
             item.setProperty('SpecialSort', 'bottom')
 
-            control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+            #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+            list_items.append((url, item, True))
         except:
             pass
 
+        control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, 'tvshows')
         control.directory(syshandle, cacheToDisc=True)
         views.setView('tvshows', {'skin.estuary': 55, 'skin.confluence': 500})
@@ -1662,6 +1679,7 @@ class tvshows:
 
         kodiVersion = control.getKodiVersion()
 
+        list_items = []
         for i in items:
             try:
                 name = i['name']
@@ -1699,9 +1717,11 @@ class tvshows:
                     vtag.setMediaType('video')
                     vtag.setPlot(plot)
 
-                control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+                #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+                list_items.append((url, item, True))
             except:
                 pass
 
+        control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, '')
         control.directory(syshandle, cacheToDisc=True)

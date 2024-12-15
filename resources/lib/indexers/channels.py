@@ -430,6 +430,7 @@ class channels:
 
         infoMenu = control.lang(32101)
 
+        list_items = []
         for i in items:
             try:
                 imdb, tmdb, title, year = i['imdb'], i['tmdb'], i['originaltitle'], i['year']
@@ -446,8 +447,7 @@ class channels:
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
                 meta.update({'mediatype': 'movie'})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb)})
-                if not 'duration' in i: meta.update({'duration': '120'})
-                elif i['duration'] == '0': meta.update({'duration': '120'})
+                if not 'duration' in meta or meta['duration'] in ['0', 'None']: meta.update({'duration': '120'})
                 try: meta.update({'duration': str(int(meta['duration']) * 60)})
                 except: pass
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})
@@ -581,11 +581,13 @@ class channels:
                             cast.append(control.actor(p, '', 0, ''))
                     vtag.setCast(cast)
 
-                control.addItem(handle=syshandle, url=url, listitem=item, isFolder=False)
+                #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=False)
+                list_items.append((url, item, False))
             except:
                 log_utils.log('channels_dir', 1)
                 pass
 
+        control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, 'files')
         control.directory(syshandle, cacheToDisc=True)
 

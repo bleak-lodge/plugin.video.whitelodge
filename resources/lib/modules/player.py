@@ -46,6 +46,7 @@ class player(xbmc.Player):
             poster, thumb, fanart, clearlogo, clearart, discart, meta = self.getMeta(meta)
 
             item = control.item(path=url)
+            item.setContentLookup(False)
             if self.content == 'movie':
                 item.setArt({'icon': thumb, 'thumb': thumb, 'poster': poster, 'fanart': fanart, 'clearlogo': clearlogo, 'clearart': clearart, 'discart': discart})
             else:

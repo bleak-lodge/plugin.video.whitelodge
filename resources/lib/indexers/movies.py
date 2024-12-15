@@ -1426,6 +1426,7 @@ class movies:
 
         infoMenu = control.lang(32101)
 
+        list_items = []
         for i in items:
             try:
                 imdb, tmdb, title, year = i['imdb'], i['tmdb'], i['originaltitle'], i['year']
@@ -1446,8 +1447,7 @@ class movies:
                 meta.update({'imdbnumber': imdb, 'code': tmdb})
                 meta.update({'trailer': '%s?action=%s&name=%s&tmdb=%s&imdb=%s' % (sysaddon, trailerAction, systitle, tmdb, imdb)})
                 if not 'mediatype' in meta: meta.update({'mediatype': 'movie'})
-                if not 'duration' in meta: meta.update({'duration': '120'})
-                elif meta['duration'] == '0': meta.update({'duration': '120'})
+                if not 'duration' in meta or meta['duration'] in ['0', 'None']: meta.update({'duration': '120'})
                 try: meta.update({'duration': str(int(meta['duration']) * 60)})
                 except: pass
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})
@@ -1583,7 +1583,8 @@ class movies:
                     if float(offset) > 120:
                         vtag.setResumePoint(float(offset))#, float(meta['duration']))
 
-                control.addItem(handle=syshandle, url=url, listitem=item, isFolder=False)
+                #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=False)
+                list_items.append((url, item, False))
             except:
                 log_utils.log('movies_dir', 1)
                 pass
@@ -1604,10 +1605,12 @@ class movies:
             item.setArt({'icon': icon, 'thumb': icon, 'poster': icon, 'banner': icon, 'fanart': addonFanart})
             item.setProperty('SpecialSort', 'bottom')
 
-            control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+            #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+            list_items.append((url, item, True))
         except:
             pass
 
+        control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, 'movies')
         control.directory(syshandle, cacheToDisc=True)
         control.sleep(1000)
@@ -1634,6 +1637,7 @@ class movies:
 
         kodiVersion = control.getKodiVersion()
 
+        list_items = []
         for i in items:
             try:
                 name = i['name']
@@ -1671,10 +1675,12 @@ class movies:
                     vtag.setMediaType('video')
                     vtag.setPlot(plot)
 
-                control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+                #control.addItem(handle=syshandle, url=url, listitem=item, isFolder=True)
+                list_items.append((url, item, True))
             except:
                 log_utils.log('mov_addDir', 1)
                 pass
 
+        control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, '')
         control.directory(syshandle, cacheToDisc=True)
