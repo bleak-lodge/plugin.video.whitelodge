@@ -86,7 +86,7 @@ class seasons:
                     url = self.search_link % (urllib_parse.quote(tvshowtitle)) + '&first_air_date_year=' + year
                     result = self.session.get(url, timeout=10).json()
                     results = result['results']
-                    show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(tvshowtitle)][0]# and re.findall('(\d{4})', r.get('first_air_date'))[0] == year][0]
+                    show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(tvshowtitle)][0]# and re.findall(r'(\d{4})', r.get('first_air_date'))[0] == year][0]
                     tmdb = show['id']
                     if not tmdb: tmdb = '0'
                     else: tmdb = str(tmdb)
@@ -328,7 +328,7 @@ class seasons:
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})
                 except: pass
                 try:
-                    season_year = re.findall('(\d{4})', i['premiered'])[0]
+                    season_year = re.findall(r'(\d{4})', i['premiered'])[0]
                     meta.update({'year': season_year})
                 except:
                     season_year = year
@@ -659,7 +659,7 @@ class episodes:
 
     def trakt_list(self, url, user):
         try:
-            for i in re.findall('date\[(\d+)\]', url):
+            for i in re.findall(r'date\[(\d+)\]', url):
                 url = url.replace('date[%s]' % i, (self.datetime - datetime.timedelta(days = int(i))).strftime('%Y-%m-%d'))
 
             q = dict(urllib_parse.parse_qsl(urllib_parse.urlsplit(url).query))
@@ -711,7 +711,7 @@ class episodes:
                 tmdb = str(tmdb)
 
                 premiered = item['episode']['first_aired']
-                try: premiered = re.compile('(\d{4}-\d{2}-\d{2})').findall(premiered)[0]
+                try: premiered = re.compile(r'(\d{4}-\d{2}-\d{2})').findall(premiered)[0]
                 except: premiered = '0'
 
                 studio = item['show']['network']
@@ -1139,7 +1139,7 @@ class episodes:
                 tvshowtitle = client.replaceHTMLCodes(tvshowtitle)
 
                 year = item['show']['premiered']
-                year = re.findall('(\d{4})', year)[0]
+                year = re.findall(r'(\d{4})', year)[0]
 
                 imdb = item['show']['externals']['imdb']
                 if not imdb: imdb = '0'
@@ -1156,7 +1156,7 @@ class episodes:
                 try: thumb1 = item['image']['original']
                 except: thumb1 = ''
 
-                try: premiered = re.findall('(\d{4}-\d{2}-\d{2})', item['airdate'])[0]
+                try: premiered = re.findall(r'(\d{4}-\d{2}-\d{2})', item['airdate'])[0]
                 except: premiered = ''
                 if not premiered: premiered = '0'
 
@@ -1188,7 +1188,7 @@ class episodes:
                 except: plot = ''
                 if not plot: plot = '0'
                 else:
-                    plot = re.sub('<.+?>|</.+?>|\n', '', plot)
+                    plot = re.sub(r'<.+?>|</.+?>|\n', '', plot)
                     plot = client.replaceHTMLCodes(plot)
 
                 poster2 = fanart = banner = landscape = clearlogo = clearart = '0'
@@ -1301,7 +1301,7 @@ class episodes:
                 url = self.search_link % (urllib_parse.quote(tvshowtitle)) + '&first_air_date_year=' + year
                 result = self.session.get(url, timeout=16).json()
                 results = result['results']
-                show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(self.list[i]['title'])][0]# and re.findall('(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]
+                show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(self.list[i]['title'])][0]# and re.findall(r'(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]
                 tmdb = show['id']
                 if not tmdb: tmdb = '0'
                 else: tmdb = str(tmdb)
@@ -1526,7 +1526,7 @@ class episodes:
                 try: meta.update({'genre': cleangenre.lang(meta['genre'], self.lang)})
                 except: pass
                 try:
-                    episode_year = re.findall('(\d{4})', i['premiered'])[0]
+                    episode_year = re.findall(r'(\d{4})', i['premiered'])[0]
                     meta.update({'year': episode_year})
                 except:
                     episode_year = year

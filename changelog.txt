@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.05.22[/COLOR][/B]
+- Compatibility fixes for Python 3.12
+
 [B][COLOR gold]v1.05.21[/COLOR][/B]
 - Metadata and cosmetic updates
 

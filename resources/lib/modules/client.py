@@ -545,7 +545,7 @@ class Cfcookie:
                 result = gzip.GzipFile(fileobj=StringIO(result)).read()
 
         jschl = re.compile('name="jschl_vc" value="(.+?)"/>').findall(result)[0]
-        init = re.compile('setTimeout\(function\(\){\s*.*?.*:(.*?)};').findall(result)[0]
+        init = re.compile(r'setTimeout\(function\(\){\s*.*?.*:(.*?)};').findall(result)[0]
         builder = re.compile(r"challenge-form\'\);\s*(.*)a.v").findall(result)[0]
 
         if '/' in init:
@@ -597,7 +597,7 @@ class bfcookie:
             headers = {'User-Agent': ua, 'Referer': netloc}
             result = _basic_request(netloc, headers=headers, timeout=timeout)
 
-            match = re.findall('xhr\.open\("GET","([^,]+),', result)
+            match = re.findall(r'xhr\.open\("GET","([^,]+),', result)
             if not match:
                 return False
 
@@ -617,7 +617,7 @@ class bfcookie:
 
     # not very robust but lazieness...
     def getCookieString(self, content, rcksid):
-        vars = re.findall('toNumbers\("([^"]+)"', content)
+        vars = re.findall(r'toNumbers\("([^"]+)"', content)
         value = self._decrypt(vars[2], vars[0], vars[1])
         cookie = "%s=%s;%s" % (self.COOKIE_NAME, value, rcksid)
         return cookie
@@ -642,14 +642,14 @@ class sucuri:
 
     def get(self, result):
         try:
-            s = re.compile("S\s*=\s*'([^']+)").findall(result)[0]
+            s = re.compile(r"S\s*=\s*'([^']+)").findall(result)[0]
             s = base64.b64decode(s)
             s = s.replace(' ', '')
-            s = re.sub('String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
-            s = re.sub('\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
-            s = re.sub('\.charAt\(([^)]+)\)', r'[\1]', s)
-            s = re.sub('\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
-            s = re.sub(';location.reload\(\);', '', s)
+            s = re.sub(r'String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
+            s = re.sub(r'\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
+            s = re.sub(r'\.charAt\(([^)]+)\)', r'[\1]', s)
+            s = re.sub(r'\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
+            s = re.sub(r';location.reload\(\);', '', s)
             s = re.sub(r'\n', '', s)
             s = re.sub(r'document\.cookie', 'cookie', s)
 

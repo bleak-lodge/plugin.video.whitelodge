@@ -29,7 +29,7 @@ class lib_tools:
             try:
                 if not 'ftp://' in folder: raise Exception()
                 from ftplib import FTP
-                ftparg = re.compile('ftp://(.+?):(.+?)@(.+?):?(\d+)?/(.+/?)').findall(folder)
+                ftparg = re.compile(r'ftp://(.+?):(.+?)@(.+?):?(\d+)?/(.+/?)').findall(folder)
                 ftp = FTP(ftparg[0][2], ftparg[0][0], ftparg[0][1])
                 try:
                     ftp.cwd(ftparg[0][4])
@@ -83,8 +83,8 @@ class lib_tools:
         try:
             filename = filename.strip()
             filename = re.sub(r'(?!%s)[^\w\-_\.]', '.', filename)
-            filename = re.sub('\.+', '.', filename)
-            filename = re.sub(re.compile('(CON|PRN|AUX|NUL|COM\d|LPT\d)\.', re.I), '\\1_', filename)
+            filename = re.sub(r'\.+', '.', filename)
+            filename = re.sub(re.compile(r'(CON|PRN|AUX|NUL|COM\d|LPT\d)\.', re.I), '\\1_', filename)
             control.legalFilename(filename)
             return filename
         except:
@@ -208,8 +208,8 @@ class libmovies:
 
             sysname, systitle = urllib_parse.quote_plus(name), urllib_parse.quote_plus(title)
 
-            try: transtitle = title.translate(None, '\/:*?"<>|')
-            except: transtitle = title.translate(str.maketrans('', '', '\/:*?"<>|'))
+            try: transtitle = title.translate(None, r'\/:*?"<>|')
+            except: transtitle = title.translate(str.maketrans('', '', r'\/:*?"<>|'))
             transtitle = cleantitle.normalize(transtitle)
 
             content = '%s?action=play&name=%s&title=%s&year=%s&imdb=%s' % (sys.argv[0], sysname, systitle, year, imdb)
@@ -375,8 +375,8 @@ class libtvshows:
             episodetitle = urllib_parse.quote_plus(cleantitle.normalize(title))
             systitle, syspremiered = urllib_parse.quote_plus(cleantitle.normalize(tvshowtitle)), urllib_parse.quote_plus(premiered)
 
-            try: transtitle = tvshowtitle.translate(None, '\/:*?"<>|')
-            except: transtitle = tvshowtitle.translate(str.maketrans('', '', '\/:*?"<>|'))
+            try: transtitle = tvshowtitle.translate(None, r'\/:*?"<>|')
+            except: transtitle = tvshowtitle.translate(str.maketrans('', '', r'\/:*?"<>|'))
             transtitle = cleantitle.normalize(transtitle)
 
             content = '%s?action=play&title=%s&year=%s&imdb=%s&tmdb=%s&season=%s&episode=%s&tvshowtitle=%s&date=%s' % (sys.argv[0], episodetitle, year, imdb, tmdb, season, episode, systitle, syspremiered)

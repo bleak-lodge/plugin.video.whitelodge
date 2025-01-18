@@ -146,11 +146,11 @@ class youtube(object):
                 d = d[0][1]['duration']
 
                 duration = 0
-                try: duration += 60 * 60 * int(re.findall('(\d*)H', d)[0])
+                try: duration += 60 * 60 * int(re.findall(r'(\d*)H', d)[0])
                 except: pass
-                try: duration += 60 * int(re.findall('(\d*)M', d)[0])
+                try: duration += 60 * int(re.findall(r'(\d*)M', d)[0])
                 except: pass
-                try: duration += int(re.findall('(\d*)S', d)[0])
+                try: duration += int(re.findall(r'(\d*)S', d)[0])
                 except: pass
                 duration = str(duration)
 

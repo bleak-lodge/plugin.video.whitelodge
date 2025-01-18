@@ -144,7 +144,7 @@ class People:
 
 
     def imdb_person_list(self, url):
-        count_ = re.findall('&count=(\d+)', url)
+        count_ = re.findall(r'&count=(\d+)', url)
         if len(count_) == 1 and int(count_[0]) > 250:
             url = url.replace('&count=%s' % count_[0], '&count=250')
 
@@ -161,11 +161,11 @@ class People:
             return
 
         try:
-            cur = re.findall('&count=(\d+)', url)[0]
+            cur = re.findall(r'&count=(\d+)', url)[0]
             if int(cur) > len(data) or cur == '250':
                 items = data[-(len(data) - int(count_[0]) + 50):]
                 raise Exception()
-            next = re.sub('&count=\d+', '&count=%s' % str(int(cur) + 50), url)
+            next = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + 50), url)
             #log_utils.log('next_url: ' + next)
             page = int(cur) // 50
         except:

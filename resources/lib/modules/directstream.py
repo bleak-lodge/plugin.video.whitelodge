@@ -8,7 +8,7 @@ from resources.lib.modules import client
 
 def google(url):
     try:
-        if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % re.compile('docid=([\w-]+)').findall(url)[0]
+        if any(x in url for x in ['youtube.', 'docid=']): url = 'https://drive.google.com/file/d/%s/view' % re.compile(r'docid=([\w-]+)').findall(url)[0]
 
         netloc = urllib_parse.urlparse(url.strip().lower()).netloc
         netloc = netloc.split('.google')[0]
@@ -37,7 +37,7 @@ def google(url):
 
         elif netloc == 'photos':
             result = result.replace('\r', '').replace('\n', '').replace('\t', '')
-            result = re.compile('"\d*/\d*x\d*.+?","(.+?)"').findall(result)[0]
+            result = re.compile(r'"\d*/\d*x\d*.+?","(.+?)"').findall(result)[0]
 
             result = result.replace('\\u003d', '=').replace('\\u0026', '&')
             result = re.compile('url=(.+?)&').findall(result)
@@ -47,9 +47,9 @@ def google(url):
 
 
         elif netloc == 'picasaweb':
-            id = re.compile('#(\d*)').findall(url)[0]
+            id = re.compile(r'#(\d*)').findall(url)[0]
 
-            result = re.search('feedPreload:\s*(.*}]}})},', result, re.DOTALL).group(1)
+            result = re.search(r'feedPreload:\s*(.*}]}})},', result, re.DOTALL).group(1)
             result = json.loads(result)['feed']['entry']
 
             if len(result) > 1:
@@ -94,8 +94,8 @@ def google(url):
 
 
 def googletag(url, append_height=False):
-    quality = re.compile('itag=(\d*)').findall(url)
-    quality += re.compile('=m(\d*)$').findall(url)
+    quality = re.compile(r'itag=(\d*)').findall(url)
+    quality += re.compile(r'=m(\d*)$').findall(url)
     try:
         quality = quality[0]
     except:
@@ -157,16 +157,16 @@ def vk(url):
         try:
             oid, video_id = query['oid'][0], query['id'][0]
         except:
-            oid, video_id = re.findall('\/video(.*)_(.*)', url)[0]
+            oid, video_id = re.findall(r'\/video(.*)_(.*)', url)[0]
 
         sources_url = 'http://vk.com/al_video.php?act=show_inline&al=1&video=%s_%s' % (oid, video_id)
         html = client.request(sources_url)
         html = re.sub(r'[^\x00-\x7F]+', ' ', html)
 
-        sources = re.findall('(\d+)x\d+.+?(http.+?\.m3u8.+?)n', html)
+        sources = re.findall(r'(\d+)x\d+.+?(http.+?\.m3u8.+?)n', html)
 
         if not sources:
-            sources = re.findall('"url(\d+)"\s*:\s*"(.+?)"', html)
+            sources = re.findall(r'"url(\d+)"\s*:\s*"(.+?)"', html)
 
         sources = [(i[0], i[1].replace('\\', '')) for i in sources]
         sources = dict(sources)
@@ -201,7 +201,7 @@ def vk(url):
 
 def odnoklassniki(url):
     try:
-        media_id = re.compile('//.+?/.+?/([\w]+)').findall(url)[0]
+        media_id = re.compile(r'//.+?/.+?/([\w]+)').findall(url)[0]
 
         result = client.request('http://ok.ru/dk', post={'cmd': 'videoPlayerMetadata', 'mid': media_id})
         result = re.sub(r'[^\x00-\x7F]+', ' ', result)
@@ -228,9 +228,9 @@ def cldmailru(url):
         r = client.request(url)
         r = re.sub(r'[^\x00-\x7F]+', ' ', r)
 
-        tok = re.findall('"tokens"\s*:\s*{\s*"download"\s*:\s*"([^"]+)', r)[0]
+        tok = re.findall(r'"tokens"\s*:\s*{\s*"download"\s*:\s*"([^"]+)', r)[0]
 
-        url = re.findall('"weblink_get"\s*:\s*\[.+?"url"\s*:\s*"([^"]+)', r)[0]
+        url = re.findall(r'"weblink_get"\s*:\s*\[.+?"url"\s*:\s*"([^"]+)', r)[0]
 
         url = '%s%s?key=%s' % (url, v, tok)
 
@@ -246,9 +246,9 @@ def yandex(url):
         r = client.request(url, cookie=cookie)
         r = re.sub(r'[^\x00-\x7F]+', ' ', r)
 
-        sk = re.findall('"sk"\s*:\s*"([^"]+)', r)[0]
+        sk = re.findall(r'"sk"\s*:\s*"([^"]+)', r)[0]
 
-        idstring = re.findall('"id"\s*:\s*"([^"]+)', r)[0]
+        idstring = re.findall(r'"id"\s*:\s*"([^"]+)', r)[0]
 
         idclient = binascii.b2a_hex(os.urandom(16))
 

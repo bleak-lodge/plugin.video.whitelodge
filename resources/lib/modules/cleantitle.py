@@ -26,8 +26,8 @@ def get_title(title, sep='.'):
     title = client.replaceHTMLCodes(title)
     title = title.replace('&', 'and').replace('.html', '').replace('_', sep)
     title = normalize(title)
-    title = re.sub('[^\w\%s]+' % sep, sep, title)
-    title = re.sub('\%s{2,}' % sep, sep, title)
+    title = re.sub(r'[^\w\%s]+' % sep, sep, title)
+    title = re.sub(r'\%s{2,}' % sep, sep, title)
     title = title.strip(sep)
     return title
 
@@ -37,8 +37,8 @@ def geturl(title):
     title = ensure_str(title, errors='ignore')
     title = title.lower()
     title = title.rstrip()
-    try: title = title.translate(None, ':*?"\'\.<>|&!,')
-    except: title = title.translate(str.maketrans('', '', ':*?"\'\.<>|&!,'))
+    try: title = title.translate(None, r':*?"\'\.<>|&!,')
+    except: title = title.translate(str.maketrans('', '', r':*?"\'\.<>|&!,'))
     title = title.replace('/', '-')
     title = title.replace(' ', '-')
     title = title.replace('--', '-')
@@ -74,11 +74,11 @@ def get_simple(title):
     if not title: return
     title = ensure_str(title, errors='ignore')
     title = title.lower()
-    title = re.sub('(\d{4})', '', title)
-    title = re.sub('&#(\d+);', '', title)
+    title = re.sub(r'(\d{4})', '', title)
+    title = re.sub(r'&#(\d+);', '', title)
     title = re.sub('(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-    title = title.replace('&quot;', '\"').replace('&amp;', '&').replace('–', '-')
-    title = re.sub('\n|\(|\)|\[|\]|\{|\}|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s', '', title).lower()
+    title = title.replace('&quot;', r'\"').replace('&amp;', '&').replace('–', '-')
+    title = re.sub(r'\n|\(|\)|\[|\]|\{|\}|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s', '', title).lower()
     return title
 
 
@@ -86,17 +86,17 @@ def getsearch(title):
     if not title: return
     title = ensure_str(title, errors='ignore')
     title = title.lower()
-    title = re.sub('&#(\d+);', '', title)
+    title = re.sub(r'&#(\d+);', '', title)
     title = re.sub('(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-    title = title.replace('&quot;', '\"').replace('&amp;', '&').replace('–', '-')
-    title = re.sub('\\\|/|-|–|:|;|!|\*|\?|"|\'|<|>|\|', '', title).lower()
+    title = title.replace('&quot;', r'\"').replace('&amp;', '&').replace('–', '-')
+    title = re.sub(r'\\\|/|-|–|:|;|!|\*|\?|"|\'|<|>|\|', '', title).lower()
     return title
 
 
 def query(title):
     if not title: return
     title = ensure_str(title, errors='ignore')
-    title = title.replace('\'', '').rsplit(':', 1)[0].rsplit(' -', 1)[0].replace('-', ' ').replace('–', ' ').replace('!', '')
+    title = title.replace(r'\'', '').rsplit(':', 1)[0].rsplit(' -', 1)[0].replace('-', ' ').replace('–', ' ').replace('!', '')
     return title
 
 
@@ -127,7 +127,7 @@ def scene_title(title, year):
     title = normalize(title)
     title = ensure_str(title, errors='ignore')
     title = title.replace('&', 'and').replace('-', ' ').replace('–', ' ').replace('_', ' ').replace('/', ' ').replace('*', ' ').replace('.', ' ')
-    title = re.sub('[^\w\s]+', '', title)
+    title = re.sub(r'[^\w\s]+', '', title)
     title = re.sub(' {2,}', ' ', title).strip()
     if title.startswith('Birdman or') and year == '2014': title = 'Birdman'
     if title == 'Birds of Prey and the Fantabulous Emancipation of One Harley Quinn' and year == '2020': title = 'Birds of Prey'
@@ -139,7 +139,7 @@ def scene_tvtitle(title, year, season, episode):
     title = normalize(title)
     title = ensure_str(title, errors='ignore')
     title = title.replace('&', 'and').replace('-', ' ').replace('–', ' ').replace('_', ' ').replace('/', ' ').replace('*', ' ').replace('.', ' ')
-    title = re.sub('[^\w\s]+', '', title)
+    title = re.sub(r'[^\w\s]+', '', title)
     title = re.sub(' {2,}', ' ', title).strip()
     if title in ['The Haunting', 'The Haunting of Bly Manor', 'The Haunting of Hill House'] and year == '2018':
         if season == '1': title = 'The Haunting of Hill House'

@@ -671,7 +671,7 @@ class tvshows:
             if len(items) == 0:
                 items = result
         except:
-            return
+            return self.list
 
         try:
             q = dict(urllib_parse.parse_qsl(urllib_parse.urlsplit(url).query))
@@ -687,7 +687,7 @@ class tvshows:
         def items_list(item):
             try:
                 title = item['title']
-                title = re.sub('\s(|[(])(UK|US|AU|\d{4})(|[)])$', '', title)
+                title = re.sub(r'\s(|[(])(UK|US|AU|\d{4})(|[)])$', '', title)
                 title = client.replaceHTMLCodes(title)
 
                 year = item['year']
@@ -708,7 +708,7 @@ class tvshows:
 
                 try: premiered = item['first_aired']
                 except: premiered = '0'
-                try: premiered = re.compile('(\d{4}-\d{2}-\d{2})').findall(premiered)[0]
+                try: premiered = re.compile(r'(\d{4}-\d{2}-\d{2})').findall(premiered)[0]
                 except: premiered = '0'
 
                 try: studio = item['network']
@@ -766,7 +766,7 @@ class tvshows:
             return self.list
         except:
             log_utils.log('trakt_list1', 1)
-            return
+            return self.list
 
 
     def trakt_user_list(self, url, user):
@@ -796,7 +796,7 @@ class tvshows:
     def imdb_list(self, url):
         try:
             url = url.split('&ref')[0]
-            for i in re.findall('date\[(\d+)\]', url):
+            for i in re.findall(r'date\[(\d+)\]', url):
                 url = url.replace('date[%s]' % i, (self.datetime - datetime.timedelta(days = int(i))).strftime('%Y-%m-%d'))
 
             # def imdb_watchlist_id(url):
@@ -813,7 +813,7 @@ class tvshows:
             # log_utils.log('imdb_url: ' + repr(url))
         except:
             log_utils.log('imdb_list fail', 1)
-            return
+            return self.list
 
         def imdb_userlist(link):
             result = client.request(link)
@@ -832,23 +832,23 @@ class tvshows:
                 data = cache.get(imdb_userlist, 24, url.split('&start')[0])
                 if not data: raise Exception()
             except:
-                return
+                return self.list
 
             try:
-                start = re.findall('&start=(\d+)', url)[0]
+                start = re.findall(r'&start=(\d+)', url)[0]
                 items = data[int(start):(int(start) + int(self.items_per_page))]
                 if (int(start) + int(self.items_per_page)) >= len(data):
                     next = page = ''
                 else:
-                    next = re.sub('&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
+                    next = re.sub(r'&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
                     #log_utils.log('next_url: ' + next)
                     page = (int(start) + int(self.items_per_page)) // int(self.items_per_page)
             except:
                 #log_utils.log('next_fail', 1)
-                return
+                return self.list
 
         else:
-            count_ = re.findall('&count=(\d+)', url)
+            count_ = re.findall(r'&count=(\d+)', url)
             if len(count_) == 1 and int(count_[0]) > 250:
                 url = url.replace('&count=%s' % count_[0], '&count=250')
 
@@ -861,14 +861,14 @@ class tvshows:
                 items = data[-int(self.items_per_page):]
                 #log_utils.log(repr(items))
             except:
-                return
+                return self.list
 
             try:
-                cur = re.findall('&count=(\d+)', url)[0]
+                cur = re.findall(r'&count=(\d+)', url)[0]
                 if int(cur) > len(data) or cur == '250':
                     items = data[-(len(data) - int(count_[0]) + int(self.items_per_page)):]
                     raise Exception()
-                next = re.sub('&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result[5])
+                next = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result[5])
                 #log_utils.log('next_url: ' + next)
                 page = int(cur) // int(self.items_per_page)
             except:
@@ -947,7 +947,7 @@ class tvshows:
             items = client.parseDOM(result, 'span', attrs = {'class': 'title'})
             items = [client.parseDOM(i, 'a', ret='href') for i in items]
             items = [i[0] for i in items if len(i) > 0]
-            items = [re.findall('/(\d+)/', i) for i in items]
+            items = [re.findall(r'/(\d+)/', i) for i in items]
             items = [i[0] for i in items if len(i) > 0]
 
             next = ''; last = []; nextp = []
@@ -967,17 +967,17 @@ class tvshows:
                 item = self.session.get(url, timeout=16).json()
 
                 title = item['name']
-                title = re.sub('\s(|[(])(UK|US|AU|\d{4})(|[)])$', '', title)
+                title = re.sub(r'\s(|[(])(UK|US|AU|\d{4})(|[)])$', '', title)
                 title = client.replaceHTMLCodes(title)
                 title = six.ensure_str(title)
 
                 premiered = item['premiered']
-                try: premiered = re.findall('(\d{4}-\d{2}-\d{2})', premiered)[0]
+                try: premiered = re.findall(r'(\d{4}-\d{2}-\d{2})', premiered)[0]
                 except: premiered = '0'
                 premiered = six.ensure_str(premiered)
 
                 year = item['premiered']
-                try: year = re.findall('(\d{4})', year)[0]
+                try: year = re.findall(r'(\d{4})', year)[0]
                 except: year = '0'
                 year = six.ensure_str(year)
 
@@ -1025,7 +1025,7 @@ class tvshows:
                 try: plot = item['summary']
                 except: plot = '0'
                 if plot == None: plot = '0'
-                plot = re.sub('<.+?>|</.+?>|\n', '', plot)
+                plot = re.sub(r'<.+?>|</.+?>|\n', '', plot)
                 plot = client.replaceHTMLCodes(plot)
                 plot = six.ensure_str(plot)
 
@@ -1106,7 +1106,7 @@ class tvshows:
                 except: premiered = ''
                 if not premiered : premiered = '0'
 
-                try: year = re.findall('(\d{4})', premiered)[0]
+                try: year = re.findall(r'(\d{4})', premiered)[0]
                 except: year = ''
                 if not year : year = '0'
 
@@ -1173,7 +1173,7 @@ class tvshows:
                     url = self.tm_search_link % (urllib_parse.quote(list_title)) + '&first_air_date_year=' + self.list[i]['year']
                     result = self.session.get(url, timeout=10).json()
                     results = result['results']
-                    show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(list_title)][0]# and re.findall('(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]
+                    show = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(list_title)][0]# and re.findall(r'(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]
                     tmdb = show['id']
                     if not tmdb: tmdb = '0'
                     else: tmdb = str(tmdb)
@@ -1253,7 +1253,7 @@ class tvshows:
             premiered = item.get('first_air_date', '')
             if not premiered : premiered = '0'
 
-            try: year = re.findall('(\d{4})', premiered)[0]
+            try: year = re.findall(r'(\d{4})', premiered)[0]
             except: year = ''
             if not year : year = '0'
 

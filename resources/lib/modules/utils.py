@@ -38,7 +38,7 @@ def title_key(title):
         articles_de = ['der', 'die', 'das']
         articles = articles_en + articles_de
 
-        match = re.match('^((\w+)\s+)', title.lower())
+        match = re.match(r'^((\w+)\s+)', title.lower())
         if match and match.group(2) in articles:
             offset = len(match.group(1))
         else:

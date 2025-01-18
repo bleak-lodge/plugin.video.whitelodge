@@ -14,11 +14,14 @@ def sources():
                     continue
 
                 try:
+                    module = loader.find_spec(module_name).loader.load_module(module_name)
+                    sourceDict.append((module_name, module.source()))
+                except AttributeError:
                     module = loader.find_module(module_name).load_module(module_name)
                     sourceDict.append((module_name, module.source()))
-                except:
-                    # from resources.lib.modules import log_utils
-                    # log_utils.log('Could not load "%s"' % module_name, 1)
+                except Exception:
+                    from resources.lib.modules import log_utils
+                    log_utils.log('Could not load "%s"' % module_name, 1)
                     pass
         return sourceDict
     except:

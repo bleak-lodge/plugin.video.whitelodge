@@ -750,7 +750,7 @@ class movies:
             #log_utils.log('movies_trakt_list_items: ' + str(items))
         except:
             log_utils.log('movies_trakt_list0', 1)
-            return
+            return self.list
 
         try:
             q = dict(urllib_parse.parse_qsl(urllib_parse.urlsplit(url).query))
@@ -877,7 +877,7 @@ class movies:
             #log_utils.log('imdb_url: ' + repr(url))
         except:
             log_utils.log('imdb_list fail', 1)
-            return
+            return self.list
 
         def imdb_userlist(link):
             result = client.request(link)
@@ -896,24 +896,24 @@ class movies:
                 data = cache.get(imdb_userlist, 24, url.split('&start')[0])
                 if not data: raise Exception()
             except:
-                return
+                return self.list
 
             try:
-                start = re.findall('&start=(\d+)', url)[0]
+                start = re.findall(r'&start=(\d+)', url)[0]
                 items = data[int(start):(int(start) + int(self.items_per_page))]
                 #log_utils.log(repr(items))
                 if (int(start) + int(self.items_per_page)) >= len(data):
                     next = page = ''
                 else:
-                    next = re.sub('&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
+                    next = re.sub(r'&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
                     #log_utils.log('next_url: ' + next)
                     page = (int(start) + int(self.items_per_page)) // int(self.items_per_page)
             except:
                 #log_utils.log('next_fail', 1)
-                return
+                return self.list
 
         else:
-            count_ = re.findall('&count=(\d+)', url)
+            count_ = re.findall(r'&count=(\d+)', url)
             if len(count_) == 1 and int(count_[0]) > 250:
                 url = url.replace('&count=%s' % count_[0], '&count=250')
 
@@ -927,14 +927,14 @@ class movies:
                 items = data[-int(self.items_per_page):]
                 #log_utils.log(repr(items))
             except:
-                return
+                return self.list
 
             try:
-                cur = re.findall('&count=(\d+)', url)[0]
+                cur = re.findall(r'&count=(\d+)', url)[0]
                 if int(cur) > len(data) or cur == '250':
                     items = data[-(len(data) - int(count_[0]) + int(self.items_per_page)):]
                     raise Exception()
-                next = re.sub('&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result[5])
+                next = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result[5])
                 #log_utils.log('next_url: ' + next)
                 page = int(cur) // int(self.items_per_page)
             except:
@@ -1061,7 +1061,7 @@ class movies:
                 except: premiered = ''
                 if not premiered : premiered = '0'
 
-                try: year = re.findall('(\d{4})', premiered)[0]
+                try: year = re.findall(r'(\d{4})', premiered)[0]
                 except: year = ''
                 if not year : year = '0'
 
@@ -1129,7 +1129,7 @@ class movies:
                     # url = self.tm_search_link % (urllib_parse.quote(list_title)) + '&year=' + self.list[i]['year']
                     # result = self.session.get(url, timeout=16).json()
                     # results = result['results']
-                    # movie = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(list_title)][0]# and re.findall('(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]
+                    # movie = [r for r in results if cleantitle.get(r.get('name')) == cleantitle.get(list_title)][0]# and re.findall(r'(\d{4})', r.get('first_air_date'))[0] == self.list[i]['year']][0]
                     # tmdb = movie.get('id')
                     # if not tmdb: tmdb = '0'
                     # else: tmdb = str(tmdb)
@@ -1206,7 +1206,7 @@ class movies:
             else:
                 cache_upd = 360
 
-            try: _year = re.findall('(\d{4})', premiered)[0]
+            try: _year = re.findall(r'(\d{4})', premiered)[0]
             except: _year = ''
             if not _year : _year = '0'
             year = self.list[i]['year'] if not self.list[i]['year'] == '0' else _year

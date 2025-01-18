@@ -128,7 +128,7 @@ class channels:
 
             try:
                 year = result['d']
-                year = re.findall('[(](\d{4})[)]', year)[0].strip()
+                year = re.findall(r'[(](\d{4})[)]', year)[0].strip()
             except:
                 year = ''
 
@@ -225,7 +225,7 @@ class channels:
 
             premiered = item.get('release_date', '') or '0'
 
-            try: year = re.findall('(\d{4})', premiered)[0]
+            try: year = re.findall(r'(\d{4})', premiered)[0]
             except: year = ''
             if not year : year = _year
 
