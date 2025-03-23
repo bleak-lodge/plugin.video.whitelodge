@@ -10,7 +10,6 @@ import simplejson as json
 
 from resources.lib.modules import cache
 from resources.lib.modules import cleandate
-from resources.lib.modules import client
 from resources.lib.modules import control
 from resources.lib.modules import log_utils
 from resources.lib.modules import utils
@@ -47,13 +46,6 @@ def __getTrakt(url, post=None):
         if getTraktCredentialsInfo():
             headers.update({'Authorization': 'Bearer %s' % control.setting('trakt.token')})
 
-        # need to fix client.request post
-        # result = client.request(url, post=post, headers=headers, output='extended', error=True)
-        # result = utils.byteify(result)
-        # resp_code = result[1]
-        # resp_header = result[2]
-        # result = result[0]
-
         if not post:
             r = requests.get(url, headers=headers, timeout=30)
         else:
@@ -83,9 +75,6 @@ def __getTrakt(url, post=None):
         oauth = urllib_parse.urljoin(BASE_URL, '/oauth/token')
         opost = {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'redirect_uri': REDIRECT_URI, 'grant_type': 'refresh_token', 'refresh_token': control.setting('trakt.refresh')}
 
-        # result = client.request(oauth, post=json.dumps(opost), headers=headers)
-        # result = utils.json_loads_as_str(result)
-
         check_limit()
         result = requests.post(oauth, data=json.dumps(opost), headers=headers, timeout=30).json()
         log_utils.log('Trakt token refresh: ' + repr(result))
@@ -95,10 +84,6 @@ def __getTrakt(url, post=None):
         control.setSetting(id='trakt.refresh', value=refresh)
 
         headers['Authorization'] = 'Bearer %s' % token
-
-        # result = client.request(url, post=post, headers=headers, output='extended', error=True)
-        # result = utils.byteify(result)
-        # return result[0], result[2]
 
         if not post:
             r = requests.get(url, headers=headers, timeout=30)
@@ -162,16 +147,14 @@ def authTrakt():
 
         token, refresh = r['access_token'], r['refresh_token']
 
-        headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': 2, 'Authorization': 'Bearer %s' % token}
+        headers = {'Content-Type': 'application/json', 'trakt-api-key': V2_API_KEY, 'trakt-api-version': '2', 'Authorization': 'Bearer %s' % token}
 
 
-        result = client.request(urllib_parse.urljoin(BASE_URL, '/users/me'), headers=headers)
-        result = utils.json_loads_as_str(result)
+        result = requests.get(urllib_parse.urljoin(BASE_URL, '/users/me'), headers=headers).json()
 
         user = result['username']
         authed = '' if user == '' else 'yes'
 
-        #print('info - ' + token)
         control.setSetting(id='trakt.user', value=user)
         control.setSetting(id='trakt.authed', value=authed)
         control.setSetting(id='trakt.authed2', value=authed)

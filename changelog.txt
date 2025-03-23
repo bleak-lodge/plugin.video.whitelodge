@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.05.23[/COLOR][/B]
+- Fixed Trakt (re)authorisation
+
 [B][COLOR gold]v1.05.22[/COLOR][/B]
 - Compatibility fixes for Python 3.12
 
