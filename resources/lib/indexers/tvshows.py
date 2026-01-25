@@ -1064,6 +1064,10 @@ class tvshows:
                 items = result['results']
             elif 'cast' in result:
                 items = result['cast']
+                if '/person/' in url:
+                    items += result['crew']
+                    items = sorted(items, key=lambda k: k['popularity'], reverse=True)
+                    items = list({item['id']: item for item in items}.values())
             if not items:
                 if 'with_watch_providers' in url:
                     control.infoDialog('Service not available in %s' % self.country)

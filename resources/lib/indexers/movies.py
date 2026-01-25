@@ -15,6 +15,7 @@ from resources.lib.modules import utils
 from resources.lib.modules import api_keys
 from resources.lib.modules import log_utils
 from resources.lib.indexers import navigator
+from resources.lib.modules import imdb_api
 
 import os,sys,re,datetime
 import simplejson as json
@@ -40,6 +41,7 @@ class movies:
         self.session = requests.Session()
 
         self.imdb_link = 'https://www.imdb.com'
+        self.imdb_graphql_link = 'https://www.api.imdb.com'
         self.trakt_link = 'https://api.trakt.tv'
         self.tmdb_link = 'https://api.themoviedb.org/3'
         self.datetime = datetime.datetime.utcnow()# - datetime.timedelta(hours = 5)
@@ -95,13 +97,22 @@ class movies:
         self.tmdb_providers_added_link = 'https://api.themoviedb.org/3/discover/movie?api_key=%s&primary_release_date.gte=%s&primary_release_date.lte=%s&sort_by=primary_release_date.desc&with_watch_providers=%s&watch_region=%s&page=1' % (self.tm_user, self.year_date, self.today_date, '%s', self.country)
 
         ## IMDb ##
+
+        ##### Pseudo-links for imdb graphql api usage #####
+        self.oscars_new_link = 'https://www.api.imdb.com/?list=get_oscar_winners&page=1&after='
+        self.rating_new_link = 'https://www.api.imdb.com/?list=get_top_rated&page=1&after='
+        self.voted_new_link = 'https://www.api.imdb.com/?list=get_most_voted&page=1&after='
+        self.popular_new_link = 'https://www.api.imdb.com/?list=get_most_popular&page=1&after='
+        self.featured_new_link = 'https://www.api.imdb.com/?list=get_featured&page=1&after='
+        #####
+
         self.genre_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=%s&release_date=,date[0]&sort=moviemeter,asc&count=%s'% ('%s', self.items_per_page)
         self.year_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=%s,%s&sort=moviemeter,asc&count=%s'% ('%s', '%s', self.items_per_page)
         self.language_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=,date[0]&sort=moviemeter,asc&primary_language=%s&count=%s'% ('%s', self.items_per_page)
         self.certification_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&certificates=US:%s&release_date=,date[0]&sort=moviemeter,asc&count=%s' % ('%s', self.items_per_page)
 
         self.popular_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=,date[0]&sort=moviemeter,asc&groups=top_1000&count=%s' % self.items_per_page
-        self.featured_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=date[365],date[60]&sort=moviemeter,asc&count=%s' % self.items_per_page
+        self.featured_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=date[365],date[10]&sort=moviemeter,asc&count=%s' % self.items_per_page
         self.rating_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=!documentary&release_date=,date[0]&sort=user_rating,desc&num_votes=10000,&count=%s' % self.items_per_page
         self.views_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=num_votes,desc&count=%s' % self.items_per_page
         self.theaters_link = 'https://www.imdb.com/search/title/?title_type=feature&release_date=date[120],date[0]&sort=moviemeter,asc&count=%s' % self.items_per_page
@@ -170,6 +181,10 @@ class movies:
 
             elif u in self.imdb_link:
                 self.list = cache.get(self.imdb_list, 24, url)
+                if idx == True: self.worker()
+
+            elif u in self.imdb_graphql_link:
+                self.list = cache.get(self.imdb_graphql, 24, url)
                 if idx == True: self.worker()
 
             elif u in self.tmdb_link:
@@ -857,7 +872,62 @@ class movies:
         return self.list
 
 
+    def imdb_graphql(self, url):
+        try:
+            first = int(self.items_per_page)
+            after = re.split(r'&after=', url)[1]
+            query = re.findall(r'list=([^&]+)', url)[0]
+            func = getattr(imdb_api, query)
+
+            items = func(first, after)
+            #log_utils.log(repr(items))
+            if items['data']['advancedTitleSearch']['pageInfo']['hasNextPage']:
+                page = re.findall(r'&page=(\d+)&', url)[0]
+                page = int(page)
+                next = re.sub(r'&after=%s' % after, '&after=%s' % items['data']['advancedTitleSearch']['pageInfo']['endCursor'], url)
+                next = re.sub(r'&page=(\d+)&', '&page=%s&' % str(page+1), next)
+            else:
+                next = page = ''
+            items = items['data']['advancedTitleSearch']['edges']
+            #log_utils.log(repr(items))
+
+
+            for item in items:
+                try:
+                    item = item['node']['title']
+                    title = item['originalTitleText']['text']
+                    plot = item['plot']['plotText']['plainText'] or '0'
+                    poster = item['primaryImage']['url']
+                    if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
+                    else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
+                    rating = str(item['ratingsSummary']['aggregateRating']) or '0'
+                    votes = str(item['ratingsSummary']['voteCount']) or '0'
+                    year = str(item['releaseYear']['year']) or '0'
+                    duration = item['runtime']['seconds']
+                    if duration: duration = str(int(duration / 60))
+                    else: duration = '0'
+                    imdb = item['id']
+
+                    self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': '0', 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': '0',
+                                      'director': '0', 'plot': plot, 'tagline': '0', 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0',
+                                      'mediatype': 'movie', 'page': page, 'next': next})
+                except:
+                    pass
+        except:
+            log_utils.log('imdb_graphql_list fail', 1)
+            pass
+
+        return self.list
+
+
     def imdb_list(self, url):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+            'Referer': 'https://www.imdb.com/',
+            'Origin': 'https://www.imdb.com'
+        }
+        self.session.headers.update(headers)
+
         try:
             url = url.split('&ref')[0]
             for i in re.findall(r'date\[(\d+)\]', url):
@@ -880,8 +950,9 @@ class movies:
             return self.list
 
         def imdb_userlist(link):
-            result = client.request(link)
-            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result)[0]
+            #result = client.request(link)
+            result = self.session.get(link, headers=headers, timeout=10)
+            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result.text)
             data = utils.json_loads_as_str(data)
             #log_utils.log(repr(data))
             if '/list/' in link:
@@ -918,9 +989,11 @@ class movies:
                 url = url.replace('&count=%s' % count_[0], '&count=250')
 
             try:
-                result = client.request(url, output='extended')
+                #result = client.request(url, headers=headers, output='extended')
                 #log_utils.log(result[0])
-                data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result[0])[0]
+                result = self.session.get(url, headers=headers, timeout=10)
+                #log_utils.log(repr(result))
+                data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result.text)[0]
                 data = utils.json_loads_as_str(data)
                 #log_utils.log(repr(data))
                 data = data['props']['pageProps']['searchResults']['titleResults']['titleListItems']
@@ -934,7 +1007,7 @@ class movies:
                 if int(cur) > len(data) or cur == '250':
                     items = data[-(len(data) - int(count_[0]) + int(self.items_per_page)):]
                     raise Exception()
-                next = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result[5])
+                next = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result.url)
                 #log_utils.log('next_url: ' + next)
                 page = int(cur) // int(self.items_per_page)
             except:
@@ -1018,7 +1091,12 @@ class movies:
             result.raise_for_status()
             result.encoding = 'utf-8'
             result = result.json() if six.PY3 else utils.json_loads_as_str(result.text)
-            items = result['results']
+            if not '/person/' in url:
+                items = result['results']
+            else:
+                items = result['cast'] + result['crew']
+                items = sorted(items, key=lambda k: k['popularity'], reverse=True)
+                items = list({item['id']: item for item in items}.values())
             if not items:
                 if 'with_watch_providers' in url:
                     control.infoDialog('Service not available in %s' % self.country)
