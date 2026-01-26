@@ -12,10 +12,10 @@ from resources.lib.modules import playcount
 from resources.lib.modules import workers
 from resources.lib.modules import views
 from resources.lib.modules import utils
+from resources.lib.modules import imdb_api
 from resources.lib.modules import api_keys
 from resources.lib.modules import log_utils
 from resources.lib.indexers import navigator
-from resources.lib.modules import imdb_api
 
 import os,sys,re,datetime
 import simplejson as json
@@ -99,11 +99,13 @@ class movies:
         ## IMDb ##
 
         ##### Pseudo-links for imdb graphql api usage #####
-        self.oscars_new_link = 'https://www.api.imdb.com/?list=get_oscar_winners&page=1&after='
-        self.rating_new_link = 'https://www.api.imdb.com/?list=get_top_rated&page=1&after='
-        self.voted_new_link = 'https://www.api.imdb.com/?list=get_most_voted&page=1&after='
-        self.popular_new_link = 'https://www.api.imdb.com/?list=get_most_popular&page=1&after='
-        self.featured_new_link = 'https://www.api.imdb.com/?list=get_featured&page=1&after='
+        self.imdb_popular_link = 'https://www.api.imdb.com/?list=get_most_popular&page=1&after='
+        self.imdb_featured_link = 'https://www.api.imdb.com/?list=get_featured&page=1&after='
+        self.imdb_rating_link = 'https://www.api.imdb.com/?list=get_top_rated&page=1&after='
+        self.imdb_voted_link = 'https://www.api.imdb.com/?list=get_most_voted&page=1&after='
+        self.imdb_added_link = 'https://www.api.imdb.com/?list=get_added&page=1&after='
+        self.imdb_boxoffice_link = 'https://www.api.imdb.com/?list=get_boxoffice&page=1&after='
+        self.imdb_oscars_link = 'https://www.api.imdb.com/?list=get_oscar_winners&page=1&after='
         #####
 
         self.genre_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=%s&release_date=,date[0]&sort=moviemeter,asc&count=%s'% ('%s', self.items_per_page)
@@ -951,8 +953,9 @@ class movies:
 
         def imdb_userlist(link):
             #result = client.request(link)
-            result = self.session.get(link, headers=headers, timeout=10)
-            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result.text)
+            result = self.session.get(link, timeout=10).text
+            #log_utils.log(result)
+            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result)[0]
             data = utils.json_loads_as_str(data)
             #log_utils.log(repr(data))
             if '/list/' in link:
@@ -991,8 +994,7 @@ class movies:
             try:
                 #result = client.request(url, headers=headers, output='extended')
                 #log_utils.log(result[0])
-                result = self.session.get(url, headers=headers, timeout=10)
-                #log_utils.log(repr(result))
+                result = self.session.get(url, timeout=10)
                 data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result.text)[0]
                 data = utils.json_loads_as_str(data)
                 #log_utils.log(repr(data))
@@ -1060,7 +1062,15 @@ class movies:
 
     def imdb_user_list(self, url):
         try:
-            result = client.request(url)
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+                'Referer': 'https://www.imdb.com/',
+                'Origin': 'https://www.imdb.com'
+            }
+            self.session.headers.update(headers)
+
+            #result = client.request(url)
+            result = self.session.get(url, timeout=10).text
             items = client.parseDOM(result, 'div', attrs = {'class': 'ipc-metadata-list-summary-item__tc'})
         except:
             pass

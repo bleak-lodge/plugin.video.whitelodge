@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.06.01[/COLOR][/B]
+- More IMDb lists migrated to the API
+
 [B][COLOR gold]v1.06.00[/COLOR][/B]
 - Fixed IMDb trailer playback (using the API this time)
 - Started migrating some IMDb lists to the graphql API,

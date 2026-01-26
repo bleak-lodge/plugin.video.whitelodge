@@ -3,7 +3,7 @@
 import requests
 import datetime
 
-now = datetime.datetime.utcnow()
+now = datetime.datetime.now()
 
 session = requests.Session()
 
@@ -16,78 +16,6 @@ headers = {
     'Content-Type': 'application/json'
 }
 session.headers.update(headers)
-
-
-def get_imdb_trailers(imdb_id):
-    query = '''
-        query (
-            $id: ID!
-        ) {
-            title(
-                id: $id
-            ) {
-                titleText {
-                    text
-                }
-                primaryVideos(first: 100) {
-                    edges {
-                        node {
-                            id
-                            name {
-                                value
-                            }
-                            contentType {
-                                displayName {
-                                    value
-                                }
-                            }
-                            description {
-                                value
-                            }
-                            thumbnail {
-                                url
-                            }
-                            primaryTitle {
-                                id
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    '''
-
-    request = {'query': query, 'variables': {'id': imdb_id}}
-    response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
-    response.raise_for_status()
-    return response.json()
-
-
-def get_playback_url(video_id):
-    query = '''
-        query VideoPlayback(
-            $viconst: ID!
-        ) {
-            video(id: $viconst) {
-                ...SharedVideoAllPlaybackUrls
-            }
-        }
-
-        fragment SharedVideoAllPlaybackUrls on Video {
-            playbackURLs {
-                displayName {
-                    value
-                }
-                videoMimeType
-                url
-            }
-        }
-    '''
-
-    request = {'operationName': 'VideoPlayback', 'query': query, 'variables': {'viconst': video_id}}
-    response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
-    response.raise_for_status()
-    return response.json()
 
 
 def get_oscar_winners(first, after):
@@ -252,7 +180,9 @@ def get_most_popular(first, after):
         }
     """
 
-    request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': '%s-%s-%s' % (now.year, str(now.month).zfill(2), str(now.day).zfill(2))}}
+    endDate = '%s-%s-%s' % (now.year, str(now.month).zfill(2), str(now.day).zfill(2))
+
+    request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': endDate}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
     return response.json()
@@ -265,7 +195,9 @@ def get_featured(first, after):
             first: $first
             after: $after
             constraints: {
-              genreConstraint: { allGenreIds: [], excludeGenreIds: ["Documentary"] }, titleTypeConstraint: { anyTitleTypeIds: ["movie", "tvMovie"], excludeTitleTypeIds: [] },
+              genreConstraint: { allGenreIds: [], excludeGenreIds: ["Documentary"] },
+              titleTypeConstraint: { anyTitleTypeIds: ["movie", "tvMovie"], excludeTitleTypeIds: [] },
+              languageConstraint: { allLanguages: ["en"] },
               releaseDateConstraint: { releaseDateRange: { start: $startDate, end: $endDate }}
             }
             sort: { sortBy: POPULARITY, sortOrder: ASC }
@@ -294,7 +226,100 @@ def get_featured(first, after):
         }
     """
 
-    request = {'query': query, 'variables': {'first': first, 'after': after, 'startDate': '%s-%s-%s' % (now.year-1, str(now.month).zfill(2), str(now.day).zfill(2)), 'endDate': '%s-%s-%s' % (now.year, str(now.month).zfill(2), str(now.day).zfill(2))}}
+    startDate = now - datetime.timedelta(days=365)
+    startDate = '%s-%s-%s' % (startDate.year, str(startDate.month).zfill(2), str(startDate.day).zfill(2))
+    endDate = '%s-%s-%s' % (now.year, str(now.month).zfill(2), str(now.day).zfill(2))
+
+    request = {'query': query, 'variables': {'first': first, 'after': after, 'startDate': startDate, 'endDate': endDate}}
+    response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
+    response.raise_for_status()
+    return response.json()
+
+
+def get_added(first, after):
+    query = """
+        query GetAdded($first: Int!, $after: String, $endDate: Date!, $startDate: Date!) {
+          advancedTitleSearch(
+            first: $first
+            after: $after
+            constraints: {
+              genreConstraint: { allGenreIds: [], excludeGenreIds: ["Documentary"] },
+              titleTypeConstraint: { anyTitleTypeIds: ["movie", "tvMovie"], excludeTitleTypeIds: [] },
+              releaseDateConstraint: { releaseDateRange: { start: $startDate, end: $endDate }},
+              userRatingsConstraint: { ratingsCountRange: { min: 100 } }
+            }
+            sort: { sortBy: RELEASE_DATE, sortOrder: DESC }
+          ) {
+            edges {
+              node {
+                title {
+                  id
+                  originalTitleText { text }
+                  releaseYear { year }
+                  ratingsSummary {
+                    aggregateRating
+                    voteCount
+                  }
+                  plot { plotText { plainText } }
+                  primaryImage { url }
+                  runtime { seconds }
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+    """
+
+    startDate = now - datetime.timedelta(days=365)
+    startDate = '%s-%s-%s' % (startDate.year, str(startDate.month).zfill(2), str(startDate.day).zfill(2))
+    endDate = '%s-%s-%s' % (now.year, str(now.month).zfill(2), str(now.day).zfill(2))
+
+    request = {'query': query, 'variables': {'first': first, 'after': after, 'startDate': startDate, 'endDate': endDate}}
+    response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
+    response.raise_for_status()
+    return response.json()
+
+
+def get_boxoffice(first, after):
+    query = """
+        query GetBoxOffice($first: Int!, $after: String) {
+          advancedTitleSearch(
+            first: $first
+            after: $after
+            constraints: {
+              titleTypeConstraint: { anyTitleTypeIds: ["movie", "tvMovie"], excludeTitleTypeIds: [] }
+            }
+            sort: { sortBy: BOX_OFFICE_GROSS_DOMESTIC, sortOrder: DESC }
+          ) {
+            edges {
+              node {
+                title {
+                  id
+                  originalTitleText { text }
+                  releaseYear { year }
+                  ratingsSummary {
+                    aggregateRating
+                    voteCount
+                  }
+                  plot { plotText { plainText } }
+                  primaryImage { url }
+                  runtime { seconds }
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+    """
+
+    request = {'query': query, 'variables': {'first': first, 'after': after}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
     return response.json()
