@@ -13,7 +13,9 @@ headers = {
     'Referer': 'https://www.imdb.com/',
     'Origin': 'https://www.imdb.com',
     'Content-Type': 'application/json',
-    'Accept-Language': 'en-US'
+    'Accept-Language': 'en-US',
+    'x-imdb-client-name': 'imdb-web-next',
+    'x-imdb-user-language': 'en-US'
 }
 session = requests.Session()
 session.headers.update(headers)
@@ -67,7 +69,7 @@ def get_oscar_winners(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_top_rated(first, after, params):
@@ -89,7 +91,7 @@ def get_top_rated(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_most_voted(first, after, params):
@@ -110,7 +112,7 @@ def get_most_voted(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_most_popular(first, after, params):
@@ -135,7 +137,7 @@ def get_most_popular(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': endDate}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_featured(first, after, params):
@@ -161,7 +163,7 @@ def get_featured(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'startDate': startDate, 'endDate': endDate}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_added(first, after, params):
@@ -187,7 +189,7 @@ def get_added(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'startDate': startDate, 'endDate': endDate}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_boxoffice(first, after, params):
@@ -207,7 +209,7 @@ def get_boxoffice(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 

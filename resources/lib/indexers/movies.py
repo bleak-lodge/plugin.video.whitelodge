@@ -60,7 +60,6 @@ class movies:
         self.user = str(control.setting('fanart.tv.user')) + str(control.setting('tm.user'))
         self.lang = control.apiLanguage()['tmdb']
         self.items_per_page = str(control.setting('items.per.page')) or '20'
-        self.imdb_sort = 'alpha,asc' if control.setting('imdb.sort.order') == '1' else 'date_added,desc'
         self.hq_artwork = control.setting('hq.artwork') or 'false'
         self.trailer_source = control.setting('trailer.source') or '2'
         self.country = control.setting('official.country') or 'US'
@@ -112,12 +111,14 @@ class movies:
         self.imdb_language_link = 'https://www.api.imdb.com/?list=get_language&params=%s&page=1&after='
         self.imdb_certification_link = 'https://www.api.imdb.com/?list=get_certification&params=%s&page=1&after='
         self.imdb_keyword_link = 'https://www.api.imdb.com/?list=get_keyword&params=%s&page=1&after='
+
+        self.imdb_customlist_link = 'https://www.api.imdb.com/?list=get_customlist&params=%s&sort=%s&page=1&after='
         #####
 
         self.customlist_link = 'https://www.imdb.com/list/%s/?view=detail&sort=list_order,asc&title_type=feature,tv_movie&start=0'
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
-        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&title_type=feature,short,tv_movie,video&start=0' % ('%s', self.imdb_sort)
-        self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist/?sort=%s&title_type=feature,short,tv_movie,video&start=0' % (self.imdb_user, self.imdb_sort)
+        self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&title_type=feature,short,tv_movie,video&start=0' % ('%s', self.imdb_sort())
+        self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist/?sort=%s&title_type=feature,short,tv_movie,video&start=0' % (self.imdb_user, self.imdb_sort())
 
         ##### Old links for site scraping #####
         # self.genre_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=%s&release_date=,date[0]&sort=moviemeter,asc&count=%s'% ('%s', self.items_per_page)
@@ -209,6 +210,15 @@ class movies:
         except:
             log_utils.log('movies_get', 1)
             pass
+
+
+    def imdb_sort(self):
+        sort = control.setting('imdb.sort.order')
+        if sort == '0': return 'date_added,desc'
+        elif sort == '1': return 'alpha,asc'
+        elif sort == '2': return 'popularity,asc'
+        elif sort == '3': return 'list_order,asc'
+        else: return 'date_added,desc'
 
 
     def search(self, code=''):
@@ -494,7 +504,7 @@ class movies:
         for i in lists: self.list.append(
             {
                 'name': i[1],
-                'url': self.customlist_link % i[0],
+                'url': self.imdb_customlist_link % (i[0], 'list_order,asc'),
                 'image': 'imdb.png',
                 'action': 'movies'
             })
@@ -803,10 +813,10 @@ class movies:
             page = q['page']
             q.update({'page': str(int(page) + 1)})
             q = (urllib_parse.urlencode(q)).replace('%2C', ',')
-            next = url.replace('?' + urllib_parse.urlparse(url).query, '') + '?' + q
-            next = six.ensure_str(next)
+            nxt = url.replace('?' + urllib_parse.urlparse(url).query, '') + '?' + q
+            nxt = six.ensure_str(nxt)
         except:
-            next = page = ''
+            nxt = page = ''
 
         for item in items:
             try:
@@ -870,7 +880,7 @@ class movies:
 
                 self.list.append({'title': title, 'originaltitle': title, 'year': year, 'premiered': premiered, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes,
                                   'mpaa': mpaa, 'plot': plot, 'tagline': tagline, 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': tmdb, 'country': country, 'tvdb': '0', 'poster': '0',
-                                  'paused_at': paused_at, 'mediatype': 'movie', 'page': page, 'next': next})
+                                  'paused_at': paused_at, 'mediatype': 'movie', 'page': page, 'next': nxt})
             except:
                 log_utils.log('movies_trakt_list1', 1)
                 pass
@@ -908,24 +918,28 @@ class movies:
             after = url.split('&after=')[1]
             query = re.findall(r'list=([^&]+)', url)[0]
             params = re.findall(r'params=([^&]*)', url)[0]
+            sort = re.findall(r'sort=([^&]*)', url)
+            if sort:
+                params = ','.join((params, sort[0]))
             func = getattr(imdb_api, query)
 
             items = func(first, after, params)
             #log_utils.log(repr(items))
-            if items['data']['advancedTitleSearch']['pageInfo']['hasNextPage']:
+            if items['pageInfo']['hasNextPage']:
                 page = re.findall(r'&page=(\d+)&', url)[0]
                 page = int(page)
-                next = re.sub(r'&after=%s' % after, '&after=%s' % items['data']['advancedTitleSearch']['pageInfo']['endCursor'], url)
-                next = re.sub(r'&page=(\d+)&', '&page=%s&' % str(page+1), next)
+                nxt = re.sub(r'&after=%s' % after, '&after=%s' % items['pageInfo']['endCursor'], url)
+                nxt = re.sub(r'&page=(\d+)&', '&page=%s&' % str(page+1), nxt)
             else:
-                next = page = ''
-            items = items['data']['advancedTitleSearch']['edges']
+                nxt = page = ''
+            items = items['edges']
             #log_utils.log(repr(items))
 
 
             for item in items:
                 try:
-                    item = item['node']['title']
+                    try: item = item['node']['title']
+                    except: item = item['title']
                     title = item['titleText']['text']
                     try: plot = item['plot']['plotText']['plainText'] or '0'
                     except: plot = '0'
@@ -944,7 +958,7 @@ class movies:
 
                     self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': '0', 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': '0',
                                       'director': '0', 'plot': plot, 'tagline': '0', 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0',
-                                      'premiered': premiered, 'mediatype': 'movie', 'page': page, 'next': next})
+                                      'premiered': premiered, 'mediatype': 'movie', 'page': page, 'next': nxt})
                 except:
                     pass
         except:
@@ -1010,10 +1024,10 @@ class movies:
                 items = data[int(start):(int(start) + int(self.items_per_page))]
                 #log_utils.log(repr(items))
                 if (int(start) + int(self.items_per_page)) >= len(data):
-                    next = page = ''
+                    nxt = page = ''
                 else:
-                    next = re.sub(r'&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
-                    #log_utils.log('next_url: ' + next)
+                    nxt = re.sub(r'&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
+                    #log_utils.log('next_url: ' + nxt)
                     page = (int(start) + int(self.items_per_page)) // int(self.items_per_page)
             except:
                 #log_utils.log('next_fail', 1)
@@ -1042,12 +1056,12 @@ class movies:
                 if int(cur) > len(data) or cur == '250':
                     items = data[-(len(data) - int(count_[0]) + int(self.items_per_page)):]
                     raise Exception()
-                next = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result.url)
-                #log_utils.log('next_url: ' + next)
+                nxt = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result.url)
+                #log_utils.log('next_url: ' + nxt)
                 page = int(cur) // int(self.items_per_page)
             except:
                 #log_utils.log('next_fail', 1)
-                next = page = ''
+                nxt = page = ''
 
         #log_utils.log(repr(items))
 
@@ -1092,7 +1106,7 @@ class movies:
 
                 self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': mpaa,
                                   'director': '0', 'plot': plot, 'tagline': '0', 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0',
-                                  'premiered': premiered, 'mediatype': 'movie', 'page': page, 'next': next})
+                                  'premiered': premiered, 'mediatype': 'movie', 'page': page, 'next': nxt})
             except:
                 log_utils.log('imdb_json_list fail', 1)
                 pass
@@ -1124,9 +1138,9 @@ class movies:
 
                 url = client.parseDOM(item, 'a', ret='href')[0]
                 url = re.findall(r'(ls\d+)/', url)[0]
-                url = self.imdblist_link % url
-                url = client.replaceHTMLCodes(url)
-                url = six.ensure_str(url, errors='replace')
+                url = self.imdb_customlist_link % (url, self.imdb_sort())
+                # url = client.replaceHTMLCodes(url)
+                # url = six.ensure_str(url, errors='replace')
 
                 self.list.append({'name': name, 'url': url, 'context': url, 'image': 'imdb.png'})
             except:
@@ -1161,9 +1175,9 @@ class movies:
             total = int(result['total_pages'])
             if page >= total: raise Exception()
             if 'page=' not in url: raise Exception()
-            next = '%s&page=%s' % (url.split('&page=', 1)[0], page+1)
+            nxt = '%s&page=%s' % (url.split('&page=', 1)[0], page+1)
         except:
-            next = page = ''
+            nxt = page = ''
 
         for item in items:
 
@@ -1204,7 +1218,7 @@ class movies:
                 else: poster = '0'
 
                 self.list.append({'title': title, 'originaltitle': originaltitle, 'premiered': premiered, 'year': year, 'rating': rating, 'votes': votes, 'plot': plot, 'imdb': '0',
-                                  'tmdb': tmdb, 'tvdb': '0', 'mpaa': '0', 'poster': poster, 'mediatype': 'movie', 'page': page, 'next': next})
+                                  'tmdb': tmdb, 'tvdb': '0', 'mpaa': '0', 'poster': poster, 'mediatype': 'movie', 'page': page, 'next': nxt})
             except:
                 log_utils.log('tmdb_list1', 1)
                 pass

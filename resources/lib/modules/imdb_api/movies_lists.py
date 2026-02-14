@@ -13,7 +13,9 @@ headers = {
     'Referer': 'https://www.imdb.com/',
     'Origin': 'https://www.imdb.com',
     'Content-Type': 'application/json',
-    'Accept-Language': 'en-US'
+    'Accept-Language': 'en-US',
+    'x-imdb-client-name': 'imdb-web-next',
+    'x-imdb-user-language': 'en-US'
 }
 session = requests.Session()
 session.headers.update(headers)
@@ -70,7 +72,7 @@ def get_keyword(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': endDate, 'keyword': params}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_genre(first, after, params):
@@ -95,7 +97,7 @@ def get_genre(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': endDate, 'genre': params, 'exclude': exclude}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_language(first, after, params):
@@ -119,7 +121,7 @@ def get_language(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': endDate, 'lang': params}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_year(first, after, params):
@@ -145,7 +147,7 @@ def get_year(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'startDate': startDate, 'endDate': endDate}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
 
 
 def get_certification(first, after, params):
@@ -169,7 +171,63 @@ def get_certification(first, after, params):
     request = {'query': query, 'variables': {'first': first, 'after': after, 'endDate': endDate, 'cert': params}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
     response.raise_for_status()
-    return response.json()
+    return response.json()['data']['advancedTitleSearch']
+
+
+def get_customlist(first, after, params):
+    query = """
+        query GetListDetails($listId: ID!, $first: Int!, $after: String, $sort: TitleListSearchSort) {
+          list(id: $listId) {
+            titleListItemSearch(
+              first: $first
+              after: $after
+              filter: { titleTypeConstraint: { anyTitleTypeIds: ["movie", "short", "tvMovie"], excludeTitleTypeIds: [] } }
+              sort: $sort
+            ) {
+              edges {
+                title {
+                  id
+                  titleText { text }
+                  releaseYear { year }
+                  releaseDate {
+                    year
+                    month
+                    day
+                  }
+                  ratingsSummary {
+                    aggregateRating
+                    voteCount
+                  }
+                  plot { plotText { plainText } }
+                  primaryImage { url }
+                  runtime { seconds }
+                }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+        }
+    """
+
+    params = params.split(',')
+    variables = {
+        'first': first,
+        'after': after,
+        'listId': params[0],
+        'sort': {
+            'by': params[1].upper().replace('ALPHA', 'TITLE_REGIONAL'),
+            'order': params[2].upper()
+        }
+        
+    }
+
+    request = {'query': query, 'variables': variables}
+    response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
+    response.raise_for_status()
+    return response.json()['data']['list']['titleListItemSearch']
 
 
 
