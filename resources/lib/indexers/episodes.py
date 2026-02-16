@@ -447,6 +447,7 @@ class seasons:
 
         control.content(syshandle, 'seasons')
         control.directory(syshandle, cacheToDisc=True)
+        control.sleep(1000)
         views.setView('seasons', {'skin.estuary': 55, 'skin.confluence': 500})
 
 
@@ -1664,6 +1665,7 @@ class episodes:
         control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, 'episodes')
         control.directory(syshandle, cacheToDisc=True)
+        control.sleep(1000)
         views.setView('episodes', {'skin.estuary': 55, 'skin.confluence': 504})
 
 

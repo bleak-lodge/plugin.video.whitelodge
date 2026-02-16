@@ -74,7 +74,7 @@ class tvshows:
         self.tmdb_networks_link = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&sort_by=popularity.desc&with_networks=%s&page=1' % (self.tm_user, '%s')
         self.tm_img_link = 'https://image.tmdb.org/t/p/w%s%s'
         self.tm_search_link = 'https://api.themoviedb.org/3/search/tv?api_key=%s&language=en-US&query=%s&page=1' % (self.tm_user, '%s')
-        self.related_link = 'https://api.themoviedb.org/3/tv/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
+        #self.related_link = 'https://api.themoviedb.org/3/tv/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
 
         self.tmdb_pop_link = 'https://api.themoviedb.org/3/discover/tv?with_original_language=en&with_type=2|4&api_key=%s&page=1' % self.tm_user
         self.tmdb_rating_link = 'https://api.themoviedb.org/3/tv/top_rated?api_key=%s&page=1' % self.tm_user
@@ -99,18 +99,20 @@ class tvshows:
         ## IMDb ##
 
         ##### Pseudo-links for imdb graphql api usage #####
-        self.imdb_popular_link = 'https://www.api.imdb.com/?list=get_most_popular_tv&params=&page=1&after='
-        self.imdb_voted_link = 'https://www.api.imdb.com/?list=get_most_voted_tv&params=&page=1&after='
-        self.imdb_rating_link = 'https://www.api.imdb.com/?list=get_top_rated_tv&params=&page=1&after='
-        self.imdb_premiere_link = 'https://www.api.imdb.com/?list=get_premier_tv&params=&page=1&after='
+        self.imdb_popular_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|excludeGenre:Reality-TV,Game-Show|sort:popularity,asc&page=1&after='
+        self.imdb_rating_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|excludeGenre:Reality-TV,Game-Show|votes:10000|sort:user_rating,desc&page=1&after='
+        self.imdb_voted_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|excludeGenre:Reality-TV,Game-Show|sort:user_rating_count,desc&page=1&after='
+        self.imdb_premiere_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|excludeGenre:Reality-TV,Game-Show|lang:en|votes:50|startDate:365|sort:release_date,desc&page=1&after='
+        
+        self.imdb_genre_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|genre:%s|excludeGenre:%s|sort:popularity,asc&page=1&after='
+        self.imdb_year_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|excludeGenre:Reality-TV,Game-Show|startDate:%s|endDate:%s|sort:popularity,asc&page=1&after='
+        self.imdb_language_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|lang:%s|sort:popularity,asc&page=1&after='
+        self.imdb_certification_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|cert:%s|sort:popularity,asc&page=1&after='
+        self.imdb_keyword_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:tvSeries,tvMiniSeries|kw:%s|sort:popularity,asc&page=1&after='
 
-        self.imdb_genre_link = 'https://www.api.imdb.com/?list=get_genre_tv&params=%s&page=1&after='
-        self.imdb_year_link = 'https://www.api.imdb.com/?list=get_year_tv&params=%s,%s&page=1&after='
-        self.imdb_language_link = 'https://www.api.imdb.com/?list=get_language_tv&params=%s&page=1&after='
-        self.imdb_certification_link = 'https://www.api.imdb.com/?list=get_certification_tv&params=%s&page=1&after='
-        self.imdb_keyword_link = 'https://www.api.imdb.com/?list=get_keyword_tv&params=%s&page=1&after='
+        self.imdb_customlist_link = 'https://www.api.imdb.com/?query=get_customlist&params=list:%s|titleType:tvSeries,tvMiniSeries|sort:%s&page=1&after='
 
-        self.imdb_customlist_link = 'https://www.api.imdb.com/?list=get_customlist_tv&params=%s&sort=%s&page=1&after='
+        self.related_link = 'https://www.api.imdb.com/?query=more_like_this&params=imdb:%s&page=1&after='
         #####
 
         self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists?tab=all&sort=modified&order=desc&filter=titles' % self.imdb_user
@@ -348,7 +350,7 @@ class tvshows:
         for i in genres: self.list.append(
             {
                 'name': cleangenre.lang(i[0], self.lang),
-                'url': self.imdb_genre_link % i[1].replace('_', '-').title() if i[2] else self.imdb_keyword_link % i[1],
+                'url': self.imdb_genre_link % (i[1].replace('_', '-').title(), 'Documentary' if not i[1] == 'documentary' else '') if i[2] else self.imdb_keyword_link % i[1],
                 'image': 'genres/{}.png'.format(i[1]),
                 'action': 'tvshows'
             })
@@ -829,11 +831,9 @@ class tvshows:
         try:
             first = int(self.items_per_page)
             after = url.split('&after=')[1]
-            query = re.findall(r'list=([^&]+)', url)[0]
+            query = re.findall(r'query=([^&]+)', url)[0]
             params = re.findall(r'params=([^&]*)', url)[0]
-            sort = re.findall(r'sort=([^&]*)', url)
-            if sort:
-                params = ','.join((params, sort[0]))
+            params = dict(p.split(':') for p in params.split('|'))
             func = getattr(imdb_api, query)
 
             items = func(first, after, params)
@@ -852,11 +852,14 @@ class tvshows:
             for item in items:
                 try:
                     try: item = item['node']['title']
-                    except: item = item['title']
+                    except:
+                        try: item = item['title']
+                        except: item = item['node']
                     title = item['titleText']['text']
                     try: plot = item['plot']['plotText']['plainText'] or '0'
                     except: plot = '0'
-                    poster = item['primaryImage']['url']
+                    try: poster = item['primaryImage']['url']
+                    except: poster = ''
                     if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
                     else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
                     rating = str(item['ratingsSummary']['aggregateRating']) or '0'
@@ -870,6 +873,7 @@ class tvshows:
                                       'plot': plot, 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0',
                                       'premiered': premiered, 'page': page, 'next': nxt})
                 except:
+                    log_utils.log('imdb_graphql_item fail', 1)
                     pass
         except:
             log_utils.log('imdb_graphql_list fail', 1)
@@ -1640,7 +1644,7 @@ class tvshows:
 
                 cm = []
 
-                cm.append((findSimilar, 'Container.Update(%s?action=tvshows&url=%s)' % (sysaddon, urllib_parse.quote_plus(self.related_link % tmdb))))
+                cm.append((findSimilar, 'Container.Update(%s?action=tvshows&url=%s)' % (sysaddon, urllib_parse.quote_plus(self.related_link % imdb))))
 
                 cm.append(('[I]Cast[/I]', 'RunPlugin(%s?action=tvcredits&tmdb=%s&status=%s)' % (sysaddon, tmdb, status)))
 
@@ -1773,6 +1777,7 @@ class tvshows:
         control.addItems(handle=syshandle, items=list_items, totalItems=len(list_items))
         control.content(syshandle, 'tvshows')
         control.directory(syshandle, cacheToDisc=True)
+        control.sleep(1000)
         views.setView('tvshows', {'skin.estuary': 55, 'skin.confluence': 500})
 
 

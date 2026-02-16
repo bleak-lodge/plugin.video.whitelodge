@@ -72,7 +72,7 @@ class movies:
         self.tmdb_by_imdb = 'https://api.themoviedb.org/3/find/%s?api_key=%s&external_source=imdb_id' % ('%s', self.tm_user)
         self.tm_search_link = 'https://api.themoviedb.org/3/search/movie?api_key=%s&language=en-US&query=%s&page=1' % (self.tm_user, '%s')
         self.tm_img_link = 'https://image.tmdb.org/t/p/w%s%s'
-        self.related_link = 'https://api.themoviedb.org/3/movie/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
+        #self.related_link = 'https://api.themoviedb.org/3/movie/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
 
         self.tmdb_pop_link = 'https://api.themoviedb.org/3/movie/popular?api_key=%s&page=1' % self.tm_user
         self.tmdb_voted_link = 'https://api.themoviedb.org/3/discover/movie?sort_by=vote_count.desc&api_key=%s&page=1' % self.tm_user
@@ -98,21 +98,23 @@ class movies:
         ## IMDb ##
 
         ##### Pseudo-links for imdb graphql api usage #####
-        self.imdb_popular_link = 'https://www.api.imdb.com/?list=get_most_popular&params=&page=1&after='
-        self.imdb_featured_link = 'https://www.api.imdb.com/?list=get_featured&params=&page=1&after='
-        self.imdb_rating_link = 'https://www.api.imdb.com/?list=get_top_rated&params=&page=1&after='
-        self.imdb_voted_link = 'https://www.api.imdb.com/?list=get_most_voted&params=&page=1&after='
-        self.imdb_added_link = 'https://www.api.imdb.com/?list=get_added&params=&page=1&after='
-        self.imdb_boxoffice_link = 'https://www.api.imdb.com/?list=get_boxoffice&params=&page=1&after='
-        self.imdb_oscars_link = 'https://www.api.imdb.com/?list=get_oscar_winners&params=&page=1&after='
+        self.imdb_popular_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|excludeGenre:Documentary|groups:1000|sort:popularity,asc&page=1&after='
+        self.imdb_featured_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|excludeGenre:Documentary|lang:en|startDate:730|sort:popularity,asc&page=1&after='
+        self.imdb_rating_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|excludeGenre:Documentary|votes:100000|sort:user_rating,desc&page=1&after='
+        self.imdb_voted_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|sort:user_rating_count,desc&page=1&after='
+        self.imdb_added_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|excludeGenre:Documentary|votes:100|startDate:365|sort:release_date,desc&page=1&after='
+        self.imdb_boxoffice_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|sort:box_office_gross_domestic,desc&page=1&after='
+        self.imdb_oscars_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie|awards:ev0000003,bestPicture,WINNER_ONLY|sort:year,desc&page=1&after='
 
-        self.imdb_genre_link = 'https://www.api.imdb.com/?list=get_genre&params=%s&page=1&after='
-        self.imdb_year_link = 'https://www.api.imdb.com/?list=get_year&params=%s,%s&page=1&after='
-        self.imdb_language_link = 'https://www.api.imdb.com/?list=get_language&params=%s&page=1&after='
-        self.imdb_certification_link = 'https://www.api.imdb.com/?list=get_certification&params=%s&page=1&after='
-        self.imdb_keyword_link = 'https://www.api.imdb.com/?list=get_keyword&params=%s&page=1&after='
+        self.imdb_genre_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|genre:%s|excludeGenre:%s|sort:popularity,asc&page=1&after='
+        self.imdb_year_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie|startDate:%s|endDate:%s|sort:popularity,asc&page=1&after='
+        self.imdb_language_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie,short|lang:%s|sort:popularity,asc&page=1&after='
+        self.imdb_certification_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie,short|cert:%s|sort:popularity,asc&page=1&after='
+        self.imdb_keyword_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie,short|kw:%s|sort:popularity,asc&page=1&after='
 
-        self.imdb_customlist_link = 'https://www.api.imdb.com/?list=get_customlist&params=%s&sort=%s&page=1&after='
+        self.imdb_customlist_link = 'https://www.api.imdb.com/?query=get_customlist&params=list:%s|titleType:movie,tvMovie,short,video|sort:%s&page=1&after='
+
+        self.related_link = 'https://www.api.imdb.com/?query=more_like_this&params=imdb:%s&page=1&after='
         #####
 
         self.customlist_link = 'https://www.imdb.com/list/%s/?view=detail&sort=list_order,asc&title_type=feature,tv_movie&start=0'
@@ -445,60 +447,62 @@ class movies:
 
 
     def custom_lists(self):
-        lists = [('ls004043006', 'Modern Horror: Top 150'),
-                 ('ls054656838', 'Horror Movie Series'),
-                 ('ls027849454', 'Horror Of The Skull Posters'),
-                 ('ls076464829', 'Top Satirical Movies'),
-                 ('ls009668082', 'Greatest Science Fiction'),
-                 ('ls057039446', 'Famous and Infamous Movie Couples'),
-                 ('ls003062015', 'Top Private Eye Movies'),
-                 ('ls027822154', 'Sleeper Hit Movies'),
-                 ('ls004943234', 'Cult Horror Movies'),
-                 ('ls020387857', 'Heist Caper Movies'),
-                 ('ls062392787', 'Artificial Intelligence'),
-                 ('ls051289348', 'Stephen King Movies and Adaptations'),
-                 ('ls063259747', 'Alien Invasion'),
-                 ('ls063204479', 'Contract Killers'),
-                 ('ls062247190', 'Heroic Bloodshed'),
-                 ('ls062218265', 'Conspiracy'),
-                 ('ls075582795', 'Top Kung Fu'),
-                 ('ls075785141', 'Movies Based In One Room'),
-                 ('ls058963815', 'Movies For Intelligent People'),
-                 ('ls069754038', 'Inspirational Movies'),
-                 ('ls070949682', 'Tech Geeks'),
-                 ('ls077141747', 'Movie Clones'),
-                 ('ls062760686', 'Obscure Underrated Movies'),
-                 ('ls020576693', 'Smut and Trash'),
-                 ('ls066797820', 'Revenge'),
-                 ('ls066222382', 'Motivational'),
-                 ('ls062746803', 'Disaster & Apocalyptic'),
-                 ('ls066191116', 'Music or Musical Movies'),
-                 ('ls066746282', 'Mental, Physical Illness and Disability Movies'),
-                 ('ls066370089', 'Best Twist Ending Movies'),
-                 ('ls066780524', 'Heists, Cons, Scams & Robbers'),
-                 ('ls066135354', 'Road Trip & Travel'),
-                 ('ls066367722', 'Spy - CIA - MI5 - MI6 - KGB'),
-                 ('ls066502835', 'Prison & Escape'),
-                 ('ls066198904', 'Courtroom'),
-                 ('ls068335911', 'Father - Son'),
-                 ('ls057631565', 'Based on a True Story'),
-                 ('ls064685738', 'Man Vs. Nature'),
-                 ('ls066176690', 'Gangster'),
-                 ('ls066113037', 'Teenage'),
-                 ('ls069248253', 'Old Age'),
-                 ('ls063841856', 'Serial Killers'),
-                 ('ls066788382', 'Addiction'),
-                 ('ls066184124', 'Time Travel'),
-                 ('ls021557769', 'Puff Puff Pass'),
-                 ('ls008462416', 'Artists'),
-                 ('ls057723258', 'Love'),
-                 ('ls057106830', 'Winter Is Here'),
-                 ('ls064085103', 'Suicide'),
-                 ('ls057104247', 'Alchoholic'),
-                 ('ls070389024', 'Video Games'),
-                 ('ls051708902', 'Shocking Movie Scenes'),
-                 ('ls057785252', 'Biographical'),
-                 ('ls051072059', 'Movies to Teach You a Thing or Two')
+        lists = [
+            ('ls4159657244', 'IMDb Editors: Dangerous Love'),
+            ('ls534685277', 'IMDb Editors: Essential Horror Films from Black Directors'),
+            ('ls592567077', 'IMDb Editors: Family Movie Picks'),
+            ('ls521170945', 'IMDb Editors: Theatrical Releases Recently Available to Stream'),
+            ('ls4159670771', 'IMDb Editors: Tragic Hearts'),
+            ('ls4159652924', 'IMDb Editors: Video Game Movie Adaptations'),
+            ('ls066788382', 'Addiction'),
+            ('ls057104247', 'Alchoholic'),
+            ('ls063259747', 'Alien Invasion'),
+            ('ls062392787', 'Artificial Intelligence'),
+            ('ls008462416', 'Artists'),
+            ('ls057631565', 'Based on a True Story'),
+            ('ls066370089', 'Best Twist Ending Movies'),
+            ('ls057785252', 'Biographical'),
+            ('ls062218265', 'Conspiracy'),
+            ('ls063204479', 'Contract Killers'),
+            ('ls066198904', 'Courtroom'),
+            ('ls004943234', 'Cult Horror Movies'),
+            ('ls062746803', 'Disaster & Apocalyptic'),
+            ('ls068335911', 'Father - Son'),
+            ('ls066176690', 'Gangster'),
+            ('ls020387857', 'Heist Caper Movies'),
+            ('ls066780524', 'Heists, Cons, Scams & Robbers'),
+            ('ls062247190', 'Heroic Bloodshed'),
+            ('ls027849454', 'Horror Of The Skull Posters'),
+            ('ls069754038', 'Inspirational Movies'),
+            ('ls057723258', 'Love'),
+            ('ls064685738', 'Man Vs. Nature'),
+            ('ls066746282', 'Mental, Physical Illness and Disability Movies'),
+            ('ls004043006', 'Modern Horror: Top 150'),
+            ('ls066222382', 'Motivational'),
+            ('ls077141747', 'Movie Clones'),
+            ('ls075785141', 'Movies Based In One Room'),
+            ('ls058963815', 'Movies For Intelligent People'),
+            ('ls066191116', 'Music or Musical Movies'),
+            ('ls062760686', 'Obscure Underrated Movies'),
+            ('ls069248253', 'Old Age'),
+            ('ls066502835', 'Prison & Escape'),
+            ('ls021557769', 'Puff Puff Pass'),
+            ('ls066797820', 'Revenge'),
+            ('ls066135354', 'Road Trip & Travel'),
+            ('ls063841856', 'Serial Killers'),
+            ('ls051708902', 'Shocking Movie Scenes'),
+            ('ls027822154', 'Sleeper Hit Movies'),
+            ('ls020576693', 'Smut and Trash'),
+            ('ls066367722', 'Spy - CIA - MI5 - MI6 - KGB'),
+            ('ls051289348', 'Stephen King Movies and Adaptations'),
+            ('ls070949682', 'Tech Geeks'),
+            ('ls066113037', 'Teenage'),
+            ('ls066184124', 'Time Travel'),
+            ('ls075582795', 'Top Kung Fu'),
+            ('ls003062015', 'Top Private Eye Movies'),
+            ('ls076464829', 'Top Satirical Movies'),
+            ('ls070389024', 'Video Games'),
+            ('ls057106830', 'Winter Is Here')
         ]
 
         for i in lists: self.list.append(
@@ -508,8 +512,6 @@ class movies:
                 'image': 'imdb.png',
                 'action': 'movies'
             })
-
-        self.list = sorted(self.list, key=lambda k: k['name'])
         self.addDirectory(self.list)
         return self.list
 
@@ -545,7 +547,7 @@ class movies:
         for i in genres: self.list.append(
             {
                 'name': cleangenre.lang(i[0], self.lang),
-                'url': self.imdb_genre_link % i[1].replace('_', '-').title() if i[2] else self.imdb_keyword_link % i[1],
+                'url': self.imdb_genre_link % (i[1].replace('_', '-').title(), 'Documentary' if not i[1] == 'documentary' else '') if i[2] else self.imdb_keyword_link % i[1],
                 'image': 'genres/{}.png'.format(i[1]),
                 'action': 'movies'
             })
@@ -916,11 +918,9 @@ class movies:
         try:
             first = int(self.items_per_page)
             after = url.split('&after=')[1]
-            query = re.findall(r'list=([^&]+)', url)[0]
+            query = re.findall(r'query=([^&]+)', url)[0]
             params = re.findall(r'params=([^&]*)', url)[0]
-            sort = re.findall(r'sort=([^&]*)', url)
-            if sort:
-                params = ','.join((params, sort[0]))
+            params = dict(p.split(':') for p in params.split('|'))
             func = getattr(imdb_api, query)
 
             items = func(first, after, params)
@@ -939,11 +939,14 @@ class movies:
             for item in items:
                 try:
                     try: item = item['node']['title']
-                    except: item = item['title']
+                    except:
+                        try: item = item['title']
+                        except: item = item['node']
                     title = item['titleText']['text']
                     try: plot = item['plot']['plotText']['plainText'] or '0'
                     except: plot = '0'
-                    poster = item['primaryImage']['url']
+                    try: poster = item['primaryImage']['url']
+                    except: poster = ''
                     if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
                     else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
                     rating = str(item['ratingsSummary']['aggregateRating']) or '0'
@@ -951,8 +954,9 @@ class movies:
                     year = str(item['releaseYear']['year']) or '0'
                     try: premiered = '%d-%02d-%02d' % (item['releaseDate']['year'], item['releaseDate']['month'], item['releaseDate']['day'])
                     except: premiered = '0'
-                    duration = item['runtime']['seconds']
-                    if duration: duration = str(int(duration / 60))
+                    try: duration = item['runtime']['seconds']
+                    except: duration = '0'
+                    if duration and not duration == '0': duration = str(int(duration / 60))
                     else: duration = '0'
                     imdb = item['id']
 
@@ -960,6 +964,7 @@ class movies:
                                       'director': '0', 'plot': plot, 'tagline': '0', 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0',
                                       'premiered': premiered, 'mediatype': 'movie', 'page': page, 'next': nxt})
                 except:
+                    log_utils.log('imdb_graphql_item fail', 1)
                     pass
         except:
             log_utils.log('imdb_graphql_list fail', 1)
@@ -1615,7 +1620,7 @@ class movies:
 
                 cm = []
 
-                cm.append((findSimilar, 'Container.Update(%s?action=movies&url=%s)' % (sysaddon, urllib_parse.quote_plus(self.related_link % tmdb))))
+                cm.append((findSimilar, 'Container.Update(%s?action=movies&url=%s)' % (sysaddon, urllib_parse.quote_plus(self.related_link % imdb))))
 
                 cm.append(('[I]Cast[/I]', 'RunPlugin(%s?action=moviecredits&tmdb=%s&status=%s)' % (sysaddon, tmdb, status)))
 
