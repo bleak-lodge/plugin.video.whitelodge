@@ -2,7 +2,6 @@
 
 import requests
 import datetime
-from resources.lib.modules import log_utils
 
 now = datetime.datetime.now()
 
@@ -172,7 +171,6 @@ def more_like_this(first, after, params):
 
     request = {'query': query, 'variables': {'imdb': params['imdb'], 'first': first, 'after': after}}
     response = session.post(_GRAPHQL_IMDB_API_URL2, json=request)
-    log_utils.log(repr(response.json()))
     response.raise_for_status()
     return response.json()['data']['title']['moreLikeThisTitles']
 
