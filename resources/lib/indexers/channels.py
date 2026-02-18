@@ -33,6 +33,7 @@ class channels:
         self.lang = control.apiLanguage()['tmdb']
         self.hq_artwork = control.setting('hq.artwork') or 'false'
         self.trailer_source = control.setting('trailer.source') or '2'
+        self.lists_provider = control.setting('lists.provider')
 
         self.sky_now_link = 'https://epgservices.sky.com/5.1.1/api/2.0/channel/json/%s/now/nn/3'
         # self.sky_programme_link = 'http://tv.sky.com/programme/channel/%s/%s/%s.json'
@@ -43,11 +44,11 @@ class channels:
             self.fanart_tv_headers.update({'client-key': self.fanart_tv_user})
         self.lang = control.apiLanguage()['tmdb']
 
-        self.tm_user = control.setting('tm.user') or api_keys.tmdb_key
-        self.tmdb_api_link = 'https://api.themoviedb.org/3/movie/%s?api_key=%s&language=%s&append_to_response=credits,release_dates,external_ids' % ('%s', self.tm_user, self.lang)
-        self.tm_img_link = 'https://image.tmdb.org/t/p/w%s%s'
-        self.related_link = 'https://www.api.imdb.com/?query=more_like_this&params=imdb:%s&page=1&after='
-        # self.related_link = 'https://api.themoviedb.org/3/movie/%s/similar?api_key=%s&page=1' % ('%s', self.tm_user)
+        self.tmdb_user = control.setting('tm.user') or api_keys.tmdb_key
+        self.tmdb_api_link = 'https://api.themoviedb.org/3/movie/%s?api_key=%s&language=%s&append_to_response=credits,release_dates,external_ids' % ('%s', self.tmdb_user, self.lang)
+        self.tmdb_img_link = 'https://image.tmdb.org/t/p/w%s%s'
+        self.tmdb_related_link = 'https://api.themoviedb.org/3/movie/%s/similar?api_key=%s&page=1' % ('%s', self.tmdb_user)
+        self.imdb_related_link = 'https://www.api.imdb.com/?query=more_like_this&params=imdb:%s&page=1&after='
         # self.related_link = 'https://api.trakt.tv/movies/%s/related'
 
         self.session = requests.Session()
@@ -275,7 +276,7 @@ class channels:
                 c = item['credits']['cast'][:30]
                 for person in c:
                     _icon = person['profile_path']
-                    icon = self.tm_img_link % ('185', _icon) if _icon else ''
+                    icon = self.tmdb_img_link % ('185', _icon) if _icon else ''
                     castwiththumb.append({'name': person['name'], 'role': person['character'], 'thumbnail': icon})
             except:
                 pass
@@ -290,13 +291,13 @@ class channels:
 
             poster_path = item.get('poster_path')
             if poster_path:
-                poster1 = self.tm_img_link % ('500', poster_path)
+                poster1 = self.tmdb_img_link % ('500', poster_path)
             else:
                 poster1 = '0'
 
             fanart_path = item.get('backdrop_path')
             if fanart_path:
-                fanart1 = self.tm_img_link % ('1280', fanart_path)
+                fanart1 = self.tmdb_img_link % ('1280', fanart_path)
             else:
                 fanart1 = '0'
 
@@ -463,6 +464,8 @@ class channels:
 
                 sysmeta = urllib_parse.quote_plus(json.dumps(meta))
 
+                related_link = urllib_parse.quote_plus(self.imdb_related_link % imdb) if self.lists_provider == '0' else urllib_parse.quote_plus(self.tmdb_related_link % tmdb)
+
                 url = '%s?action=play&title=%s&year=%s&imdb=%s&tmdb=%s&meta=%s&t=%s' % (sysaddon, systitle, year, imdb, tmdb, sysmeta, self.systime)
                 sysurl = urllib_parse.quote_plus(url)
 
@@ -470,7 +473,7 @@ class channels:
 
                 cm = []
 
-                cm.append((findSimilar, 'Container.Update(%s?action=movies&url=%s)' % (sysaddon, urllib_parse.quote_plus(self.related_link % imdb))))
+                cm.append((findSimilar, 'Container.Update(%s?action=movies&url=%s)' % (sysaddon, related_link)))
 
                 cm.append(('[I]Cast[/I]', 'RunPlugin(%s?action=moviecredits&tmdb=%s&status=%s)' % (sysaddon, tmdb, status)))
 

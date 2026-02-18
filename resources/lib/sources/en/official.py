@@ -14,8 +14,8 @@ class source:
     def __init__(self):
         self.priority = 1
         self.country = control.setting('official.country') or 'US'
-        self.tm_user = control.setting('tm.user') or api_keys.tmdb_key
-        self.tmdb_by_imdb = 'https://api.themoviedb.org/3/find/%s?api_key=%s&external_source=imdb_id' % ('%s', self.tm_user)
+        self.tmdb_user = control.setting('tm.user') or api_keys.tmdb_key
+        self.tmdb_by_imdb = 'https://api.themoviedb.org/3/find/%s?api_key=%s&external_source=imdb_id' % ('%s', self.tmdb_user)
         self.aliases = []
 
 

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
-    WhiteLodge Add-on
-"""
-
 import os
 from kodi_six import xbmc
 import requests
