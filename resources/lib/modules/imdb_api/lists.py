@@ -49,7 +49,7 @@ def advanced_search(first, after, params):
     excGenre = params.get('excGenre', '')
     if excGenre: excGenre = ['"'+g+'"' for g in excGenre.split(',')]
     if genre or excGenre:
-        genre = """genreConstraint: { allGenreIds: [%s], excludeGenreIds: [%s] }""" % (' ,'.join(genre), ' ,'.join(excGenre))
+        genre = """genreConstraint: { allGenreIds: [%s], excludeGenreIds: [%s] }""" % (', '.join(genre), ', '.join(excGenre))
 
     cert = params.get('cert', '')
     if cert: cert = ', '.join(["""{ rating: "%s", region: "US" }""" % c for c in cert.split(',')])
@@ -64,7 +64,11 @@ def advanced_search(first, after, params):
 
     awards = params.get('awards', '')
     if awards:
-        awards = """awardConstraint: { allEventNominations: [{eventId: "%s", searchAwardCategoryId: "%s", winnerFilter: %s}] }""" % (awards.split(',')[0], awards.split(',')[1], awards.split(',')[2])
+        awards = awards.split(',')
+        event = awards[0]
+        category = """, searchAwardCategoryId: "%s" """ % awards[1] if awards[1] else ''
+        winner = """, winnerFilter: %s """ % awards[2] if awards[2] else ''
+        awards = """awardConstraint: { allEventNominations: [{ eventId: "%s"%s%s}] }""" % (event, category, winner)
 
     groups = params.get('groups', '')
     if groups:

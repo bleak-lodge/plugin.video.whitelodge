@@ -459,6 +459,30 @@ msgctxt "#32149"
 msgid "{} subtitles not found"
 msgstr ""
 
+msgctxt "#32150"
+msgid "Awards & Festivals"
+msgstr ""
+
+msgctxt "#32151"
+msgid "{} - Winners"
+msgstr ""
+
+msgctxt "#32152"
+msgid "{} - Nominations"
+msgstr ""
+
+msgctxt "#32153"
+msgid "Golden Globes"
+msgstr ""
+
+msgctxt "#32154"
+msgid "Cannes"
+msgstr ""
+
+msgctxt "#32155"
+msgid "Razzies"
+msgstr ""
+
 msgctxt "#32200"
 msgid "No Color"
 msgstr ""

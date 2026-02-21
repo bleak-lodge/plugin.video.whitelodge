@@ -13,8 +13,7 @@
         <setting id="hq.artwork" type="bool" label="32129" default="false" />
         <setting id="hq.art.text" type="text" label="32130" enable="false" visible="eq(-1,true)" />
         <setting id="items.per.page" type="slider" label="32138" default="20" range="10,40" option="int" />
-        <setting id="trailer.source" type="enum" label="Trailers Source" values="TMDb|YouTube|IMDb" default="2" />
-        <setting id="trailer.select" type="enum" label="Trailers Action" lvalues="32334|32119" default="1" />
+        <setting id="trailer.source" type="enum" label="Trailers & Related videos Source" values="TMDb|YouTube|IMDb" default="2" />
         <setting type="lsep" label="32319" />
         <setting id="channels" type="enum" label="32007" lvalues="32302|32301" default="0" />
         <setting id="imdb.sort.order" type="enum" label="32567" lvalues="32568|32569|32574|32575" default="0" />

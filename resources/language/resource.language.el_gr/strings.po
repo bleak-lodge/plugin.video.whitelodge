@@ -455,6 +455,30 @@ msgctxt "#32149"
 msgid "{} subtitles not found"
 msgstr "Δεν βρέθηκαν {} υπότιτλοι"
 
+msgctxt "#32150"
+msgid "Awards & Festivals"
+msgstr "Βραβεία & Φεστιβάλ"
+
+msgctxt "#32151"
+msgid "{} - Winners"
+msgstr "{} - Νικητές"
+
+msgctxt "#32152"
+msgid "{} - Nominations"
+msgstr "{} - Υποψηφιότητες"
+
+msgctxt "#32153"
+msgid "Golden Globes"
+msgstr "Χρυσές Σφαίρες"
+
+msgctxt "#32154"
+msgid "Cannes"
+msgstr "Φεστιβάλ Καννών"
+
+msgctxt "#32155"
+msgid "Razzies"
+msgstr "Χρυσά Βατόμουρα"
+
 msgctxt "#32200"
 msgid "No Color"
 msgstr "Χωρίς Χρώμα"
