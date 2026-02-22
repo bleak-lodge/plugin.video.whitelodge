@@ -603,14 +603,14 @@ class movies:
             (control.lang(32152).format(control.lang(32153)), 'ev0000292,,', 'Golden Globes'),
             (control.lang(32151).format(control.lang(32154)), 'ev0000147,,WINNER_ONLY', 'Cannes'),
             (control.lang(32152).format(control.lang(32154)), 'ev0000147,,', 'Cannes'),
-            (control.lang(32151).format(control.lang(32155)), 'ev0000558,,WINNER_ONLY', 'Razzies'),
-            (control.lang(32152).format(control.lang(32155)), 'ev0000558,,', 'Razzies'),
             (control.lang(32151).format('BAFTA'), 'ev0000123,,WINNER_ONLY', 'Bafta'),
             (control.lang(32152).format('BAFTA'), 'ev0000123,,', 'Bafta'),
             (control.lang(32151).format('Critics Choice Awards'), 'ev0000133,,WINNER_ONLY', 'Critics Choice'),
             (control.lang(32152).format('Critics Choice Awards'), 'ev0000133,,', 'Critics Choice'),
             (control.lang(32151).format('Film Independent Spirit Awards'), 'ev0000349,,WINNER_ONLY', 'Film Independent'),
             (control.lang(32152).format('Film Independent Spirit Awards'), 'ev0000349,,', 'Film Independent'),
+            (control.lang(32151).format(control.lang(32155)), 'ev0000558,,WINNER_ONLY', 'Razzies'),
+            (control.lang(32152).format(control.lang(32155)), 'ev0000558,,', 'Razzies'),
             ('Sundance Film Festival', 'ev0000631,,WINNER_ONLY', 'Sundance'),
             ('Toronto International Film Festival', 'ev0000659,,WINNER_ONLY', 'TIFF'),
             ('Berlin International Film Festival', 'ev0000091,,WINNER_ONLY', 'Berlin'),
@@ -649,7 +649,7 @@ class movies:
             (control.lang(32152).format('Best Actor'), 'ev0000003,bestActor,'),
             (control.lang(32151).format('Best Actress'), 'ev0000003,bestActress,WINNER_ONLY'),
             (control.lang(32152).format('Best Actress'), 'ev0000003,bestActress,'),
-            ('All Winners', 'ev0000003,,WINNER_ONLY')
+            (control.lang(32156), 'ev0000003,,WINNER_ONLY')
         ]
 
         for i in awards:

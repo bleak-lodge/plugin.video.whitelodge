@@ -476,11 +476,15 @@ msgid "Golden Globes"
 msgstr ""
 
 msgctxt "#32154"
-msgid "Cannes"
+msgid "Cannes Festival"
 msgstr ""
 
 msgctxt "#32155"
 msgid "Razzies"
+msgstr ""
+
+msgctxt "#32156"
+msgid "All Categories Winners"
 msgstr ""
 
 msgctxt "#32200"

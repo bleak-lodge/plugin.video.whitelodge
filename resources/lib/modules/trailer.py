@@ -75,7 +75,7 @@ class YT_trailer:
                 control.execute('Dialog.Close(%s, true)' % control.getCurrentDialogId)
         except:
             log_utils.log('YT_trailer play fail', 1)
-            TMDb_trailer().play(tmdb, imdb, season, episode)
+            TMDb_trailer().play(mode, tmdb, imdb, season, episode)
 
     def worker(self, name, url):
         try:
@@ -249,13 +249,14 @@ class TMDb_trailer:
 
 class IMDb_trailer:
     def __init__(self):
-        pass
+        self.mode = None
 
     def play(self, mode, imdb, name, tmdb='', season='', episode='', windowedtrailer=0):
         try:
             if not imdb or imdb == '0': raise Exception()
+            self.mode = mode
 
-            item_dict = self.get_items(imdb, name, mode)
+            item_dict = self.get_items(imdb, name)
             if not item_dict: raise Exception('IMDb_trailer failed, trying TMDb')
             elif item_dict == 'canceled': return
             title = item_dict['title']
@@ -286,9 +287,9 @@ class IMDb_trailer:
                 control.execute('Dialog.Close(%s, true)' % control.getCurrentDialogId)
         except:
             log_utils.log('IMDb_trailer fail', 1)
-            TMDb_trailer().play(tmdb, imdb, season, episode)
+            TMDb_trailer().play(mode, tmdb, imdb, season, episode)
 
-    def get_items(self, imdb, name, mode):
+    def get_items(self, imdb, name):
         try:
             listItems = cache.get(imdb_api.get_imdb_trailers, 48, imdb)
             #log_utils.log(repr(listItems))
@@ -313,7 +314,7 @@ class IMDb_trailer:
             if not vids_list: return
             vids_list = [v for v in vids_list if 'trailer' in v['type'].lower()] + [v for v in vids_list if 'trailer' not in v['type'].lower()]
 
-            if mode == 'select':
+            if self.mode == 'select':
                 vids = []
                 for v in vids_list:
                     if control.getKodiVersion() >= 17:
@@ -349,8 +350,10 @@ class IMDb_trailer:
 
             vids = cache.get(imdb_api.get_playback_url, 48, video_id)
             vids = vids['data']['video']['playbackURLs']
+            #vids = [v for v in vids if v['videoMimeType'] == 'MP4']
+            vids.sort(key=lambda x: int(re.sub(r'\D', '0', x['displayName']['value'])), reverse=True)
             #log_utils.log(repr(vids))
-            vid = [i['url'] for i in vids if i['videoMimeType'] == 'MP4'][0]
+            vid = [i['url'] for i in vids][0]
             return vid
         except:
             log_utils.log('IMDb_trailer resolve fail', 1)

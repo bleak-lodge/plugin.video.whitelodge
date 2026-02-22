@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.06.10[/COLOR][/B]
+- Trailers fallback fix
+
 [B][COLOR gold]v1.06.09[/COLOR][/B]
 - Settings file fix
 
