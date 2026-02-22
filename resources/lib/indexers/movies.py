@@ -610,7 +610,7 @@ class movies:
             (control.lang(32151).format('Critics Choice Awards'), 'ev0000133,,WINNER_ONLY', 'Critics Choice'),
             (control.lang(32152).format('Critics Choice Awards'), 'ev0000133,,', 'Critics Choice'),
             (control.lang(32151).format('Film Independent Spirit Awards'), 'ev0000349,,WINNER_ONLY', 'Film Independent'),
-            (control.lang(32151).format('Film Independent Spirit Awards'), 'ev0000349,,', 'Film Independent'),
+            (control.lang(32152).format('Film Independent Spirit Awards'), 'ev0000349,,', 'Film Independent'),
             ('Sundance Film Festival', 'ev0000631,,WINNER_ONLY', 'Sundance'),
             ('Toronto International Film Festival', 'ev0000659,,WINNER_ONLY', 'TIFF'),
             ('Berlin International Film Festival', 'ev0000091,,WINNER_ONLY', 'Berlin'),

@@ -200,8 +200,8 @@ msgid "No Trakt, IMDb account or supported services add-ons found."
 msgstr "Δεν βρέθηκε λογαριασμός Trakt ή IMDb ή συμβατά πρόσθετα."
 
 msgctxt "#32043"
-msgid "[B]Whitelodge[/B] : Settings"
-msgstr "[B]Whitelodge[/B] : Ρυθμίσεις"
+msgid "Trailers & Related Videos Source"
+msgstr "Trailers & σχετικά videos από:"
 
 msgctxt "#32046"
 msgid "[B]Whitelodge[/B] : Maintenance"

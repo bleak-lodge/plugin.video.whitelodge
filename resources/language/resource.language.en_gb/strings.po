@@ -200,7 +200,7 @@ msgid "No Trakt, IMDb account or supported services add-ons found."
 msgstr ""
 
 msgctxt "#32043"
-msgid "[B]Whitelodge[/B] : Settings"
+msgid "Trailers & Related Videos Source"
 msgstr ""
 
 msgctxt "#32046"

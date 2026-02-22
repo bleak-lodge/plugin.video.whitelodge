@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.06.09[/COLOR][/B]
+- Settings file fix
+
 [B][COLOR gold]v1.06.08[/COLOR][/B]
 - Added new Awards & Festivals category for movies and TV shows
   (thanks a lot for the icons J.E.!)
