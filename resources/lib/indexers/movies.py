@@ -273,7 +273,7 @@ class movies:
         dbcur.execute("INSERT INTO movies VALUES (?,?)", (None,q))
         dbcon.commit()
         dbcur.close()
-        url = self.imdb_search_link % q if self.lists_provider == '0' else self.tmdb_search_link % urllib_parse.quote(q)
+        url = self.imdb_search_link % q if (self.lists_provider == '0' and not code) else self.tmdb_search_link % urllib_parse.quote(q)
         self.get(url, code=code)
 
 
@@ -287,7 +287,7 @@ class movies:
         dbcur.execute("INSERT INTO movies VALUES (?,?)", (None, q))
         dbcon.commit()
         dbcur.close()
-        url = self.imdb_search_link % q if self.lists_provider == '0' else self.tmdb_search_link % urllib_parse.quote(q)
+        url = self.imdb_search_link % q if (self.lists_provider == '0' and not code) else self.tmdb_search_link % urllib_parse.quote(q)
         self.get(url, code=code)
 
 
