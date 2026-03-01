@@ -11,6 +11,7 @@ Supported services and their equivalent add-ons for playback are as follows:
 - BBC IPLAYER      :  `plugin.video.iplayerwww` - official Kodi repository
 - CRACKLE          :  `plugin.video.crackle` - official Kodi repository
 - CURIOSITY STREAM :  `slyguy.curiositystream` - slyguy or `plugin.video.curiositystream` - official Kodi repository
+- DISCOVERY+       :  `slyguy.discovery.plus` - slyguy repository
 - DISNEY+          :  `slyguy.disney.plus` - slyguy repository
 - HBO MAX          :  `slyguy.hbo.max` - slyguy repository
 - HULU             :  `slyguy.hulu` - slyguy repository
