@@ -356,7 +356,7 @@ class movies:
                         'time travel', 'title spoken by character', 'told in flashback', 'vampire', 'virtual reality', 'voice over narration', 'whistleblower', 'wilhelm scream', 'wuxia',
                         'zombie']
 
-        keywords += ['based on true story', 'christmas', 'dc comics', 'easter', 'existential', 'halloween', 'hearing characters thoughts', 'loner', 'marvel comics', 'new year',
+        keywords += ['artificial intelligence', 'based on true story', 'christmas', 'dc comics', 'easter', 'existential', 'halloween', 'hearing characters thoughts', 'loner', 'marvel comics', 'new year',
                      'official james bond series', 'private eye', 'racism', 'schizophrenia', 'star wars', 'thanksgiving']
 
         keywords = sorted(set(keywords))
@@ -1202,7 +1202,7 @@ class movies:
             result.encoding = 'utf-8'
             result = result.json() if six.PY3 else utils.json_loads_as_str(result.text)
             if not '/person/' in url:
-                items = result['results']
+                items = result['results'][:int(self.items_per_page)]
             else:
                 items = result['cast'] + result['crew']
                 items = sorted(items, key=lambda k: k['popularity'], reverse=True)

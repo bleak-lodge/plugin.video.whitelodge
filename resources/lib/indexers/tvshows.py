@@ -1255,7 +1255,7 @@ class tvshows:
             result = result.json() if six.PY3 else utils.json_loads_as_str(result.text)
             #log_utils.log('tmdb_result: ' + repr(result))
             if 'results' in result:
-                items = result['results']
+                items = result['results'][:int(self.items_per_page)]
             elif 'cast' in result:
                 items = result['cast']
                 if '/person/' in url:
