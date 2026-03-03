@@ -308,7 +308,6 @@ class TMDbPeople:
         self.session = requests.Session()
 
         self.tmdb_user = control.setting('tm.user') or api_keys.tmdb_key
-        self.items_per_page = control.setting('items.per.page') or '20'
 
         self.personlist_link = 'https://api.themoviedb.org/3/person/popular?api_key=%s&language=en-US&page=1' % self.tmdb_user
         self.person_search_link = 'https://api.themoviedb.org/3/search/person?query=%s&api_key=%s&page=1' % ('%s', self.tmdb_user)
@@ -425,7 +424,7 @@ class TMDbPeople:
         result.raise_for_status()
         result.encoding = 'utf-8'
         result = result.json() if six.PY3 else utils.json_loads_as_str(result.text)
-        items = result['results'][:int(self.items_per_page)]
+        items = result['results']
         #log_utils.log(repr(items))
 
         try:

@@ -1202,7 +1202,7 @@ class movies:
             result.encoding = 'utf-8'
             result = result.json() if six.PY3 else utils.json_loads_as_str(result.text)
             if not '/person/' in url:
-                items = result['results'][:int(self.items_per_page)]
+                items = result['results']
             else:
                 items = result['cast'] + result['crew']
                 items = sorted(items, key=lambda k: k['popularity'], reverse=True)
