@@ -59,13 +59,13 @@ msgctxt "#32007"
 msgid "Channels"
 msgstr "Κανάλια"
 
-msgctxt "#32009"
-msgid "Discover Movies"
-msgstr "Περιηγήσεις Ταινιών"
-
 msgctxt "#32008"
 msgid "Tools"
 msgstr "Εργαλεία"
+
+msgctxt "#32009"
+msgid "Discover Movies"
+msgstr "Περιηγήσεις Ταινιών"
 
 msgctxt "#32010"
 msgid "Search"
