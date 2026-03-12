@@ -211,6 +211,10 @@ msgctxt "#32046"
 msgid "[B]Whitelodge[/B] : Maintenance"
 msgstr ""
 
+msgctxt "#32047"
+msgid "[B]Whitelodge[/B] : Settings"
+msgstr ""
+
 msgctxt "#32049"
 msgid "[B]Whitelodge[/B] : Viewtypes"
 msgstr ""

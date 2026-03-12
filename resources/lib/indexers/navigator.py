@@ -172,7 +172,7 @@ class navigator:
     def tools(self):
         self.addDirectoryItem('[B]Whitelodge[/B] : INFO - Please Read', 'servicesInfo', 'tools.png', 'DefaultAddonProgram.png', isFolder=False)
         self.addDirectoryItem('[B]Whitelodge[/B] : Changelog', 'changelog', 'tools.png', 'DefaultAddonProgram.png', isFolder=False)
-        self.addDirectoryItem(32043, 'openSettings&query=0.0', 'tools.png', 'DefaultAddonProgram.png', isFolder=False)
+        self.addDirectoryItem(32047, 'openSettings&query=0.0', 'tools.png', 'DefaultAddonProgram.png', isFolder=False)
         self.addDirectoryItem(32049, 'viewsNavigator', 'tools.png', 'DefaultAddonProgram.png')
         self.addDirectoryItem(32556, 'libraryNavigator', 'tools.png', 'DefaultAddonProgram.png')
         self.addDirectoryItem(32046, 'cacheNavigator', 'tools.png', 'DefaultAddonProgram.png')
