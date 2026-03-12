@@ -313,7 +313,7 @@ def aliases_to_array(aliases, filter=None):
 def is_match(name, title, hdlr=None, aliases=None):
     try:
         name = name.lower()
-        t = re.sub(r'(\+|\.|\(|\[|\s)(\d{4}|s\d+e\d+|s\d+|3d)(\.|\)|\]|\s|)(.+|)', '', name)
+        t = re.sub(r'(\+|\.|\(|\[|\s)(\d{4}|s\d+e\d+|s\d+|season\s\d|3d)(\.|\)|\]|\s|)(.+|)', '', name)
         t = cleantitle.get(t)
         titles = [cleantitle.get(title)]
 
