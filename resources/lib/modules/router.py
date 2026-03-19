@@ -423,11 +423,11 @@ def routing(_argv):
         from resources.lib.modules import sources
         sources.sources().play(title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select)
 
-    elif action == 'playUnfiltered':
+    elif action == 'playCustom':
         from resources.lib.modules import control
         control.busy()
         from resources.lib.modules import sources
-        sources.sources().play(title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select, unfiltered=True)
+        sources.sources().play(title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select, custom=True)
 
     elif action == 'addItem':
         from resources.lib.modules import sources

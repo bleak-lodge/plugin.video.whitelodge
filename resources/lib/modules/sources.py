@@ -30,9 +30,12 @@ class sources:
         self.content = None
 
 
-    def play(self, title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select):
+    def play(self, title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select, custom=False):
         try:
             self.content = 'episode' if tvshowtitle else 'movie'
+
+            if custom:
+                title, tvshowtitle, year, season, episode = self.customScrape(title, tvshowtitle, year, season, episode)
 
             url = None
 
@@ -238,7 +241,7 @@ class sources:
 
             header = control.addonInfo('name') + ': Resolving...'
 
-            progressDialog = control.progressDialog if control.setting('progress.dialog') == '0' else control.progressDialogBG
+            progressDialog = control.progressDialogBG
             progressDialog.create(header, '')
             #progressDialog.update(0)
 
@@ -316,10 +319,21 @@ class sources:
             pass
 
 
+    def customScrape(self, title, tvshowtitle, year, season, episode):
+        if self.content == 'movie':
+            title = control.getKeyboard(title, 'Title:')
+            year = control.getKeyboard(year, 'Year:')
+        else:
+            tvshowtitle = control.getKeyboard(tvshowtitle, 'TV Show Title:')
+            season = control.getKeyboard(season, 'Season number:')
+            episode = control.getKeyboard(episode, 'Episode number:')
+
+        return title, tvshowtitle, year, season, episode
+
+
     def getSources(self, title, year, imdb, tmdb, season, episode, tvshowtitle, premiered):
-        progressDialog = control.progressDialog if control.setting('progress.dialog') == '0' else control.progressDialogBG
-        if progressDialog == control.progressDialogBG:
-            control.idle()
+        progressDialog = control.progressDialogBG
+        control.idle()
 
         progressDialog.create(self.module_name)
         #progressDialog.update(0)
@@ -742,7 +756,7 @@ class sources:
 
             header = control.addonInfo('name') + ': Resolving...'
 
-            progressDialog = control.progressDialog if control.setting('progress.dialog') == '0' else control.progressDialogBG
+            progressDialog = control.progressDialogBG
             progressDialog.create(header, '')
             #progressDialog.update(0)
 
@@ -827,7 +841,7 @@ class sources:
         try:
             control.sleep(1000)
 
-            progressDialog = control.progressDialog if control.setting('progress.dialog') == '0' else control.progressDialogBG
+            progressDialog = control.progressDialogBG
             progressDialog.create(header, '')
             #progressDialog.update(0)
         except:

@@ -512,6 +512,8 @@ class channels:
 
                 cm.append((playbackMenu, 'RunPlugin(%s?action=alterSources&url=%s&meta=%s)' % (sysaddon, sysurl, sysmeta)))
 
+                cm.append(('[I]Custom Scrape[/I]', 'RunPlugin(%s?action=playCustom&title=%s&year=%s&imdb=%s&meta=%s&t=%s)' % (sysaddon, systitle, year, imdb, sysmeta, self.systime)))
+
                 cm.append((clearProviders, 'RunPlugin(%s?action=clearCacheProviders)' % sysaddon))
 
                 if kodiVersion < 17:

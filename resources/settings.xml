@@ -49,7 +49,6 @@
     <category label="32338">
         <setting id="hosts.mode" type="enum" label="32331" lvalues="32332|32333|32334" default="1" />
         <setting id="source.list.meta" type="bool" label="32112" default="false" visible="eq(-1,1)" />
-        <setting id="progress.dialog" type="enum" label="32335" lvalues="32336|32337" default="0" />
         <setting id="scrapers.timeout.1" type="slider" label="32312" default="40" range="10,60" option="int" />
         <setting id="linesplit" type="enum" label="32628" lvalues="32629|32630" default="0" />
         <setting id="official.identify" type="select" label="32632" lvalues="32201|32202|32203|32204|32205|32206|32207|32208|32209|32210|32211|32212|32213|32214|32215|32216|32217|32218|32219|32220|32221" default="15" enable="!eq(-1,2)"/>
