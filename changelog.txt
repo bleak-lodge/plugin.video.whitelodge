@@ -1,3 +1,7 @@
+[B][COLOR gold]v1.06.27[/COLOR][/B]
+- Reworked playback through library
+- Code reduction
+
 [B][COLOR gold]v1.06.26[/COLOR][/B]
 - Fixed issue with playback related to progress dialog
 - Added custom scrape parameters support (available via context menu)
