@@ -314,7 +314,7 @@ class seasons:
                 else:
                     landscape = fanart
 
-                imdb, tvdb, tmdb, year, season = i['imdb'], i.get('tvdb'), i['tmdb'], i['year'], i['season']
+                imdb, tvdb, tmdb, year, season = i.get('imdb', ''), i.get('tvdb', ''), i['tmdb'], i['year'], i['season']
 
                 ep_meta = {'poster': poster, 'fanart': fanart, 'banner': banner, 'clearlogo': i.get('clearlogo', '0'), 'clearart': i.get('clearart', '0'), 'landscape': landscape, 'status': i.get('status', '0'), 'studio': i.get('studio', '0')}
 
@@ -333,7 +333,7 @@ class seasons:
                     meta.update({'year': season_year})
                 except:
                     season_year = year
-                meta.update({'mediatype': 'season', 'title': label, 'imdbnumber': imdb, 'code': tmdb, 'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape})
+                meta.update({'mediatype': 'season', 'season': season, 'title': label, 'imdbnumber': imdb, 'code': tmdb, 'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape})
 
                 try:
                     season_indicators = [i for i in indicators[0][2] if i[0] == int(season)]
@@ -1513,7 +1513,7 @@ class episodes:
                 except:
                     pass
 
-                imdb, tvdb, tmdb, year, season, episode = i['imdb'], i.get('tvdb'), i['tmdb'], i['year'], i['season'], i['episode']
+                imdb, tvdb, tmdb, year, season, episode = i.get('imdb', ''), i.get('tvdb', ''), i['tmdb'], i['year'], i['season'], i['episode']
 
                 poster = i['poster'] if 'poster' in i and not i['poster'] == '0' else addonPoster
                 fanart = i['fanart'] if 'fanart' in i and not i['fanart'] == '0' else addonFanart
@@ -1543,7 +1543,7 @@ class episodes:
                     episode_year = year
                 offset = bookmarks.get('episode', imdb, season, episode, True)
 
-                meta.update({'mediatype': 'episode', 'title': i['label'], 'offset': offset, 'imdbnumber': imdb, 'code': tmdb,
+                meta.update({'mediatype': 'episode', 'season': season, 'title': i['label'], 'offset': offset, 'imdbnumber': imdb, 'code': tmdb,
                              'poster': poster, 'fanart': fanart, 'banner': banner, 'landscape': landscape})
 
                 sysmeta = urllib_parse.quote_plus(json.dumps(meta))

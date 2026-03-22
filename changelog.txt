@@ -1,3 +1,8 @@
+[B][COLOR gold]v1.06.28[/COLOR][/B]
+- Fixed special seasons not populating
+- Set some fallback values so items still appear on list
+  even if some info is missing
+
 [B][COLOR gold]v1.06.27[/COLOR][/B]
 - Reworked playback through library
 - Code reduction

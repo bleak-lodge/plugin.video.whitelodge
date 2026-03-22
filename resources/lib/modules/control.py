@@ -311,7 +311,7 @@ def apiLanguage(ret_name=None):
     lang['tmdb'] = name if name in tmdb else 'en'
 
     if ret_name:
-        lang['trakt'] = [i[0] for i in six.iteritems(langDict)if i[1] == lang['trakt']][0]
+        lang['trakt'] = [i[0] for i in six.iteritems(langDict) if i[1] == lang['trakt']][0]
         lang['tvdb'] = [i[0] for i in six.iteritems(langDict) if i[1] == lang['tvdb']][0]
         lang['youtube'] = [i[0] for i in six.iteritems(langDict) if i[1] == lang['youtube']][0]
         lang['tmdb'] = [i[0] for i in six.iteritems(langDict) if i[1] == lang['tmdb']][0]
@@ -395,8 +395,8 @@ def metadataClean(metadata): # Filter out non-existing/custom keys. Otherise the
 
 
 def processListItem(item, meta):
-    mediatype = meta['mediatype']
     if getKodiVersion() > 19:
+        mediatype = meta['mediatype']
         vtag = item.getVideoInfoTag()
         vtag.setMediaType(mediatype)
         vtag.setTitle(meta['title'])
@@ -415,8 +415,8 @@ def processListItem(item, meta):
         vtag.setDirectors(meta.get('director', '').split(', '))
         vtag.setWriters(meta.get('writer', '').split(', '))
         vtag.setPremiered(meta.get('premiered'))
-        vtag.setIMDBNumber(meta['imdb'])
-        vtag.setUniqueIDs({'imdb': meta['imdb'], 'tmdb': meta.get('tmdb', '')})
+        vtag.setIMDBNumber(meta.get('imdb', ''))
+        vtag.setUniqueIDs({'imdb': meta.get('imdb', ''), 'tmdb': meta.get('tmdb', '')})
 
         if mediatype in ['tvshow', 'season', 'episode']:
             vtag.setTvShowTitle(meta['tvshowtitle'])
