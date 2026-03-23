@@ -96,8 +96,7 @@ class navigator:
             self.addDirectoryItem(32032, 'movies&url=traktcollection', 'trakt.png', 'DefaultMovies.png', queue=True, context=(32551, 'moviesToLibrary&url=traktcollection'))
             self.addDirectoryItem(32035, 'movies&url=traktrecommendations', 'trakt.png', 'DefaultMovies.png', queue=True)
 
-        if imdbCredentials == True or traktCredentials == True:
-            self.addDirectoryItem(32039, 'movieUserlists', 'userlists.png', 'DefaultMovies.png')
+        self.addDirectoryItem(32039, 'movieUserlists', 'userlists.png', 'DefaultMovies.png')
 
         if traktCredentials == False:
             self.addDirectoryItem(32094, 'movies&url=local_ondeck', 'iconT.png', 'DefaultMovies.png', queue=True)
@@ -168,8 +167,7 @@ class navigator:
             self.addDirectoryItem(32035, 'tvshows&url=traktrecommendations', 'trakt.png', 'DefaultTVShows.png')
             self.addDirectoryItem(32041, 'episodeUserlists', 'userlists.png', 'DefaultTVShows.png')
 
-        if imdbCredentials == True or traktCredentials == True:
-            self.addDirectoryItem(32040, 'tvUserlists', 'userlists.png', 'DefaultTVShows.png')
+        self.addDirectoryItem(32040, 'tvUserlists', 'userlists.png', 'DefaultTVShows.png')
 
         if traktCredentials == False:
             self.addDirectoryItem(32094, 'calendar&url=local_ondeck', 'iconT.png', 'DefaultRecentlyAddedEpisodes.png', queue=True)

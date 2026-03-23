@@ -403,7 +403,7 @@ def processListItem(item, meta):
         vtag.setOriginalTitle(meta.get('originaltitle', meta['title']))
         vtag.setPlot(meta.get('plot'))
         vtag.setPlotOutline(meta.get('plot'))
-        vtag.setYear(int(meta['year']))
+        vtag.setYear(int(meta.get('year', '0 ')))
         vtag.setRating(float(meta.get('rating', '0')), int(meta.get('votes', '0').replace(',', '')), meta.get('list_prov', 'imdb'))
         vtag.setMpaa(meta.get('mpaa'))
         vtag.setDuration(int(meta.get('duration', 6000)))

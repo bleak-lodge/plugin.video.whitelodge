@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import time
+import time, re
 
 try: from sqlite3 import dbapi2 as database, IntegrityError
 except: from pysqlite2 import dbapi2 as database, IntegrityError
 
 from resources.lib.modules import control
+from resources.lib.modules import cleantitle
+from resources.lib.modules import imdb_api
 from resources.lib.modules import log_utils
 
 
@@ -57,4 +59,46 @@ def check_list(content):
     except:
         return []
 
+
+def add_imdb_list():
+    list_id = control.getKeyboard('ls', 'List ID ( lsXXXXXXX )')
+    if not list_id or list_id == 'ls' or len(re.sub('[^0-9]+', '', list_id)) < 6:
+        return control.infoDialog('Invalid List ID', sound=True, icon='ERROR')
+    list_id = 'ls%s' % re.sub('[^0-9]+', '', list_id)
+    params = {'list': list_id, 'titleType': 'movie,tvMovie,short,video,tvSeries,tvMiniSeries', 'sort': 'POPULARITY,ASC'}
+    try:
+        lst = imdb_api.get_customlist(1, '', params, True)
+        if not lst['titleListItemSearch']:
+            return control.infoDialog('Could not populate list %s' % list_id, sound=True, icon='ERROR')
+        list_name = cleantitle.normalize(lst['name']['originalText'])
+        author = cleantitle.normalize(lst['author']['username']['text'])
+    except:
+        return control.infoDialog('Could not populate list %s' % list_id, sound=True, icon='ERROR')
+
+    try:
+        control.makeFile(control.dataPath)
+        dbcon = database.connect(control.mylistsFile)
+        dbcur = dbcon.cursor()
+        dbcur.execute("CREATE TABLE IF NOT EXISTS imdbLists (""id TEXT, ""name TEXT, ""author TEXT, ""UNIQUE(id)"");")
+        dbcur.execute("INSERT INTO imdbLists Values (?, ?, ?)", (list_id, list_name, author))
+        dbcon.commit()
+        dbcon.close()
+        control.refresh()
+        control.infoDialog('List added!', heading=list_name, sound=True)
+    except IntegrityError:
+        control.infoDialog('List is already added', heading=list_name, sound=True, icon='INFO')
+    except Exception:
+        control.infoDialog('Error adding list', heading=list_name, sound=True, icon='ERROR')
+        log_utils.log('my_list_error', 1)
+
+
+def del_imdb_list(list_id):
+    control.makeFile(control.dataPath)
+    dbcon = database.connect(control.mylistsFile)
+    dbcur = dbcon.cursor()
+    dbcur.execute("DELETE FROM imdbLists WHERE id = '%s'" % list_id)
+    dbcon.commit()
+    dbcon.close()
+    control.refresh()
+    control.infoDialog('List %s removed' % list_id, sound=True, icon='INFO')
 
