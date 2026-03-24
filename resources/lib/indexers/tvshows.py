@@ -256,7 +256,7 @@ class tvshows:
     def search_new(self, code=''):
         control.idle()
 
-        q = control.getKeyboard(heading=control.lang(32010))
+        q = control.inputDialog(heading=control.lang(32010))
         if not q: return
         q = q.lower()
 
@@ -950,7 +950,7 @@ class tvshows:
 
 
     def userlists(self):
-        navigator.navigator().addDirectoryItem(32158, 'addIMDbList', 'userlists.png', 'DefaultTVShows.png')
+        navigator.navigator().addDirectoryItem(32158, 'addIMDbList', 'userlists.png', 'DefaultTVShows.png', isFolder=False)
 
         userlists = []
 

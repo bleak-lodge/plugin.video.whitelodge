@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.06.30[/COLOR][/B]
+- Minor fixes
+
 [B][COLOR gold]v1.06.29[/COLOR][/B]
 - Added an option under My Lists to insert a new IMDb user list
   [I]INFO:[/I] A valid list id must be entered (the [I]lsXXXXXXX[/I] part of the list url).

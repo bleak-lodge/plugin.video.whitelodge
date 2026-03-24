@@ -103,7 +103,7 @@ class navigator:
             self.addDirectoryItem(32036, 'movies&url=local_history', 'iconT.png', 'DefaultMovies.png', queue=True)
             self.addDirectoryItem(32527, 'movies&url=local_list', 'iconT.png', 'DefaultMovies.png', queue=True)
 
-        self.endDirectory()
+        self.endDirectory(cache=False)
 
 
     def tvshows(self):
@@ -174,7 +174,7 @@ class navigator:
             self.addDirectoryItem(32036, 'calendar&url=local_history', 'iconT.png', 'DefaultTVShows.png', queue=True)
             self.addDirectoryItem(32527, 'tvshows&url=local_list', 'iconT.png', 'DefaultTVShows.png')
 
-        self.endDirectory()
+        self.endDirectory(cache=False)
 
 
     def tools(self):

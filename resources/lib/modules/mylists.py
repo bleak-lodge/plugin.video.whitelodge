@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time, re
+import time
 
 try: from sqlite3 import dbapi2 as database, IntegrityError
 except: from pysqlite2 import dbapi2 as database, IntegrityError
@@ -61,10 +61,10 @@ def check_list(content):
 
 
 def add_imdb_list():
-    list_id = control.getKeyboard('ls', 'List ID ( lsXXXXXXX )')
-    if not list_id or list_id == 'ls' or len(re.sub('[^0-9]+', '', list_id)) < 6:
+    list_id = control.inputDialog(heading='List ID ( ls[I]XXXXXXX[/I] )', kb='num')
+    if not list_id or len(list_id) < 6:
         return control.infoDialog('Invalid List ID', sound=True, icon='ERROR')
-    list_id = 'ls%s' % re.sub('[^0-9]+', '', list_id)
+    list_id = 'ls%s' %  list_id
     params = {'list': list_id, 'titleType': 'movie,tvMovie,short,video,tvSeries,tvMiniSeries', 'sort': 'POPULARITY,ASC'}
     try:
         lst = imdb_api.get_customlist(1, '', params, True)
@@ -82,9 +82,8 @@ def add_imdb_list():
         dbcur.execute("CREATE TABLE IF NOT EXISTS imdbLists (""id TEXT, ""name TEXT, ""author TEXT, ""UNIQUE(id)"");")
         dbcur.execute("INSERT INTO imdbLists Values (?, ?, ?)", (list_id, list_name, author))
         dbcon.commit()
-        dbcon.close()
-        control.refresh()
         control.infoDialog('List added!', heading=list_name, sound=True)
+        control.refresh()
     except IntegrityError:
         control.infoDialog('List is already added', heading=list_name, sound=True, icon='INFO')
     except Exception:
@@ -98,7 +97,6 @@ def del_imdb_list(list_id):
     dbcur = dbcon.cursor()
     dbcur.execute("DELETE FROM imdbLists WHERE id = '%s'" % list_id)
     dbcon.commit()
-    dbcon.close()
     control.refresh()
     control.infoDialog('List %s removed' % list_id, sound=True, icon='INFO')
 

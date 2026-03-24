@@ -217,7 +217,7 @@ class seasons:
 
         for s_item in seasons:
             try:
-                #log_utils.log(repr(s_item))
+                #log_utils.log(s_item)
                 season = str(s_item['season_number'])
 
                 total_episodes = str(s_item.get('episode_count', '0'))

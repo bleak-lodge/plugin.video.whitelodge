@@ -256,6 +256,21 @@ def selectDialog(list, heading=addonInfo('name'), useDetails=False):
         return dialog.select(heading, list)
 
 
+def inputDialog(default='', heading=addonInfo('name'), kb='alpha', option=0, autoclose=0):
+    types = {'alpha': xbmcgui.INPUT_ALPHANUM, 'num': xbmcgui.INPUT_NUMERIC, 'date': xbmcgui.INPUT_DATE,
+             'time': xbmcgui.INPUT_TIME, 'ip': xbmcgui.INPUT_IPADDRESS, 'pw': xbmcgui.INPUT_PASSWORD}
+    _type = types[kb]
+    return dialog.input(heading, default, _type, option, autoclose)
+
+
+def getKeyboard(default='', heading='', hidden=False):
+    k = keyboard(default, heading, hidden)
+    k.doModal()
+    if k.isConfirmed():
+        return six.ensure_text(k.getText())
+    return default
+
+
 def textViewer(file=None, text='', heading=addonInfo('name'), monofont=True):
     sleep(200)
     if file:
@@ -270,14 +285,6 @@ def textViewer(file=None, text='', heading=addonInfo('name'), monofont=True):
     head = '[COLOR gold][I]%s[/I][/COLOR]' % six.ensure_str(heading, errors='replace')
     if getKodiVersion() >= 18: return dialog.textviewer(head, txt, monofont)
     else: return dialog.textviewer(head, txt)
-
-
-def getKeyboard(default='', heading='', hidden=False):
-    k = keyboard(default, heading, hidden)
-    k.doModal()
-    if k.isConfirmed():
-        return six.ensure_text(k.getText())
-    return default
 
 
 def apiLanguage(ret_name=None):
