@@ -426,13 +426,15 @@ def routing(_argv):
         trakt.authTrakt()
 
     elif action == 'play':
-        from resources.lib.modules import control, sources
+        from resources.lib.modules import control
         control.busy()
+        from resources.lib.modules import sources
         sources.sources().play(title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select)
 
     elif action == 'playCustom':
-        from resources.lib.modules import control, sources
+        from resources.lib.modules import control
         control.busy()
+        from resources.lib.modules import sources
         sources.sources().play(title, year, imdb, tmdb, season, episode, tvshowtitle, premiered, meta, select, custom=True)
 
     elif action == 'addItem':
