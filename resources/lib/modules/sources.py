@@ -342,12 +342,12 @@ class sources:
 
     def customScrape(self, title, tvshowtitle, year, season, episode):
         if self.content == 'movie':
-            title = control.inputDialog(title, 'Title:')
-            year = control.inputDialog(year, 'Year:')
+            title = control.inputDialog('Title:', title)
+            year = control.inputDialog('Year:', year, kb='num')
         else:
-            tvshowtitle = control.inputDialog(tvshowtitle, 'TV Show Title:')
-            season = control.inputDialog(season, 'Season number:', kb='num')
-            episode = control.inputDialog(episode, 'Episode number:', kb='num')
+            tvshowtitle = control.inputDialog('TV Show Title:', tvshowtitle)
+            season = control.inputDialog('Season number:', season, kb='num')
+            episode = control.inputDialog('Episode number:', episode, kb='num')
 
         return title, tvshowtitle, year, season, episode
 
