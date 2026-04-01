@@ -329,6 +329,8 @@ class tvshows:
 
 
     def keywords(self):
+        navigator.navigator().addDirectoryItem('[I]Keyword Search...[/I]', 'tvKwSearch', 'genres/mystery.png', 'DefaultAddonsSearch.png')
+
         url = 'https://www.imdb.com/search/keyword/?s=kw'
         r = cache.get(client.request, 168, url)
         rows = client.parseDOM(r, 'a', attrs={'class': 'ipc-chip ipc-chip--on-base-accent2'})
@@ -373,6 +375,14 @@ class tvshows:
             )
         self.addDirectory(self.list)
         return self.list
+
+
+    def keyword_search(self):
+        kw = control.inputDialog(control.lang(32160))
+        if not kw: return
+        kw = ','.join([k.strip().lower().replace(' ', '-') for k in kw.split(',')])
+        url = self.imdb_keyword_link % kw
+        self.get(url)
 
 
     def genres(self):
