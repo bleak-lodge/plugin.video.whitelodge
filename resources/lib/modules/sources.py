@@ -144,7 +144,8 @@ class sources:
 
         def sourcesDirMeta(metadata):
             if not metadata: return metadata
-            allowed = ['icon', 'poster', 'fanart', 'thumb', 'clearlogo', 'clearart', 'discart', 'title', 'year', 'tvshowtitle', 'season', 'episode', 'rating', 'plot', 'trailer', 'mediatype']
+            allowed = ['icon', 'poster', 'fanart', 'thumb', 'clearlogo', 'clearart', 'discart', 'title', 'year',
+                        'tvshowtitle', 'season', 'episode', 'rating', 'votes', 'plot', 'trailer', 'mediatype']
             return {k: v for k, v in six.iteritems(metadata) if k in allowed}
 
         control.playlist.clear()
@@ -193,9 +194,9 @@ class sources:
                         vtag.setMediaType('video')
                         vtag.setTitle(meta['title'])
                         vtag.setYear(int(meta['year']))
-                        vtag.setRating(float(meta.get('rating', 0)))
+                        vtag.setRating(float(meta.get('rating', '0')), int(meta.get('votes', '0').replace(',', '')))
                         vtag.setPlot(meta.get('plot'))
-                        vtag.setTrailer(meta['trailer'])
+                        vtag.setTrailer(meta.get('trailer'))
                         if 'tvshowtitle' in meta:
                             vtag.setTvShowTitle(meta['tvshowtitle'])
                             vtag.setSeason(int(meta['season']))

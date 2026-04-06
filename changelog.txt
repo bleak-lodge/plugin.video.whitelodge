@@ -1,3 +1,6 @@
+[B][COLOR gold]v1.06.34[/COLOR][/B]
+- Minor fixes
+
 [B][COLOR gold]v1.06.33[/COLOR][/B]
 - Various fixes
 
