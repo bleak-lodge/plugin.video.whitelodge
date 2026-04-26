@@ -412,7 +412,7 @@ class sources:
         start_time = time.time()
         end_time = start_time + timeout
 
-        string3 = control.lang(32406)
+        remaining_prov = control.lang(32406)
 
         lib_source = service_source = 0
 
@@ -449,8 +449,8 @@ class sources:
                 try:
                     info = [sourcelabelDict[x.getName()] for x in threads if x.is_alive() == True]
                     line1 = pdiag_format % (lib_source_label, service_source_label)
-                    if len(info) > 6: line3 = string3 % (str(len(info)))
-                    elif len(info) > 0: line3 = string3 % (', '.join(info))
+                    if len(info) > 6: line3 = remaining_prov % (str(len(info)))
+                    elif len(info) > 0: line3 = remaining_prov % (', '.join(info))
                     else: break
                     current_time = time.time()
                     current_progress = current_time - start_time

@@ -1,3 +1,7 @@
+[B][COLOR gold]v1.06.35[/COLOR][/B]
+- Prevent unaired episodes from appearing in Trakt progress lists
+- Code reduction
+
 [B][COLOR gold]v1.06.34[/COLOR][/B]
 - Minor fixes
 
