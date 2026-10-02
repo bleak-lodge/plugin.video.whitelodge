@@ -157,9 +157,17 @@ class source:
                 dnp = [o for o in offers if o['package']['packageId'] in [337, 390]]
                 if dnp:
                     try:
-                        disney_id = dnp[0]['standardWebURL']
-                        disney_id = disney_id.rstrip('/').split('/')[-1]
-                        streams.append(('disney+', 'plugin://slyguy.disney.plus/?_=play&_play=1&content_id=' + disney_id))
+                        if content == 'movies':
+                            disney_id = dnp[0]['standardWebURL']
+                            disney_id = disney_id.split('?')[0].rstrip('/').split('/')[-1]
+                        else:
+                            disney_id = self.get_dnp_ep_id(dnp[0])
+                        if disney_id:
+                            if content == 'movies' and not disney_id.startswith('entity-'):
+                                uri = 'plugin://slyguy.disney.plus/?_=play&_play=1&content_id=' + disney_id
+                            else:
+                                uri = 'plugin://slyguy.disney.plus/?_=play&_play=1&deeplink_id=' + disney_id
+                            streams.append(('disney+', uri))
                     except:
                         pass
 
@@ -338,6 +346,22 @@ class source:
         except:
             log_utils.log('get_crk_ep_id fail', 1)
             return
+
+
+    def get_dnp_ep_id(self, offer):
+        for key in ('deeplinkAndroid', 'deeplinkRoku', 'standardWebURL'):
+            try:
+                url = offer.get(key)
+                if not url:
+                    continue
+                part = url.split('#')[0].split('?')[0].rstrip('/').split('/')[-1]
+                if not part:
+                    continue
+                return part
+            except:
+                continue
+        log_utils.log('get_dnp_ep_id fail', 1)
+        return
 
 
     def get_nf_ep_id(self, imdb, season, episode):

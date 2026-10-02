@@ -118,32 +118,12 @@ class movies:
         self.imdb_interests_link = 'https://www.api.imdb.com/?query=advanced_search&params=titleType:movie,tvMovie,short,video|interest:%s|sort:POPULARITY,ASC&page=1&after='
 
         self.imdb_customlist_link = 'https://www.api.imdb.com/?query=get_customlist&params=list:%s|titleType:movie,tvMovie,short,video|sort:%s&page=1&after='
-
         self.imdb_related_link = 'https://www.api.imdb.com/?query=more_like_this&params=imdb:%s&page=1&after='
+
+        self.imdb_userlists_link = 'https://www.api.imdb.com/?query=get_userlists&params=id:ur%s' % self.imdb_user
+        self.imdb_watchlist_link = 'https://www.api.imdb.com/?query=get_watchlist_id&params=id:ur%s' % self.imdb_user
         #####
 
-        self.imdblists_link = 'https://www.imdb.com/user/ur%s/lists/?type=titles&visibility=public' % self.imdb_user
-        self.imdb_watchlist_link = 'https://www.api.imdb.com/user/ur%s/watchlist' % self.imdb_user
-
-        ##### Old links for site scraping #####
-        # self.genre_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=%s&release_date=,date[0]&sort=moviemeter,asc&count=%s'% ('%s', self.items_per_page)
-        # self.year_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=%s,%s&sort=moviemeter,asc&count=%s'% ('%s', '%s', self.items_per_page)
-        # self.language_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=,date[0]&sort=moviemeter,asc&primary_language=%s&count=%s'% ('%s', self.items_per_page)
-        # self.certification_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&certificates=US:%s&release_date=,date[0]&sort=moviemeter,asc&count=%s' % ('%s', self.items_per_page)
-        # self.keyword_link = 'https://www.imdb.com/search/title/?title_type=feature,short,tv_movie&release_date=,date[0]&sort=moviemeter,asc&keywords=%s&count=%s' % ('%s', self.items_per_page)
-
-        # self.popular_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=,date[0]&sort=moviemeter,asc&groups=top_1000&count=%s' % self.items_per_page
-        # self.featured_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=date[365],date[10]&sort=moviemeter,asc&count=%s' % self.items_per_page
-        # self.rating_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&genres=!documentary&release_date=,date[0]&sort=user_rating,desc&num_votes=10000,&count=%s' % self.items_per_page
-        # self.views_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=num_votes,desc&count=%s' % self.items_per_page
-        # self.theaters_link = 'https://www.imdb.com/search/title/?title_type=feature&release_date=date[120],date[0]&sort=moviemeter,asc&count=%s' % self.items_per_page
-        # self.boxoffice_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=boxoffice_gross_us,desc&count=%s' % self.items_per_page
-        # self.added_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&release_date=%s,%s&sort=release_date,desc&num_votes=500,&languages=en&count=%s' % (self.year_date, self.today_date, self.items_per_page)
-        # self.oscars_link = 'https://www.imdb.com/search/title/?title_type=feature,tv_movie&sort=year,desc&groups=best_picture_winner&count=%s' % self.items_per_page
-
-        # self.imdblist_link = 'https://www.imdb.com/list/%s/?sort=%s&title_type=feature,short,tv_movie,video&start=0' % ('%s', self.imdb_sort().lower().replace('title_regional', 'alpha'))
-        # self.imdbwatchlist_link = 'https://www.imdb.com/user/ur%s/watchlist/?sort=%s&title_type=feature,short,tv_movie,video&start=0' % (self.imdb_user, self.imdb_sort().lower().replace('title_regional', 'alpha'))
-        #####
 
         ## Trakt ##
         self.trending_link = 'https://api.trakt.tv/movies/trending?limit=%s&page=1' % self.items_per_page
@@ -978,7 +958,7 @@ class movies:
 
         try:
             if self.imdb_user == '': raise Exception()
-            userlists += cache.get(self.imdb_user_list, 24, self.imdblists_link)
+            userlists += cache.get(self.imdb_user_list, 24, self.imdb_userlists_link)
         except:
             pass
 
@@ -1144,24 +1124,9 @@ class movies:
 
 
     def imdb_graphql(self, url):
-
-        def watchlist_id(link):
-            headers = {
-                'User-Agent': client.agent(),
-                'Referer': 'https://www.imdb.com/',
-                'Origin': 'https://www.imdb.com',
-                'Accept-Language': 'en-US'
-            }
-            self.session.headers.update(headers)
-            r = self.session.get(link, timeout=10).text
-            r = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', r)[0]
-            r = utils.json_loads_as_str(r)
-            r = r['props']['pageProps']['aboveTheFoldData']['listId']
-            return r
-
         try:
             if url == self.imdb_watchlist_link:
-                wl_id = cache.get(watchlist_id, 7200, url.replace('.api', ''))
+                wl_id = cache.get(imdb_api.get_watchlist_id, 7200, 'ur%s' % self.imdb_user)
                 url = self.imdb_customlist_link % (wl_id, self.imdb_sort())
 
             first = int(self.items_per_page)
@@ -1223,188 +1188,16 @@ class movies:
         return self.list
 
 
-    def imdb_list(self, url): # for site scraping - not used currently
-        headers = {
-            'User-Agent': client.agent(),
-            'Referer': 'https://www.imdb.com/',
-            'Origin': 'https://www.imdb.com',
-            'Accept-Language': 'en-US'
-        }
-        self.session.headers.update(headers)
+    def imdb_user_list(self, url):
+        result = imdb_api.get_userlists('ur%s' % self.imdb_user)
+        #log_utils.log(result)
 
-        try:
-            url = url.split('&ref')[0]
-            for i in re.findall(r'date\[(\d+)\]', url):
-                url = url.replace('date[%s]' % i, (self.datetime - datetime.timedelta(days = int(i))).strftime('%Y-%m-%d'))
-
-            # def imdb_watchlist_id(url):
-                # r = client.request(url)
-                # data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', r)[0]
-                # data = utils.json_loads_as_str(data)
-                # lst = data['props']['pageProps']['aboveTheFoldData']['listId']
-                # return lst
-
-            # if url == self.imdbwatchlist_link:
-                # url = cache.get(imdb_watchlist_id, 8640, url)
-                # url = self.imdblist_link % url
-
-            #log_utils.log('imdb_url: ' + url)
-        except:
-            log_utils.log('imdb_list fail', 1)
-            return self.list
-
-        def imdb_userlist(link):
-            #result = client.request(link)
-            result = self.session.get(link, timeout=10).text
-            #log_utils.log(result)
-            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result)[0]
-            data = utils.json_loads_as_str(data)
-            #log_utils.log(data)
-            if '/list/' in link:
-                data = data['props']['pageProps']['mainColumnData']['list']['titleListItemSearch']['edges']
-            elif '/user/' in link:
-                data = data['props']['pageProps']['mainColumnData']['predefinedList']['titleListItemSearch']['edges']
-            data = [item['listItem'] for item in data if item['listItem']['titleType']['id'] in ['movie', 'tvMovie', 'short', 'video']]
-            return data
-
-        if '/list/' in url or '/user/' in url:
-            try:
-                data = cache.get(imdb_userlist, 24, url.split('&start')[0])
-                if not data: raise Exception()
-            except:
-                return self.list
-
-            try:
-                start = re.findall(r'&start=(\d+)', url)[0]
-                items = data[int(start):(int(start) + int(self.items_per_page))]
-                #log_utils.log(items)
-                if (int(start) + int(self.items_per_page)) >= len(data):
-                    nxt = page = ''
-                else:
-                    nxt = re.sub(r'&start=\d+', '&start=%s' % str(int(start) + int(self.items_per_page)), url)
-                    #log_utils.log('next_url: ' + nxt)
-                    page = (int(start) + int(self.items_per_page)) // int(self.items_per_page)
-            except:
-                #log_utils.log('next_fail', 1)
-                return self.list
-
-        else:
-            count_ = re.findall(r'&count=(\d+)', url)
-            if len(count_) == 1 and int(count_[0]) > 250:
-                url = url.replace('&count=%s' % count_[0], '&count=250')
-
-            try:
-                #result = client.request(url, headers=headers, output='extended')
-                #log_utils.log(result[0])
-                result = self.session.get(url, timeout=10)
-                data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result.text)[0]
-                data = utils.json_loads_as_str(data)
-                #log_utils.log(data)
-                data = data['props']['pageProps']['searchResults']['titleResults']['titleListItems']
-                items = data[-int(self.items_per_page):]
-                #log_utils.log(items)
-            except:
-                return self.list
-
-            try:
-                cur = re.findall(r'&count=(\d+)', url)[0]
-                if int(cur) > len(data) or cur == '250':
-                    items = data[-(len(data) - int(count_[0]) + int(self.items_per_page)):]
-                    raise Exception()
-                nxt = re.sub(r'&count=\d+', '&count=%s' % str(int(cur) + int(self.items_per_page)), result.url)
-                #log_utils.log('next_url: ' + nxt)
-                page = int(cur) // int(self.items_per_page)
-            except:
-                #log_utils.log('next_fail', 1)
-                nxt = page = ''
-
-        #log_utils.log(items)
-
+        items = result['edges']
         for item in items:
             try:
-                if '/list/' in url or '/user/' in url:
-                    try: mpaa = item['certificate']['rating'] or '0'
-                    except: mpaa = '0'
-                    genre = ' / '.join([i['genre']['text'] for i in item['titleGenres']['genres']]) or '0'
-                    title = item['titleText']['text']
-                    try: plot = item['plot']['plotText']['plainText'] or '0'
-                    except: plot = '0'
-                    poster = item['primaryImage']['url']
-                    if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
-                    else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
-                    rating = str(item['ratingsSummary']['aggregateRating']) or '0'
-                    votes = str(item['ratingsSummary']['voteCount']) or '0'
-                    year = str(item['releaseYear']['year']) or '0'
-                    try: premiered = '%d-%02d-%02d' % (item['releaseDate']['year'], item['releaseDate']['month'], item['releaseDate']['day'])
-                    except: premiered = '0'
-                    duration = item.get('runtime', {}).get('seconds', 0)
-                    if duration: duration = str(int(duration // 60))
-                    else: duration = '0'
-                    imdb = item['id']
-                else:
-                    mpaa = item.get('certificate', '0') or '0'
-                    genre = ' / '.join([i for i in item['genres']]) or '0'
-                    title = item['titleText']
-                    plot = item.get('plot') or '0'
-                    poster = item['primaryImage']['url']
-                    if not poster or '/sash/' in poster or '/nopicture/' in poster: poster = '0'
-                    else: poster = re.sub(r'(?:_SX|_SY|_UX|_UY|_CR|_AL|_V)(?:\d+|_).+?\.', '_SX500.', poster)
-                    rating = str(item['ratingSummary']['aggregateRating']) or '0'
-                    votes = str(item['ratingSummary']['voteCount']) or '0'
-                    year = str(item['releaseYear']) or '0'
-                    try: premiered = '%d-%02d-%02d' % (item['releaseDate']['year'], item['releaseDate']['month'], item['releaseDate']['day'])
-                    except: premiered = '0'
-                    duration = item.get('runtime')
-                    if duration: duration = str(int(duration // 60))
-                    else: duration = '0'
-                    imdb = item['titleId']
-
-                self.list.append({'title': title, 'originaltitle': title, 'year': year, 'genre': genre, 'duration': duration, 'rating': rating, 'votes': votes, 'mpaa': mpaa,
-                                  'director': '0', 'plot': plot, 'tagline': '0', 'imdb': imdb, 'imdbnumber': imdb, 'tmdb': '0', 'tvdb': '0', 'poster': poster, 'cast': '0',
-                                  'premiered': premiered, 'mediatype': 'movie', 'list_prov': 'imdb', 'page': page, 'next': nxt})
-            except:
-                log_utils.log('imdb_json_list fail', 1)
-                pass
-
-        return self.list
-
-
-    def imdb_user_list(self, url):
-        headers = {
-            'User-Agent': client.agent(),
-            'Referer': 'https://www.imdb.com/',
-            'Origin': 'https://www.imdb.com',
-            'Accept-Language': 'en-US'
-        }
-        self.session.headers.update(headers)
-        result = self.session.get(url, timeout=10).text
-
-        try:
-            data = re.findall('<script id="__NEXT_DATA__" type="application/json">({.+?})</script>', result)[0]
-            data = utils.json_loads_as_str(data)
-            items = data['props']['pageProps']['mainColumnData']['userListSearch']['edges']
-            for item in items:
-                try:
-                    name = cleantitle.normalize(item['node']['name']['originalText'])
-                    url = self.imdb_customlist_link % (item['node']['id'], self.imdb_sort())
-                    self.list.append({'name': name, 'url': url, 'context': url, 'image': 'imdb.png'})
-                except:
-                    pass
-        except:
-
-            try:
-                items = client.parseDOM(result, 'div', attrs = {'class': 'ipc-metadata-list-summary-item__tc'})
-                for item in items:
-                    try:
-                        name = client.parseDOM(item, 'a')[0]
-                        name = client.replaceHTMLCodes(name)
-                        name = six.ensure_str(name, errors='ignore')
-                        url = client.parseDOM(item, 'a', ret='href')[0]
-                        url = re.findall(r'(ls\d+)/', url)[0]
-                        url = self.imdb_customlist_link % (url, self.imdb_sort())
-                        self.list.append({'name': name, 'url': url, 'context': url, 'image': 'imdb.png'})
-                    except:
-                        pass
+                name = cleantitle.normalize(item['node']['name']['originalText'])
+                url = self.imdb_customlist_link % (item['node']['id'], self.imdb_sort())
+                self.list.append({'name': name, 'url': url, 'context': url, 'image': 'imdb.png'})
             except:
                 pass
 

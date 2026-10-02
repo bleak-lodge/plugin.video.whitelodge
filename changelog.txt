@@ -1,3 +1,9 @@
+[B][COLOR gold]v1.06.39[/COLOR][/B]
+- IMDb user lists are back - entering your IMDb user id in settings
+  will now populate your personal lists in the appropriate sections.
+  Note that if you have manually added your personal lists, you can
+  remove them via context menu, so they won't be duplicated.
+
 [B][COLOR gold]v1.06.38[/COLOR][/B]
 - Added caching to some (now) slow Trakt api methods
 - Utilised failsafes to some weird Trakt responses

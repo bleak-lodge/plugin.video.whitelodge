@@ -41,6 +41,11 @@ def _get_limiter():
     pass
 
 @sleep_and_retry
+@limits(calls=2, period=1)
+def _get_rate_limiter():
+    pass
+
+@sleep_and_retry
 @limits(calls=1, period=1)
 def _post_limiter():
     pass
@@ -59,6 +64,7 @@ def getTrakt(url, post=None, full=False):
         try:
             if not post:
                 _get_limiter()
+                _get_rate_limiter()
                 r = _SESSION.get(url, timeout=30)
             else:
                 _post_limiter()
