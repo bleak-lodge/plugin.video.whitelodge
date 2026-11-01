@@ -1,3 +1,7 @@
+[B][COLOR gold]v1.06.40[/COLOR][/B]
+- Refactored the OpenSubtitles API interaction module
+- Use of stream details info (when provided) for better subtitles matching
+
 [B][COLOR gold]v1.06.39[/COLOR][/B]
 - IMDb user lists are back - entering your IMDb user id in settings
   will now populate your personal lists in the appropriate sections.

@@ -110,23 +110,36 @@ class sources:
             title = self.getTitle(title)
 
             if len(items) > 0:
+                control.window.clearProperty(self.itemProperty)
+                control.window.setProperty(self.itemProperty, json.dumps(items))
 
-                if select == '1' and 'plugin' in control.infoLabel('Container.PluginName'):
-                    control.window.clearProperty(self.itemProperty)
-                    control.window.setProperty(self.itemProperty, json.dumps(items))
+                control.window.clearProperty(self.metaProperty)
+                control.window.setProperty(self.metaProperty, json.dumps(meta))
 
-                    control.window.clearProperty(self.metaProperty)
-                    control.window.setProperty(self.metaProperty, json.dumps(meta))
-
+                if select == '1':
                     control.sleep(200)
+                    if 'plugin' in control.infoLabel('Container.PluginName'):
+                        return control.execute('Container.Update(%s?action=addItem&title=%s)' % (sys.argv[0], urllib_parse.quote_plus(title)))
 
-                    return control.execute('Container.Update(%s?action=addItem&title=%s)' % (sys.argv[0], urllib_parse.quote_plus(title)))
+                    else:
+                        waited = 0
+                        while waited < 15000 and control.condVisibility('System.HasActiveModalDialog'):
+                            control.sleep(100)
+                            waited += 100
+
+                        if waited >= 15000:
+                            log_utils.log('sources view: dialogs still up after 15s, switching anyway')
+
+                        control.sleep(200)
+
+                        path = '%s?action=addItem&title=%s' % (sys.argv[0], urllib_parse.quote_plus(title))
+                        control.execute('ActivateWindow(Videos,%s,return)' % path)
 
                 elif select == '0' or select == '1':
-                    url = self.sourcesDialog(items)
+                    url, name = self.sourcesDialog(items)
 
                 else:
-                    url = self.sourcesDirect(items)
+                    url, name = self.sourcesDirect(items)
 
 
             if url == 'close://' or url == None:
@@ -134,7 +147,7 @@ class sources:
                 return self.errorForSources()
 
             from resources.lib.modules.player import player
-            player().run(title, year, season, episode, imdb, tmdb, url, meta)
+            player().run(title, year, season, episode, imdb, tmdb, url, name, meta)
         except:
             log_utils.log('sources_play_fail', 1)
             pass
@@ -272,6 +285,7 @@ class sources:
             for i in range(len(items)):
                 try:
                     label = re.sub(' {2,}', ' ', str(items[i]['label']))
+                    name = items[i].get('name')
                     try:
                         if progressDialog.iscanceled(): break
                         progressDialog.update(int((100 / float(len(items))) * i), label)
@@ -325,7 +339,7 @@ class sources:
                     control.execute('Dialog.Close(yesnoDialog)')
 
                     from resources.lib.modules.player import player
-                    player().run(title, year, season, episode, imdb, tmdb, self.url, meta)
+                    player().run(title, year, season, episode, imdb, tmdb, self.url, name, meta)
 
                     return self.url
                 except:
@@ -833,14 +847,14 @@ class sources:
 
                     if self.url == None: raise Exception()
 
-                    self.selectedSource = items[i]['label']
+                    name = items[i].get('name', '')
 
                     try: progressDialog.close()
                     except: pass
 
                     control.execute('Dialog.Close(virtualkeyboard)')
                     control.execute('Dialog.Close(yesnoDialog)')
-                    return self.url
+                    return self.url, name
                 except:
                     pass
 
@@ -857,6 +871,7 @@ class sources:
 
     def sourcesDirect(self, items):
         u = None
+        name = None
 
         header = control.addonInfo('name') + ': Resolving...'
 
@@ -881,8 +896,11 @@ class sources:
                 if control.monitor.abortRequested(): return sys.exit()
 
                 url = self.sourcesResolve(items[i])
-                if u == None: u = url
-                if not url == None: break
+                if u == None:
+                    u = url
+                if not url == None:
+                    name = items[i].get('name', '')
+                    break
             except:
                 pass
 
@@ -890,7 +908,7 @@ class sources:
         except: pass
         del progressDialog
 
-        return u
+        return u, name
 
 
     def errorForSources(self):

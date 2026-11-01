@@ -126,7 +126,7 @@ def check_token():
     return _refresh_trakt_token()
 
 def _refresh_trakt_token():
-    oauth_url = 'https://api.trakt.tv/oauth/token'
+    oauth_url = 'https://auth.trakt.tv/oauth/token'
     opost = {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'redirect_uri': REDIRECT_URI, 'grant_type': 'refresh_token', 'refresh_token': control.setting('trakt.refresh')}
 
     for _ in range(3):
@@ -175,6 +175,8 @@ def authTrakt():
     try:
         if getTraktCredentialsInfo() == True:
             if control.yesnoDialog(control.lang(32511) + '[CR]' + control.lang(32512), heading='Trakt'):
+                try: getTrakt('https://auth.trakt.tv/oauth/revoke', {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'token': control.setting('trakt.token')})
+                except: pass
                 control.setSetting(id='trakt.user', value='')
                 control.setSetting(id='trakt.token', value='')
                 control.setSetting(id='trakt.refresh', value='')
@@ -184,7 +186,7 @@ def authTrakt():
                 control.setSetting(id='trakt.authed3', value='')
             raise Exception()
 
-        result = getTrakt('/oauth/device/code', {'client_id': V2_API_KEY})
+        result = getTrakt('https://auth.trakt.tv/oauth/device/code', {'client_id': V2_API_KEY})
         verification_url = control.lang(32513) % result['verification_url']
         user_code = six.ensure_text(control.lang(32514) % result['user_code'])
         expires_in = int(result['expires_in'])
@@ -201,7 +203,7 @@ def authTrakt():
                 if progressDialog.iscanceled(): break
                 time.sleep(1)
                 if not float(i) % interval == 0: raise Exception()
-                r = getTrakt('/oauth/device/token', {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'code': device_code})
+                r = getTrakt('https://auth.trakt.tv/oauth/device/token', {'client_id': V2_API_KEY, 'client_secret': CLIENT_SECRET, 'code': device_code})
                 if 'access_token' in r: break
             except:
                 pass
